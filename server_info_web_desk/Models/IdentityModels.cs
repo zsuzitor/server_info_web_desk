@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
+using server_info_web_desk.Models;
+using server_info_web_desk.Models.Info;
 
 namespace server_info_web_desk.Models
 {
@@ -24,6 +26,9 @@ namespace server_info_web_desk.Models
             : base("DefaultConnection", throwIfV1Schema: false)
         {
         }
+
+        public DbSet<Article> Articles { get; set; }
+        public DbSet<Section> Sections { get; set; }
 
         public static ApplicationDbContext Create()
         {
