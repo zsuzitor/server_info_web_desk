@@ -5,12 +5,23 @@ using Microsoft.AspNet.Identity;
 using Microsoft.AspNet.Identity.EntityFramework;
 using server_info_web_desk.Models;
 using server_info_web_desk.Models.Info;
+using System.Collections.Generic;
 
 namespace server_info_web_desk.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser
     {
+        public bool Open_data_info { get; set; }
+
+        public ICollection<Section> Sections { get; set; }
+        public ICollection<Article> Articles { get; set; }
+
+
+        public ApplicationUser() : base()
+        {
+            Open_data_info = false;
+        }
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
