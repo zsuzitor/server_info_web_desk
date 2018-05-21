@@ -1,19 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
+
 using System.Linq;
+//using MoreLinq;
+
 using System.Web;
 using System.Web.Mvc;
+
 using server_info_web_desk.Models;
 using server_info_web_desk.Models.Info;
+using server_info_web_desk.Models.ViewModel;
+
 using System.IO;
 using Newtonsoft.Json;
 using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity;
 
 //
-using static server_info_web_desk.Models.functions.Functions_project;
-using static server_info_web_desk.Models.functions.Functions_info;
+using static server_info_web_desk.Models.functions.FunctionsProject;
+using static server_info_web_desk.Models.functions.FunctionsInfo;
 using static server_info_web_desk.Models.DataBase.DataBase;
+
 namespace server_info_web_desk.Controllers
 {
 
@@ -25,9 +32,56 @@ namespace server_info_web_desk.Controllers
         [HttpGet]
         public ActionResult Index()
         {
+            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            
+
             return View();
         }
+        [HttpGet]
+        public ActionResult Info_page(string person_id)
+        {
+            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            person_id=person_id ?? check_id;
+            IndexInfoView res = new IndexInfoView();
+            Section first_sec = null;
+            try
+            {
+                //var first_sec_id = db.Sections.AsNoTracking().Where(x1 => x1.UserId == person_id).Min(x1 => x1.Id);
+                //first_sec = db.Sections.AsNoTracking().First(x1 => x1.Id == first_sec_id);
+                first_sec = db.Sections.AsNoTracking().Where(x1 => x1.UserId == person_id).First(x1=>x1.Section_parrentId==null);
+                if (person_id != check_id)
+                {
+                    db.Entry(first_sec).Reference(x1 => x1.User).Load();
+                    if(!first_sec.User.Open_data_info)
+                        return new HttpStatusCodeResult(423);
+                }
+               
+            }
+            catch (Exception ex)
+            {
+                if (!(ex is ArgumentNullException) && !(ex is InvalidOperationException))
+                {
+                    throw ex;
+                }
 
+               
+                    ApplicationUser pers = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+                    first_sec=new Section() { Head="ALL",User= pers };
+                    db.Sections.Add(first_sec);
+                    db.SaveChanges();
+                
+
+            }
+            GetSectionInside(first_sec.Id, res.Sections, res.Articles);
+            //res.Sections.AddRange();
+            res.Sections.Add(first_sec);
+
+
+
+
+            return View();
+        }
+        
         //TODO
         [HttpGet]
         public JsonResult Load_inside_section(int id)
@@ -38,13 +92,15 @@ namespace server_info_web_desk.Controllers
 
 
             var section = db.Sections.AsNoTracking().FirstOrDefault(x1 => x1.Id == id);
-            db.Entry(section).Reference("User").Load();
+            db.Entry(section).Reference(x1=>x1.User).Load();
             if(!section.User.Open_data_info&& section.User.Id != check_id)
             {
                 //TODO обработать ошибку доступа к данным
+                //return new HttpStatusCodeResult(423);//Locked
+                return Json(false, JsonRequestBehavior.AllowGet);
             }
-            db.Entry(section).Reference("Sections").Load();
-            db.Entry(section).Reference("Articles").Load();
+            db.Entry(section).Reference(x1=>x1.Sections).Load();
+            db.Entry(section).Reference(x1=>x1.Articles).Load();
             section.User = null;
             section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null });
 
@@ -69,10 +125,12 @@ namespace server_info_web_desk.Controllers
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
             bool success = true;
-            Section parrent_sec = Check_access_section(check_id, parrent_sec_id,out success);
+            Section parrent_sec = CheckAccessSection(check_id, parrent_sec_id,out success);
             if (!success)
             {
                 //TODO обработать ошибку
+                //return new HttpStatusCodeResult(423);//Locked
+                return Json(false, JsonRequestBehavior.AllowGet);
             }
 
             db.Sections.Add(a);
@@ -95,10 +153,12 @@ namespace server_info_web_desk.Controllers
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             bool success = true;
-            Section parrent_sec = Check_access_section(check_id, parrent_sec_id, out success);
+            Section parrent_sec = CheckAccessSection(check_id, parrent_sec_id, out success);
             if (!success)
             {
                 //TODO обработать ошибку
+                //return new HttpStatusCodeResult(423);//Locked
+                return Json(false, JsonRequestBehavior.AllowGet);
             }
             db.Articles.Add(a);
             db.SaveChanges();
@@ -119,10 +179,12 @@ namespace server_info_web_desk.Controllers
             
             Section section = db.Sections.FirstOrDefault(x1 => x1.Id == a.Id);
             db.Entry(section).Reference(x1 => x1.Section_parrent).Load();
-             Check_access_section(check_id, section.Section_parrent.Id, out success);
+            CheckAccessSection(check_id, section.Section_parrent.Id, out success);
             if (!success)
             {
                 //TODO обработать ошибку
+                //return new HttpStatusCodeResult(423);//Locked
+                return Json(false, JsonRequestBehavior.AllowGet);
             }
             section.Head = a.Head;
             db.SaveChanges();
@@ -139,10 +201,12 @@ namespace server_info_web_desk.Controllers
 
             Article article = db.Articles.FirstOrDefault(x1 => x1.Id == a.Id);
             db.Entry(article).Reference(x1 => x1.Section_parrent).Load();
-            Check_access_section(check_id, article.Section_parrent.Id, out success);
+            CheckAccessSection(check_id, article.Section_parrent.Id, out success);
             if (!success)
             {
                 //TODO обработать ошибку
+                //return new HttpStatusCodeResult(423);//Locked
+                return Json(false, JsonRequestBehavior.AllowGet);
             }
             article.Head = a.Head;
             article.Body= a.Body;
@@ -175,6 +239,32 @@ namespace server_info_web_desk.Controllers
 
             return Json(true, JsonRequestBehavior.AllowGet);
         }
+
+        //TODO
+        [HttpPost]
+        public ActionResult Load_all_data_in_db(string a)
+        {
+            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            ListData data = null;
+            try
+            {
+                data = JsonConvert.DeserializeObject<ListData>(a);
+            }
+            catch {
+                //TODO обработать ошибку
+                //return RedirectToAction("Send_error","Home",new { ret=2, code="Произошла ошибка" });
+                //return StatusCode(418);
+                return new HttpStatusCodeResult(400);//bad request
+            }
+
+            db.Articles.RemoveRange(db.Articles.Where(x1 => x1.UserId == check_id));
+            db.Sections.RemoveRange(db.Sections.Where(x1 => x1.UserId == check_id));
+
+
+            return View();
+        }
+
+
 
 
 

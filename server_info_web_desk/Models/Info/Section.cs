@@ -5,6 +5,8 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
+
+
 namespace server_info_web_desk.Models.Info
 {
     public class Section
@@ -12,12 +14,15 @@ namespace server_info_web_desk.Models.Info
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
         //public int Parrent_id { get; set; }
+
+        [Display(Name = "Название")]
+        [Required(ErrorMessage = "Поле должно быть установлено")]
         public string Head { get; set; }
 
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
 
-        public int Section_parrentId { get; set; }
+        public int? Section_parrentId { get; set; }//для главной секции будет у всех пользователей null
         public Section Section_parrent { get; set; }
 
         public ICollection<Section> Sections { get; set; }
@@ -28,6 +33,7 @@ namespace server_info_web_desk.Models.Info
             Id = 0;
             //Parrent_id = 0;
             Head = "";
+            Section_parrentId = null;
             Articles = new List<Article>();
             Sections = new List<Section>();
             Section_parrent = null;

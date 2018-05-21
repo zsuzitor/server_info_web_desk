@@ -207,10 +207,11 @@
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
     <Compile Include="Models\DataBase\DataBase.cs" />
-    <Compile Include="Models\functions\Functions_info.cs" />
-    <Compile Include="Models\functions\Functions_project.cs" />
+    <Compile Include="Models\functions\FunctionsInfo.cs" />
+    <Compile Include="Models\functions\FunctionsProject.cs" />
     <Compile Include="Models\IdentityModels.cs" />
     <Compile Include="Models\Info\Article.cs" />
+    <Compile Include="Models\Info\ListData.cs" />
     <Compile Include="Models\Info\Section.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModel\IndexInfoView.cs" />
