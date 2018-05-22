@@ -29,6 +29,7 @@ namespace server_info_web_desk.Controllers
     public class InfoController : Controller
     {
         // GET: Info
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult Index()
         {
@@ -37,11 +38,14 @@ namespace server_info_web_desk.Controllers
 
             return View();
         }
+        [AllowAnonymous]
         [HttpGet]
         public ActionResult Info_page(string person_id)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             person_id=person_id ?? check_id;
+            if (person_id == null)
+                return RedirectToAction("Login", "Account");
             IndexInfoView res = new IndexInfoView();
             Section first_sec = null;
             try
@@ -79,10 +83,11 @@ namespace server_info_web_desk.Controllers
 
 
 
-            return View();
+            return View(res);
         }
-        
+
         //TODO
+        [AllowAnonymous]
         [HttpGet]
         public JsonResult Load_inside_section(int id)
         {
@@ -119,6 +124,7 @@ namespace server_info_web_desk.Controllers
 
 
         //TODO
+        [Authorize]
         [HttpPost]
         public JsonResult Add_section(int? parrent_sec_id, [Bind(Include = "Id, Head")] Section a)
         {
@@ -148,6 +154,7 @@ namespace server_info_web_desk.Controllers
         }
 
         //TODO
+        [Authorize]
         [HttpPost]
         public JsonResult Add_article(int? parrent_sec_id, [Bind(Include = "Id, Head, Body")]Article a)
         {
@@ -171,6 +178,7 @@ namespace server_info_web_desk.Controllers
         }
 
         //TODO
+        [Authorize]
         [HttpPost]
         public JsonResult Edit_section([Bind(Include = "Id, Head")]Section a)
         {
@@ -193,6 +201,7 @@ namespace server_info_web_desk.Controllers
         }
 
         //TODO
+        [Authorize]
         [HttpPost]
         public JsonResult Edit_article([Bind(Include = "Id, Head, Body")]Article a)
         {
@@ -218,6 +227,7 @@ namespace server_info_web_desk.Controllers
         }
 
         //TODO
+        [Authorize]
         [HttpPost]
         public JsonResult Delete_section(Section a)
         {
@@ -230,6 +240,7 @@ namespace server_info_web_desk.Controllers
         }
 
         //TODO
+        [Authorize]
         [HttpPost]
         public JsonResult Delete_article(Article a)
         {
@@ -241,6 +252,7 @@ namespace server_info_web_desk.Controllers
         }
 
         //TODO
+        [Authorize]
         [HttpPost]
         public ActionResult Load_all_data_in_db(string a)
         {
@@ -270,6 +282,7 @@ namespace server_info_web_desk.Controllers
 
 
         //TODO
+        [AllowAnonymous]
         [HttpPost]
         public ActionResult Start_search(string src)
         {
@@ -279,11 +292,19 @@ namespace server_info_web_desk.Controllers
             return View();
         }
 
+        [AllowAnonymous]
+        [ChildActionOnly]
+        public ActionResult Main_header()
+        {
+            //var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+
+
+            return PartialView();
+        }
 
 
 
-
-
+        [Authorize]
         [HttpPost]
         public ActionResult Upload_data_file(HttpPostedFileBase upload)
         {

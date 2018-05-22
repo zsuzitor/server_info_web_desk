@@ -15,7 +15,8 @@ namespace server_info_web_desk.Models.functions
         {
             //ListData res = null;
             section.AddRange( db.Sections.AsNoTracking().Where(x1 => x1.Section_parrentId == id_section));
-            article.AddRange(db.Articles.AsNoTracking().Where(x1 => x1.Section_parrentId == id_section).Select(x1=>new Article() { Id=x1.Id, Head=x1.Head }));
+            //article.AddRange(db.Articles.AsNoTracking().Where(x1 => x1.Section_parrentId == id_section).Select(x1=>new{ Id=x1.Id, Head=x1.Head }).ToList().Select(x1=>new Article() { Id = x1.Id, Head = x1.Head }));
+            article.AddRange(db.Articles.AsNoTracking().Where(x1 => x1.Section_parrentId == id_section).ToList().Select(x1=> new Article() { Id=x1.Id, Head=x1.Head }).ToList());
 
 
             return true;

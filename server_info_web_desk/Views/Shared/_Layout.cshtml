@@ -10,11 +10,33 @@
     @Scripts.Render("~/scripts/jquery-3.3.1.js")
     @Scripts.Render("~/scripts/jquery.unobtrusive-ajax.js")
     @Scripts.Render("~/scripts/main_scripts.js")
-
+    @{
+        string controller_name = ViewContext.RequestContext.RouteData.Values["controller"].ToString();
+        string action_name = ViewContext.RequestContext.RouteData.Values["action"].ToString();
+        if (controller_name == "Info")
+        {
+            if (action_name != "Index")
+            {
+                @Scripts.Render("~/scripts/main_info_scripts.js")
+            }
+            @Scripts.Render("~/scripts/index_info_scripts.js")
+            @Styles.Render("~/Content/InfoStyle.css")
+        }
+    }
 
 
 </head>
 <body>
+    @if (controller_name == "info")
+    {
+    @Html.Action("Main_header","Info")
+    }
+    @if (controller_name == "Home")
+    {
+        //@Html.Action("Main_header","Home")
+        <div>HEADER HOME</div>
+    }
+    <hr />
     <div class="">@Html.Partial("_LoginPartial")</div>
         @RenderBody()
         <hr />

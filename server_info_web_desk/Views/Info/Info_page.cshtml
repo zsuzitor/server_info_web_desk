@@ -1,0 +1,53 @@
+﻿@model server_info_web_desk.Models.ViewModel.IndexInfoView
+@{
+    ViewBag.Title = "Info_page";
+}
+
+<h2>Info_page</h2>
+
+
+<div class="main_div">
+    
+    <div class="div_left_column" id="div_left_column_id">
+        <div class="div_for_top_menu" id="div_for_top_menu_id">
+            <div class="top_menu_button top_menu_add_section" title="add section" onclick='add_section()'></div> <!-- добавить секцию -->
+            <div class="top_menu_button top_menu_add_article" title="add article" onclick='add_article()'></div> <!-- добавить статью -->
+            <div class="top_menu_button top_menu_dell_select" title="delete select" onclick='dell_select()'></div> <!-- удалить выбранное -->
+            <div class="top_menu_button top_menu_home_button" title="Home" onclick='home_button_return_left()'>
+                <!-- восстановить меню -->
+                <span class="span_top_menu_home"></span>
+            </div>
+            <div class="top_menu_button top_menu_edit_button" onclick='edit_select()' title="edit select">
+                <!-- редактировать выделенное -->
+                <span class="span_top_menu_edit">&#10000;</span>
+            </div>
+            <div class="top_menu_button top_menu_save_button" onclick='save_server_db()' title="save all changes">
+                <!-- Сохранить все изменения -->
+                <span class="span_top_menu_save">&#9883;</span>
+            </div>
+            <div class="top_menu_button top_menu_fr_load_button" onclick='close_reload_list()' title="close all section">
+                <!-- Закрыть все секции -->
+                <span class="span_top_menu_cl_reload">&#9850;</span>
+            </div>
+        </div>
+        <div class="scroll_top_button" id="scroll_top_button_id" onclick="page_up_function()">
+
+        </div>
+    </div>
+
+    <!-- <div class="div_inline_block div_for_block" id="div_for_block_id"><div class="div_inline_block main_block_left" id="main_block_left_id"></div></div> -->
+
+    <div class="div_inline_block div_for_block" id="div_for_block_id">
+        <div class="div_inline_block main_block_left" id="main_block_left_id">
+            @{
+                //@Healpers.Load_sections(Model.Article, Model.Section)
+            }
+        @Html.HiddenFor(x1=>x1.Sections.First().Id,new {id="id_first_load_section" })
+            @Html.HiddenFor(x1 => x1.Sections.First().Head, new { id = "head_first_load_section" })
+
+        </div><div class="div_inline_block main_block_right" id="main_block_right_id">
+
+        </div>
+    </div>
+
+</div>
