@@ -63,8 +63,8 @@ var x_centre = 0;//относительно всего экрана(от лев�
 var change_x_centre_object = {};
 change_x_centre_object.click_change_x_centre = null;
 
-var mass_section = null;
-var mass_article = null;
+var mass_section = [];
+var mass_article = [];
 var last_click_name = null;
 var mass_section_open = [];
 
@@ -145,12 +145,12 @@ function page_first_start() {
         move_search_div(0);
     
     
-    mass_section.push(function () {
+    mass_section.push((function () {
         var tmp = {};
         tmp.Id = document.getElementById("id_first_load_section").value;
         tmp.Head = document.getElementById("head_first_load_section").value;
         return tmp;
-    });
+    })());
     var left_div = document.getElementById("main_block_left_id");
     var str_res_for_left_ul = load_one_section(mass_section[0].Id);
     left_div.innerHTML = str_add_name_section(mass_section[0].Id) + str_res_for_left_ul;
@@ -235,4 +235,152 @@ function convert_string(str) {
 
 function click_name_section(a) {
     //проверять если есть блоки с parrent id то загружать не надо
+    var need_load = true;
+    for (var i = 0; i < mass_section.length; ++i) {
+        if (mass_section[i].Section_parrentId == a.id) {
+            need_load = false;
+            break;
+        }
+    }
+    if (need_load)
+    for (var i = 0; i < mass_article.length; ++i) {
+        if (mass_article[i].Section_parrentId == a.id) {
+            need_load = false;
+            break;
+        }
+    }
+
+    if (mass_article) {
+        var inp = document.getElementById("id_section_for_load_input");
+        inp.value = a.id.split("_")[4];
+        document.getElementById("id_section_for_load_input_submit").click();
+
+    }
+
+}
+
+function OnComplete_load_inside_section(data) {
+    alert(data);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+//-------------------------------------------------------------
+function show_top_menu() {
+    var top_menu = document.getElementById("div_for_top_menu_id");
+    top_menu.style.left = "0";
+    var ch = document.getElementById("div_settings_bottom_b_ex");
+    ch.innerHTML = "<div class='div_settings_top_b' onclick='hidden_top_menu()'></div>";
+}
+
+
+function hidden_top_menu() {
+    var top_menu = document.getElementById("div_for_top_menu_id");
+    top_menu.style.left = "-70px";
+    var ch = document.getElementById("div_settings_bottom_b_ex");
+    ch.innerHTML = "<div class='div_settings_bottom_b' onclick='show_top_menu()'></div>";
+}
+
+
+function show_left_menu() {
+    var left_div = document.getElementById("main_block_left_id");
+    var setting_div = document.getElementById("div_settings_block_id");
+    if (left_div.style.display == 'none') {
+        left_div.style.display = 'block';
+        change_centre(x_centre);
+        move_search_div(0);
+    }
+    else {
+        change_centre(client_width - setting_div.offsetWidth / 2);
+    }
+}
+
+
+function change_centre(coord) {//координата от левого края  //change_var   
+    var left_div = document.getElementById("main_block_left_id");
+    var setting_div = document.getElementById("div_settings_block_id");
+    var right_div = document.getElementById("main_block_right_id");
+    var left_line_div = document.getElementById("div_left_column_id");
+
+    setting_div.style.left = coord - setting_div.offsetWidth / 2 + 'px';
+    left_div.style.width = coord - left_line_div.offsetWidth - 3 + 'px';
+    right_div.style.width = client_width - coord - 6 + 'px';
+    right_div.style.left = coord - left_line_div.offsetWidth + 3 + 'px';
+}
+
+function hidden_left_menu() {
+    var left_div = document.getElementById("main_block_left_id");
+    var right_div = document.getElementById("main_block_right_id");
+    var left_line_div = document.getElementById("div_left_column_id");
+    var setting_div = document.getElementById("div_settings_block_id");
+    if (left_div.style.display == 'block' || left_div.style.display == '') {
+
+        if (setting_div.getBoundingClientRect().left < x_centre) {
+            change_centre(left_line_div.offsetWidth);
+            left_div.style.display = 'none';
+            move_search_div(300);
+        }
+        else {
+            change_centre(x_centre);
+            if (setting_div < 310)
+                move_search_div(450);
+        }
+    }
+}
+
+
+
+
+
+
+
+
+function show_search_block() {
+    var div = document.getElementById("div_search_id");
+    div.style.width = '300px';
+    var div_img = document.getElementById("div_search_img_id");
+    div_img.style.transform = 'rotateY(180deg)';
+}
+
+
+function hidden_search_block() {
+    var div = document.getElementById("div_search_id");
+    div.style.width = '55px';
+    var div_img = document.getElementById("div_search_img_id");
+    div_img.style.transform = 'rotateY(0deg)';
+}
+
+
+function click_on_centre_settings(flag) {
+    change_x_centre_object.click_change_x_centre = flag;
+    var sett_block = document.getElementById("div_settings_block_id");
+    var left_div = document.getElementById("main_block_left_id");
+    var right_div = document.getElementById("main_block_right_id");
+    if (flag == true) {
+        sett_block.style.transition = '0s';
+        left_div.style.transition = '0s';
+        right_div.style.transition = '0s';
+    }
+    else {
+        sett_block.style.transition = '1s';
+        left_div.style.transition = '1s';
+        right_div.style.transition = '1s';
+    }
+}
+
+
+
+function move_search_div(marginleft) {
+    var search_div = document.getElementById("div_search_id");
+    search_div.style.marginLeft = marginleft + 'px';
 }

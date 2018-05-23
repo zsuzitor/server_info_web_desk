@@ -1,5 +1,9 @@
 ﻿<div class="main_top_div">
 
+    @if (ViewBag.action_name != "index")
+    {
+
+    
     <div class="div_inline_block div_search" id="div_search_id" onmouseout='hidden_search_block()' onmouseover='show_search_block()'>
         <div class="div_search_img div_inline_block" id='div_search_img_id' onclick="start_search()">
             <span class="span_top_menu_lupa"></span>
@@ -15,6 +19,7 @@
             }
         </div>
     </div>
+
     <div class="div_inline_block div_settings_block" id="div_settings_block_id">
         <div>
             <div class="div_inline_block"><div class="div_settings_left_b" onclick="show_left_menu()"></div></div>
@@ -33,5 +38,7 @@
             </div>
         </div>
     </div>
+    }
+    <div class="">@Html.Partial("_LoginPartial")</div>
 </div>
 

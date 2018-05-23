@@ -3,7 +3,7 @@
     ViewBag.Title = "Info_page";
 }
 
-<h2>Info_page</h2>
+
 
 
 <div class="main_div">
@@ -49,5 +49,14 @@
 
         </div>
     </div>
+
+</div>
+@*формы для отправки всякого*@
+<div style="display:none;">
+    @using (Ajax.BeginForm("Load_inside_section","Info",new AjaxOptions {OnComplete= "OnComplete_load_inside_section" }))
+    {
+        <input name="id" id="id_section_for_load_input"/>  @*@Html.Editor("id_section_for_load_input", "id")*@
+        <input id="id_section_for_load_input_submit" type="submit"/>
+    }
 
 </div>

@@ -40,5 +40,16 @@ namespace server_info_web_desk.Models.Info
             UserId = null;
             User = null;
         }
-    }
+        public Section(Section a)
+        {
+            this.Id = a.Id;
+            this.Head = a.Head;
+            this.UserId = a.UserId;
+            this.User = a.User;
+            this.Section_parrentId = a.Section_parrentId;
+            this.Section_parrent = a.Section_parrent;
+            this.Sections = a.Sections;
+            this.Articles = a.Articles;
+        }
+        }
 }

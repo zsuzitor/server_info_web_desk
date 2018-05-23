@@ -38,6 +38,9 @@ namespace server_info_web_desk.Controllers
 
             return View();
         }
+
+
+        //тут убрать .AsNoTracking() проверить как работает
         [AllowAnonymous]
         [HttpGet]
         public ActionResult Info_page(string person_id)
@@ -52,7 +55,7 @@ namespace server_info_web_desk.Controllers
             {
                 //var first_sec_id = db.Sections.AsNoTracking().Where(x1 => x1.UserId == person_id).Min(x1 => x1.Id);
                 //first_sec = db.Sections.AsNoTracking().First(x1 => x1.Id == first_sec_id);
-                first_sec = db.Sections.AsNoTracking().Where(x1 => x1.UserId == person_id).First(x1=>x1.Section_parrentId==null);
+                first_sec = db.Sections.Where(x1 => x1.UserId == person_id).First(x1=>x1.Section_parrentId==null);
                 if (person_id != check_id)
                 {
                     db.Entry(first_sec).Reference(x1 => x1.User).Load();
@@ -88,24 +91,26 @@ namespace server_info_web_desk.Controllers
 
         //TODO
         [AllowAnonymous]
-        [HttpGet]
-        public JsonResult Load_inside_section(int id)
+       // [HttpGet][HttpPost]
+        public JsonResult Load_inside_section(int? id)
         {
-
+            if(string.IsNullOrWhiteSpace(id.ToString()))
+                return Json(false, JsonRequestBehavior.AllowGet);
             //TODO проверить есть ли доступ
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
 
-            var section = db.Sections.AsNoTracking().FirstOrDefault(x1 => x1.Id == id);
-            db.Entry(section).Reference(x1=>x1.User).Load();
-            if(!section.User.Open_data_info&& section.User.Id != check_id)
+            var section = db.Sections.FirstOrDefault(x1 => x1.Id == id);//AsNoTracking()
+            db.Entry(section).Reference(x1 => x1.User).Load();
+            if (!section.User.Open_data_info&& section.User.Id != check_id)
             {
                 //TODO обработать ошибку доступа к данным
                 //return new HttpStatusCodeResult(423);//Locked
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
-            db.Entry(section).Reference(x1=>x1.Sections).Load();
-            db.Entry(section).Reference(x1=>x1.Articles).Load();
+            db.Entry(section).Collection(x1=>x1.Sections).Load();
+            db.Entry(section).Collection(x1=>x1.Articles).Load();
+            section = new Section(section);
             section.User = null;
             section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null });
 
@@ -251,7 +256,11 @@ namespace server_info_web_desk.Controllers
             return Json(true, JsonRequestBehavior.AllowGet);
         }
 
+
+
         //TODO
+
+            //загрузка и обновление всей db из файла\текста пользователя
         [Authorize]
         [HttpPost]
         public ActionResult Load_all_data_in_db(string a)
@@ -294,10 +303,10 @@ namespace server_info_web_desk.Controllers
 
         [AllowAnonymous]
         [ChildActionOnly]
-        public ActionResult Main_header()
+        public ActionResult Main_header(string action_name)
         {
             //var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-
+            ViewBag.action_name = action_name;
 
             return PartialView();
         }
