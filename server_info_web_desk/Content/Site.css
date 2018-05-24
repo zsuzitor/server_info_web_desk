@@ -46,10 +46,7 @@ input,
 		padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
 	}
 
-	.div_inline_block {
-		display: inline-block;
-		vertical-align: top;
-	}
+	
 
    
 

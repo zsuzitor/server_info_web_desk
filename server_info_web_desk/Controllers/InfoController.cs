@@ -88,7 +88,24 @@ namespace server_info_web_desk.Controllers
 
             return View(res);
         }
-
+        //TODO
+        [AllowAnonymous]
+        // [HttpGet][HttpPost]
+        public JsonResult Load_article_body(int? id)
+        {
+            if (string.IsNullOrWhiteSpace(id.ToString()))
+                return Json(false, JsonRequestBehavior.AllowGet);
+            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            Article res = db.Articles.FirstOrDefault(x1 => x1.Id == id);
+            if (res.UserId != check_id)
+            {
+                db.Entry(res).Reference(x1 => x1.User).Load();
+                if(!res.User.Open_data_info)
+                    return Json(false, JsonRequestBehavior.AllowGet);
+            }
+            res = new Article(res) { User=null };
+            return Json(res, JsonRequestBehavior.AllowGet);
+        }
         //TODO
         [AllowAnonymous]
        // [HttpGet][HttpPost]
@@ -112,7 +129,7 @@ namespace server_info_web_desk.Controllers
             db.Entry(section).Collection(x1=>x1.Articles).Load();
             section = new Section(section);
             section.User = null;
-            section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null });
+            section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null,Section_parrentId=x1.Section_parrentId });
 
             return Json(section, JsonRequestBehavior.AllowGet);
             /*

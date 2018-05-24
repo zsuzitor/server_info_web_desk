@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    @Styles.Render("~/Content/css")
+    
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/bundles/modernizr")
     @Scripts.Render("~/scripts/jquery-3.3.1.js")
@@ -19,8 +19,13 @@
             {
                 @Scripts.Render("~/scripts/main_info_scripts.js")
             }
+           
             @Scripts.Render("~/scripts/index_info_scripts.js")
             @Styles.Render("~/Content/InfoStyle.css")
+        }
+        if (controller_name != "info")
+        {
+            @Styles.Render("~/Content/css")
         }
     }
 
@@ -33,7 +38,7 @@
 
     @Html.Action("Main_header","Info",new { action_name= action_name })
     }
-    @if (controller_name == "home")
+    @if (controller_name != "info")
     {
         //@Html.Action("Main_header","Home")
         <div>HEADER HOME</div>
@@ -42,11 +47,13 @@
     
     
         @RenderBody()
+@if (controller_name != "info")
+{
         <hr />
         <footer>
             <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
         </footer>
-    
+}
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

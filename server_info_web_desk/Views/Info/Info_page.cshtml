@@ -58,5 +58,10 @@
         <input name="id" id="id_section_for_load_input"/>  @*@Html.Editor("id_section_for_load_input", "id")*@
         <input id="id_section_for_load_input_submit" type="submit"/>
     }
+    @using (Ajax.BeginForm("Load_article_body", "Info", new AjaxOptions { OnComplete = "OnComplete_load_article_body" }))
+    {
+        <input name="id" id="id_article_for_load_input" />  @*@Html.Editor("id_section_for_load_input", "id")*@
+        <input id="id_article_for_load_input_submit" type="submit" />
+    }
 
 </div>

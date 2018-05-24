@@ -1,59 +1,5 @@
 ﻿// box-shadow: 0 0 10px rgba(0,0,0,0.5);
-/*
-TODO
 
-реализация поиска
-
-ширину divов левого и правого задавать из js а не css
-
-добавить резервное копирование и спрашивать о том нужно ли сохранение(мб просто кнопку в меню сверху)
-
-
-после каждого действия (сохранния удаления сохранять это действие в json и в html)
-
-кнопка для закрытия всех вкладок
-hidden_search_block show_search_block мб не нужен и тот что рядом тоже(поменять на css свойства)
-
-
-проверить что бы везде были ;;;;
-
-
-хранить путь к выделенной вкладке и выделять весь путь
-хранить открытые вкладки что бы можно было восстановить все как было
-добавить защиту на клики(пока определенная функция не выполнится не разрешать менять last_click_name)
-
-разобраться c хранением данных htmlи вообще потестить как хранятся отображаются разные комбинации и тдтдтдтд
-
-
-когда скрывается левый список кнопкой и потом тянуть блок с настройками вправо уже руками, для списка размер плохой задается попробовать пофиксить
-
-после редактирования проверять изменилось ли что то  и после этого решать отправлять ли на сервер
-{
-добавить облако тегов его редактирование сохранение хранение и поиск по ним
-теги просто прикрутить в body в конце например
-}
-//до поиска сохранять innerHTML и после нажатия на домик возвращать его, но это плохо тк если что то редактировать удалять то будет старое отображение
-поиск по облаку тегов(если юзер не указал #) оценку делать ниже чем у head но выше чем у body если указал то выше чем у body
-{
-//ПОИСК ДОЛЖЕН ПРИОРИТЕТНО ВЫПОЛНЯТЬСЯ В ВЫБРАННОМ РАЗДЕЛЕ
-//сейчас поиск только по том что в выбранной секции/статье  и показывает только inside а нужно после разделителя показывать и остальное
-^^^^ возможно задавать коэфициент и чем секция выше по уровню тем ниже коэф
-типо для секции ~50 для родителя 40 для родителя родителя 30 и тдтдтд 
-}
-при поиске не отображать статьи у которых 0 баллов
-переписать js под callbackи
-//кнопка для закрытия всех секций
-везде где циклы делать досрочный выход из них, типо оптимизация
-к head статей и секций добавить title с полной надписью
-к регуляркам добавить еще и флаг i что бы без учетра регистра искал
-при сохранении надо менять все # на другой символ и потом менять обратно
-делать convert_string и для head всего
-при ошибке(например чтения файла ) предлагать сохранить резервную копию
-обрабатывать ошибки
-сделать линки как в html так и в сервере на вк
-
-
-*/
 
 
 
@@ -235,6 +181,7 @@ function convert_string(str) {
 
 function click_name_section(a) {
     //проверять если есть блоки с parrent id то загружать не надо
+    select_view_line(a.id);
     var need_load = true;
     for (var i = 0; i < mass_section.length; ++i) {
         if (mass_section[i].Section_parrentId == a.id) {
@@ -250,17 +197,92 @@ function click_name_section(a) {
         }
     }
 
-    if (mass_article) {
+    if (need_load) {
         var inp = document.getElementById("id_section_for_load_input");
         inp.value = a.id.split("_")[4];
         document.getElementById("id_section_for_load_input_submit").click();
 
     }
-
+    else {
+        open_section(a.id);
+    }
 }
 
+function open_section(id) {
+    var before_d = document.getElementById("before_for_sect_name_" + id);
+    var div = document.getElementById("div_one_section_inside_" + id);
+    var f1_ = function () {
+        before_d.style.borderLeft = '30px solid black';
+        before_d.style.borderBottom = '15px solid transparent';
+        before_d.style.borderTop = '15px solid transparent';
+        div.style.display = 'none';
+    };
+
+    var f2_ = function () {
+        var div_in_sec = document.getElementById("div_inside_sections_" + id);
+        var div_in_art = document.getElementById("div_inside_articles_" + id);
+        before_d.style.borderTop = '30px solid black';
+        before_d.style.borderRight = '15px solid transparent';
+        before_d.style.borderLeft = '15px solid transparent';
+        if (div_in_sec.innerHTML != '' || div_in_art.innerHTML != '') {
+            div.style.display = 'inline-block';
+            
+        }
+    };
+
+    if (div.style.display == '' || div.style.display == 'inline-block') {
+        f1_();
+    }
+    else {
+        f2_();
+    }
+
+
+
+
+}
 function OnComplete_load_inside_section(data) {
-    alert(data);
+    var dt = JSON.parse(data.responseText); 
+    if (dt == false)
+        alert("OnComplete_load_inside_section return false");
+    for (var i = 0; i < dt.Sections.length; ++i) {
+        var obg_tmp = { Id: dt.Sections.Id, Head: dt.Sections.Head, Section_parrentId: dt.Sections.Section_parrentId };
+        mass_section.push(obg_tmp)
+    }
+    for (var i = 0; i < dt.Articles.length; ++i) {
+        var obg_tmp = { Id: dt.Articles.Id, Head: dt.Articles.Head, Body: null, Section_parrentId: dt.Articles.Section_parrentId };
+        mass_article.push(obg_tmp)
+    }
+
+    var inside = document.getElementById("div_one_section_inside_" + dt.Id);
+
+    inside.innerHTML = load_one_section_data(dt.Id);
+    
+    //= load_one_section(mass_section[0].Id);
+    //left_div.innerHTML = str_add_name_section(mass_section[0].Id) + str_res_for_left_ul;
+
+    open_section(dt.Id);
+}
+function OnComplete_load_article_body(data) {
+    var dt = JSON.parse(data.responseText);
+    if (dt == false)
+        alert("OnComplete_load_inside_section return false");
+    show_article(dt);
+}
+
+
+//TODO
+function add_section() {
+    if (last_click_name != null)
+        if (last_click_name.indexOf('div_one_section_name_') < 0)
+            alert('выберите секцию');
+        else {
+            var right_div = document.getElementById("main_block_right_id");
+            var res = add_form_for_add_or_edit(null, 1);
+            right_div.innerHTML = res;
+        }
+    else
+        alert('выберите секцию');
 }
 
 
@@ -269,12 +291,52 @@ function OnComplete_load_inside_section(data) {
 
 
 
+//--------------------------------------------------------------
+
+function select_view_line(new_click_id) {
+    if (new_click_id != null && new_click_id != undefined) {
+        var block_prev = document.getElementById(last_click_name);
+        var block_current = document.getElementById(new_click_id);
+        if (block_prev != null)
+            block_prev.style.backgroundColor = '';
+        if (block_current != null) {
+            block_current.style.backgroundColor = '#F08080';
+            last_click_name = new_click_id;
+        }
+    }
+}
 
 
+function load_article(id_ar) {
+    var acticle = null;
+    select_view_line('div_one_article_name_' + id_ar);
+    for (var i = 0; i < mass_article.length; ++i)
+        if (mass_article[i].Id == id_ar) {
+            acticle = mass_article[i];
+            break;
+        }
 
-
-
-
+    if (acticle == null) {
+        //TODO загрузить статью
+    }
+    else {
+        show_article(acticle);
+    }
+   
+}
+function show_article(acticle) {
+    var res = "";
+    var right_div = document.getElementById("main_block_right_id");
+    res = "<div>";
+    res += "<h1><pre>";
+    res += convert_string(acticle.Head);
+    res += "</pre><h1>";
+    res += "<div><pre>";
+    res += convert_string(acticle.Body);
+    res += "</pre></div>";
+    res += "</div>";
+    right_div.innerHTML = res;
+}
 //-------------------------------------------------------------
 function show_top_menu() {
     var top_menu = document.getElementById("div_for_top_menu_id");

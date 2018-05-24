@@ -206,6 +206,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\AccountViewModels.cs" />
+    <Compile Include="Models\DataBase\AppDbInitializer.cs" />
     <Compile Include="Models\DataBase\DataBase.cs" />
     <Compile Include="Models\functions\FunctionsInfo.cs" />
     <Compile Include="Models\functions\FunctionsProject.cs" />

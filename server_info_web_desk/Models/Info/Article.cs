@@ -36,5 +36,15 @@ namespace server_info_web_desk.Models.Info
             User = null;
             Section_parrentId = 0;
         }
-    }
+        public Article(Article a)
+        {
+            Id = a.Id;
+            Head = a.Head;
+            Body = a.Body;
+            UserId = a.UserId;
+            User = a.User;
+            Section_parrentId = a.Section_parrentId;
+            Section_parrent = a.Section_parrent;
+        }
+        }
 }

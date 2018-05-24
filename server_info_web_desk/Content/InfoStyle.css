@@ -1,4 +1,12 @@
-﻿body{
+﻿.div_inline_block {
+		display: inline-block;
+		vertical-align: top;
+	}
+div.info_log_partial_div{
+	width: 300px;
+}
+
+body{
 		position: relative;
 		background-color: #DDD7D7;
 		background-size: 50px 50px;
