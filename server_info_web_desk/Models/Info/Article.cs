@@ -12,12 +12,12 @@ namespace server_info_web_desk.Models.Info
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
 
-
+        [UIHint("MultilineText")]
         [Display(Name = "Название")]
         [Required(ErrorMessage = "Поле должно быть установлено")]
         public string Head { get; set; }
 
-
+        [UIHint("MultilineText")]
         [Display(Name = "Содержание")]
         public string Body { get; set; }
 

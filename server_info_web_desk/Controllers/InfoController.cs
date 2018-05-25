@@ -34,7 +34,7 @@ namespace server_info_web_desk.Controllers
         public ActionResult Index()
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            
+            var ff = db.Users.ToList();
 
             return View();
         }
@@ -145,7 +145,7 @@ namespace server_info_web_desk.Controllers
 
 
 
-        //TODO
+        ////TODO
         [Authorize]
         [HttpPost]
         public JsonResult Add_section(int? parrent_sec_id, [Bind(Include = "Id, Head")] Section a)

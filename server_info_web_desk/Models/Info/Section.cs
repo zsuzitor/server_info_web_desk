@@ -15,6 +15,7 @@ namespace server_info_web_desk.Models.Info
         public int Id { get; set; }
         //public int Parrent_id { get; set; }
 
+        [UIHint("MultilineText")]
         [Display(Name = "Название")]
         [Required(ErrorMessage = "Поле должно быть установлено")]
         public string Head { get; set; }

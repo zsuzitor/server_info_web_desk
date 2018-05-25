@@ -292,6 +292,64 @@ function add_section() {
 
 
 //--------------------------------------------------------------
+function add_form_for_add(id, type) {//1 секция 2 статья
+
+    var block = find_in_mass(id, type);
+    var res = "'<form action=\"/Info/";
+    if(type==1)
+        res+='Add_section"';
+    else
+        res+='Add_article"';
+    res+='data-ajax="true" data-ajax-complete="';
+    if (type == 1)
+        res += 'OnComplete_Add_section"';
+    else
+        res += 'OnComplete_Add_article"';
+    res += '" data-ajax-loading="#Main_preloader_id" data-ajax-loading-duration="200" id="form2" method="post">';
+
+    СЮДА переписать add_form_for_add_or_edit
+
+    res += '</form>';
+}
+//function add_form_for_edit(id, type) {//1 секция 2 статья
+
+
+//}
+function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
+    var res = '';
+    switch (type) {
+        case 1:
+            var block = find_in_mass(id, type);
+            res += '<div><div><label>Заголовок</label></div>';
+
+             
+
+            res += '<textarea class="text_area_add_edit" id="input_for_section_head">' + (block == null ? '' : block.Head) + '</textarea>';
+            if (block == null)
+                res += '<button onclick="add_section_form()">Добавить раздел</button>';
+            else
+                res += '<button onclick="edit_select_section_form(' + id + ')">Сохранить название</button>';
+            res += '</div>';
+            break;
+        case 2:
+            var block = find_in_mass(id, type);
+
+            res += '<div><div><label>Заголовок</label></div>';
+            res += '<textarea class="text_area_add_edit" id="input_for_article_head">' + (block == null ? '' : block.Head) + '</textarea>';
+            res += '<div><label>Содержание</label></div>';
+            res += '<textarea class="text_area_add_edit" id="input_for_article_body">' + (block == null ? '' : block.Body) + '</textarea>';
+            if (block == null)
+                res += '<button onclick="add_article_form()">Добавить статью</button>';
+            else
+                res += '<button onclick="edit_select_article_form(' + id + ')">Сохранить</button>';
+            res += '</div>';
+            break;
+        default:
+            alert("error");
+            break;
+    }
+    return res;
+}
 
 function select_view_line(new_click_id) {
     if (new_click_id != null && new_click_id != undefined) {
