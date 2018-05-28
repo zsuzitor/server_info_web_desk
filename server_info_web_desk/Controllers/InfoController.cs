@@ -79,9 +79,10 @@ namespace server_info_web_desk.Controllers
                 
 
             }
+            res.Sections.Add(first_sec);//главная секция должна быть первой в списке
             GetSectionInside(first_sec.Id, res.Sections, res.Articles);
             //res.Sections.AddRange();
-            res.Sections.Add(first_sec);
+            
 
 
 
@@ -121,16 +122,17 @@ namespace server_info_web_desk.Controllers
             db.Entry(section).Reference(x1 => x1.User).Load();
             if (!section.User.Open_data_info&& section.User.Id != check_id)
             {
-                //TODO обработать ошибку доступа к данным
-                //return new HttpStatusCodeResult(423);//Locked
+                
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
             db.Entry(section).Collection(x1=>x1.Sections).Load();
             db.Entry(section).Collection(x1=>x1.Articles).Load();
             section = new Section(section);
             section.User = null;
-            section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null,Section_parrentId=x1.Section_parrentId });
-
+            section.Section_parrent = null;
+            section.Articles=section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null,Section_parrentId=x1.Section_parrentId }).ToList();
+            section.Sections=section.Sections.Select(x1 => x1 = new Section() { Id = x1.Id, Head = x1.Head, Section_parrentId = x1.Section_parrentId }).ToList();
+            //return JsonConvert.SerializeObject(section);
             return Json(section, JsonRequestBehavior.AllowGet);
             /*
              function OnSuccess(data) {
@@ -148,7 +150,7 @@ namespace server_info_web_desk.Controllers
         ////TODO
         [Authorize]
         [HttpPost]
-        public JsonResult Add_section(int? parrent_sec_id, [Bind(Include = "Id, Head")] Section a)
+        public JsonResult Add_section(int? parrent_sec_id, [Bind(Include = "Head")] Section a)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
@@ -178,7 +180,7 @@ namespace server_info_web_desk.Controllers
         //TODO
         [Authorize]
         [HttpPost]
-        public JsonResult Add_article(int? parrent_sec_id, [Bind(Include = "Id, Head, Body")]Article a)
+        public JsonResult Add_article(int? parrent_sec_id, [Bind(Include = "Head, Body")]Article a)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             bool success = true;

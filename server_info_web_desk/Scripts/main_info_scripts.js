@@ -182,16 +182,17 @@ function convert_string(str) {
 function click_name_section(a) {
     //проверять если есть блоки с parrent id то загружать не надо
     select_view_line(a.id);
+    var int_id = a.id.split("_")[4];
     var need_load = true;
     for (var i = 0; i < mass_section.length; ++i) {
-        if (mass_section[i].Section_parrentId == a.id) {
+        if (mass_section[i].Section_parrentId == int_id) {
             need_load = false;
             break;
         }
     }
     if (need_load)
     for (var i = 0; i < mass_article.length; ++i) {
-        if (mass_article[i].Section_parrentId == a.id) {
+        if (mass_article[i].Section_parrentId == int_id) {
             need_load = false;
             break;
         }
@@ -199,12 +200,12 @@ function click_name_section(a) {
 
     if (need_load) {
         var inp = document.getElementById("id_section_for_load_input");
-        inp.value = a.id.split("_")[4];
+        inp.value = int_id;
         document.getElementById("id_section_for_load_input_submit").click();
 
     }
     else {
-        open_section(a.id);
+        open_section(int_id);
     }
 }
 
@@ -242,15 +243,19 @@ function open_section(id) {
 
 }
 function OnComplete_load_inside_section(data) {
-    var dt = JSON.parse(data.responseText); 
-    if (dt == false)
+    var dt = JSON.parse(data.responseText);
+   // alert(dt);
+    if (dt == false) {
         alert("OnComplete_load_inside_section return false");
+        return;
+    }
+       
     for (var i = 0; i < dt.Sections.length; ++i) {
-        var obg_tmp = { Id: dt.Sections.Id, Head: dt.Sections.Head, Section_parrentId: dt.Sections.Section_parrentId };
+        var obg_tmp = { Id: dt.Sections[i].Id, Head: dt.Sections[i].Head, Section_parrentId: dt.Sections[i].Section_parrentId };
         mass_section.push(obg_tmp)
     }
     for (var i = 0; i < dt.Articles.length; ++i) {
-        var obg_tmp = { Id: dt.Articles.Id, Head: dt.Articles.Head, Body: null, Section_parrentId: dt.Articles.Section_parrentId };
+        var obg_tmp = { Id: dt.Articles[i].Id, Head: dt.Articles[i].Head, Body: null, Section_parrentId: dt.Articles[i].Section_parrentId };
         mass_article.push(obg_tmp)
     }
 
@@ -265,10 +270,33 @@ function OnComplete_load_inside_section(data) {
 }
 function OnComplete_load_article_body(data) {
     var dt = JSON.parse(data.responseText);
-    if (dt == false)
+    if (dt == false) {
         alert("OnComplete_load_inside_section return false");
+        return;
+    }
+        
     show_article(dt);
 }
+
+
+function OnComplete_Add_section(data) {
+    var dt = JSON.parse(data.responseText);
+    if (dt == false) {
+        alert("OnComplete_Add_section return false");
+        return;
+    }
+    document.getElementById("main_block_right_id").innerHTML = "";
+        
+}
+function OnComplete_Add_article(data) {
+    var dt = JSON.parse(data.responseText);
+    if (dt == false) {
+        alert("OnComplete_Add_article return false");
+        return;
+    }
+       
+}
+
 
 
 //TODO
@@ -278,7 +306,7 @@ function add_section() {
             alert('выберите секцию');
         else {
             var right_div = document.getElementById("main_block_right_id");
-            var res = add_form_for_add_or_edit(null, 1);
+            var res = add_form_for_add(null, 1);
             right_div.innerHTML = res;
         }
     else
@@ -295,7 +323,7 @@ function add_section() {
 function add_form_for_add(id, type) {//1 секция 2 статья
 
     var block = find_in_mass(id, type);
-    var res = "'<form action=\"/Info/";
+    var res = "<form action=\"/Info/";
     if(type==1)
         res+='Add_section"';
     else
@@ -307,9 +335,10 @@ function add_form_for_add(id, type) {//1 секция 2 статья
         res += 'OnComplete_Add_article"';
     res += '" data-ajax-loading="#Main_preloader_id" data-ajax-loading-duration="200" id="form2" method="post">';
 
-    СЮДА переписать add_form_for_add_or_edit
-
+    //СЮДА переписать add_form_for_add_or_edit
+    res+=add_form_for_add_or_edit(id, type);
     res += '</form>';
+    return res;
 }
 //function add_form_for_edit(id, type) {//1 секция 2 статья
 
@@ -321,27 +350,33 @@ function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
         case 1:
             var block = find_in_mass(id, type);
             res += '<div><div><label>Заголовок</label></div>';
-
-             
-
-            res += '<textarea class="text_area_add_edit" id="input_for_section_head">' + (block == null ? '' : block.Head) + '</textarea>';
-            if (block == null)
-                res += '<button onclick="add_section_form()">Добавить раздел</button>';
+            
+            res += '<textarea name="Head" class="text_area_add_edit" id="input_for_section_head">' + (block == null ? '' : block.Head) + '</textarea>';
+            if (block == null){
+                res += "<input name='parrent_sec_id' type='hidden' value=" + click_sect_id() + " />";
+                res += "<input value='Добавить секцию'  type='submit'/>";
+            }
+                
             else
-                res += '<button onclick="edit_select_section_form(' + id + ')">Сохранить название</button>';
+                res += "<input value='Сохранить'  type='submit'/>";
+
             res += '</div>';
             break;
         case 2:
             var block = find_in_mass(id, type);
 
             res += '<div><div><label>Заголовок</label></div>';
-            res += '<textarea class="text_area_add_edit" id="input_for_article_head">' + (block == null ? '' : block.Head) + '</textarea>';
+            res += '<textarea name="Head" class="text_area_add_edit" id="input_for_article_head">' + (block == null ? '' : block.Head) + '</textarea>';
             res += '<div><label>Содержание</label></div>';
-            res += '<textarea class="text_area_add_edit" id="input_for_article_body">' + (block == null ? '' : block.Body) + '</textarea>';
-            if (block == null)
-                res += '<button onclick="add_article_form()">Добавить статью</button>';
+            res += '<textarea name="Body" class="text_area_add_edit" id="input_for_article_body">' + (block == null ? '' : block.Body) + '</textarea>';
+            if (block == null){
+                res += "<input value='Добавить секцию'  type='submit'/>";
+                res += "<input value='Добавить статью'  type='submit'/>";
+            }
+               
             else
-                res += '<button onclick="edit_select_article_form(' + id + ')">Сохранить</button>';
+                res += "<input value='Сохранить'  type='submit'/>";
+                
             res += '</div>';
             break;
         default:
@@ -394,6 +429,17 @@ function show_article(acticle) {
     res += "</pre></div>";
     res += "</div>";
     right_div.innerHTML = res;
+}
+
+
+function click_sect_id() {
+    if (last_click_name == null)
+        return null;
+    if (last_click_name.indexOf('div_one_section_name_') == 0)
+        return last_click_name.split('_')[4];
+    else {
+        return find_in_mass(last_click_name.split('_')[4], 2).Section_parrentId;
+    }
 }
 //-------------------------------------------------------------
 function show_top_menu() {
