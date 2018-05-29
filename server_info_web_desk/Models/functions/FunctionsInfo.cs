@@ -22,6 +22,19 @@ namespace server_info_web_desk.Models.functions
             return true;
         }
 
+
+        public static void Get_inside_id(int id,List<int>sections_id, List<int> articles_id)
+        {
+            var sec_list=db.Sections.Where(x1 => x1.Section_parrentId == id).Select(x1=>x1.Id).ToList();
+            //var art_list = db.Articles.Where(x1 => x1.Section_parrentId == id).Select(x1=>x1.Id).ToList();
+            //articles_id.AddRange(art_list);
+            sections_id.AddRange(sec_list);
+            foreach (var i in sec_list)
+            {
+                Get_inside_id(i,  sections_id,  articles_id);
+            }
+            return;
+        }
         public static Section CheckAccessSection(string check_id, int? parrent_sec_id, out bool success)
         {
             success = true;

@@ -7,11 +7,17 @@ using server_info_web_desk.Models;
 using System.IO;
 using Newtonsoft.Json;
 
+using Microsoft.AspNet.Identity.Owin;
+using System.Runtime.Serialization.Formatters.Binary;
+
+using Microsoft.AspNet.Identity;
+
 //
 using static server_info_web_desk.Models.functions.FunctionsProject;
 using static server_info_web_desk.Models.DataBase.DataBase;
-using Microsoft.AspNet.Identity.Owin;
-using System.Runtime.Serialization.Formatters.Binary;
+
+
+
 
 namespace server_info_web_desk.Controllers
 {
@@ -19,7 +25,7 @@ namespace server_info_web_desk.Controllers
     {
         public ActionResult Index()
         {
-            
+            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             return View();
         }
 

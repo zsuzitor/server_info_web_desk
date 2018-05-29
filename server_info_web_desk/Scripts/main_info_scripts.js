@@ -285,7 +285,14 @@ function OnComplete_Add_section(data) {
         alert("OnComplete_Add_section return false");
         return;
     }
+    var obj = { Id: dt.Id, Head: dt.Head, Section_parrentId: dt.Section_parrentId };
+    mass_section.push(obj);
+
     document.getElementById("main_block_right_id").innerHTML = "";
+
+    var inside_sect = document.getElementById("div_inside_sections_" + obj.Section_parrentId);
+    var str= str_add_name_section(obj.Id) + load_one_section(obj.Id);
+    inside_sect.innerHTML += str;
         
 }
 function OnComplete_Add_article(data) {
@@ -294,19 +301,29 @@ function OnComplete_Add_article(data) {
         alert("OnComplete_Add_article return false");
         return;
     }
-       
+    var obj = { Id: dt.Id, Head: dt.Head, Body: null, Section_parrentId: dt.Section_parrentId };
+    mass_article.push(obj)
+    document.getElementById("main_block_right_id").innerHTML = "";
+    var tmp = "";
+    tmp += "<div class='div_one_article_name' id='div_one_article_name_" + obj.Id + "' onclick='load_article(" + obj.Id + ")'>" + obj.Head + "</div>";
+    var inside_sect = document.getElementById("div_inside_articles_" + obj.Section_parrentId);
+    inside_sect.innerHTML += tmp;
 }
 
 
 
-//TODO
-function add_section() {
+//TODO //add_article add_section
+function add_form_right(type) {//1-секция 2 -статья
+    if (type != 1 && type != 2) {
+        alert("Ошибка?")
+        return;
+    }
     if (last_click_name != null)
         if (last_click_name.indexOf('div_one_section_name_') < 0)
             alert('выберите секцию');
         else {
             var right_div = document.getElementById("main_block_right_id");
-            var res = add_form_for_add(null, 1);
+            var res = add_form_for_add(null, type);
             right_div.innerHTML = res;
         }
     else
@@ -319,10 +336,65 @@ function add_section() {
 
 
 
+function dell_select() {
+    if (!confirm("Удалить выбранное со всеми вложениями?"))
+        return;
+
+    if (last_click_name == null) {
+        alert("выберите что-то для удаления");
+        return;
+    }
+    var id = last_click_name.split('_')[4];
+    
+    if (last_click_name.indexOf("div_one_section_name") >= 0) {
+        delete_section_f(id);
+    }
+    else if (last_click_name.indexOf("div_one_article_name") >= 0) {
+        delete_article_f(id);
+    }
+    last_click_name = null;
+    document.getElementById("main_block_right_id").innerHTML = "";
+}
+function delete_section_f(id) {
+    var inp = document.getElementById("id_section_for_delete_input");
+    inp.value = id;
+    document.getElementById("id_section_for_delete_input_submit").click();
+}
+
+function delete_article_f(id) {
+    var inp = document.getElementById("id_article_for_delete_input");
+    inp.value = id;
+    document.getElementById("id_article_for_delete_input_submit").click();
+}
+function OnComplete_delete_section(data) {
+    var dt = JSON.parse(data.responseText);
+    if (dt == false) {
+        alert("OnComplete_Add_article return false");
+        return;
+    }
+    if (dt.indexOf("inside_") >= 0) {
+        document.getElementById("div_one_section_inside_" + dt).innerHTML = "";
+    }
+    else {
+        document.getElementById("div_one_section_name_" + dt).remove();
+        document.getElementById("div_one_section_inside_" + dt).remove();
+    }
+   
+}
+function OnComplete_delete_article(data) {
+    var dt = JSON.parse(data.responseText);
+    if (dt == false) {
+        alert("OnComplete_Add_article return false");
+        return;
+    }
+    document.getElementById('div_one_article_name_' + dt).remove();
+}
+
 //--------------------------------------------------------------
+
 function add_form_for_add(id, type) {//1 секция 2 статья
 
-    var block = find_in_mass(id, type);
+    //var block = find_in_mass(id, type);
     var res = "<form action=\"/Info/";
     if(type==1)
         res+='Add_section"';
@@ -370,8 +442,9 @@ function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
             res += '<div><label>Содержание</label></div>';
             res += '<textarea name="Body" class="text_area_add_edit" id="input_for_article_body">' + (block == null ? '' : block.Body) + '</textarea>';
             if (block == null){
-                res += "<input value='Добавить секцию'  type='submit'/>";
                 res += "<input value='Добавить статью'  type='submit'/>";
+                res += "<input name='parrent_sec_id' type='hidden' value=" + click_sect_id() + " />";
+                
             }
                
             else

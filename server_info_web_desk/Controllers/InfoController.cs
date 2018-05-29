@@ -6,6 +6,7 @@ using System.Linq;
 
 using System.Web;
 using System.Web.Mvc;
+using System.Data.Entity;
 
 using server_info_web_desk.Models;
 using server_info_web_desk.Models.Info;
@@ -20,6 +21,7 @@ using Microsoft.AspNet.Identity;
 using static server_info_web_desk.Models.functions.FunctionsProject;
 using static server_info_web_desk.Models.functions.FunctionsInfo;
 using static server_info_web_desk.Models.DataBase.DataBase;
+
 
 namespace server_info_web_desk.Controllers
 {
@@ -172,9 +174,9 @@ namespace server_info_web_desk.Controllers
 
             //var pers = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
 
-
-
-            return Json(true, JsonRequestBehavior.AllowGet);
+            
+            Section res = new Section(a) { User = null, Section_parrent = null };
+            return Json(res, JsonRequestBehavior.AllowGet);
         }
 
         //TODO
@@ -191,14 +193,16 @@ namespace server_info_web_desk.Controllers
                 //return new HttpStatusCodeResult(423);//Locked
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
+            a.Section_parrentId = (int)parrent_sec_id;
+            a.UserId = check_id;
+
+           
+            
             db.Articles.Add(a);
             db.SaveChanges();
-            parrent_sec.Articles.Add(a);
-            parrent_sec.User.Articles.Add(a);
-            db.SaveChanges();
 
 
-            return Json(true, JsonRequestBehavior.AllowGet);
+            return Json(new Article(a) { User = null, Section_parrent = null }, JsonRequestBehavior.AllowGet);
         }
 
         //TODO
@@ -253,26 +257,46 @@ namespace server_info_web_desk.Controllers
         //TODO
         [Authorize]
         [HttpPost]
-        public JsonResult Delete_section(Section a)
+        public JsonResult Delete_section(int? id)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            var sec = db.Sections.FirstOrDefault(x1 => x1.Id == id && x1.UserId == check_id);
+            if(sec==null)
+                return Json(false);
+            List<int> sec_list = new List<int>();
+            List<int> art_list = new List<int>();
+            if (sec.Section_parrentId != null)
+                sec_list.Add(sec.Id);
+            else
+            {
+                var lst = db.Articles.Where(x1 => x1.Section_parrentId == sec.Id).ToList();
+                if(lst.Count>0)
+                db.Articles.RemoveRange(lst);
+            }
+            Get_inside_id((int)id, sec_list, art_list);
+            var section_for_delete = db.Sections.Join(sec_list, p => p.Id, c => c, (p, c) => p);
+            db.Sections.RemoveRange(section_for_delete);
+            db.SaveChanges();
 
-
-
-
-            return Json(true, JsonRequestBehavior.AllowGet);
+            //var gg = db.Articles.ToList();
+            //var gg2 = db.Sections.ToList();
+            return Json("inside_"+id);
         }
 
         //TODO
         [Authorize]
         [HttpPost]
-        public JsonResult Delete_article(Article a)
+        public JsonResult Delete_article(int? id)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            var art = db.Articles.FirstOrDefault(x1 => x1.Id == id && x1.UserId == check_id);
+            if (art == null)
+                return Json(false);
+            db.Articles.Remove(art);
+            db.SaveChanges();
 
 
-
-            return Json(true, JsonRequestBehavior.AllowGet);
+            return Json(id);
         }
 
 
