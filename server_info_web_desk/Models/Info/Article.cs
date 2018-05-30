@@ -28,23 +28,31 @@ namespace server_info_web_desk.Models.Info
         public Section Section_parrent { get; set; }
         public Article()
         {
-            Id = 0;
-            Section_parrent = null;
-            Head = null;
-            Body = null;
-            UserId = null;
-            User = null;
-            Section_parrentId = 0;
+            this.Id = 0;
+            this.Section_parrent = null;
+            this.Head = null;
+            this.Body = null;
+            this.UserId = null;
+            this.User = null;
+            this.Section_parrentId = 0;
         }
-        public Article(Article a)
+        public Article(Article a, bool with_out_reference = false)
         {
-            Id = a.Id;
-            Head = a.Head;
-            Body = a.Body;
-            UserId = a.UserId;
-            User = a.User;
-            Section_parrentId = a.Section_parrentId;
-            Section_parrent = a.Section_parrent;
+            this.Id = a.Id;
+            this.Head = a.Head;
+            this.Body = a.Body;
+            this.UserId = a.UserId;
+            this.Section_parrentId = a.Section_parrentId;
+            if (!with_out_reference)
+            {
+                this.User = a.User;
+                this.Section_parrent = a.Section_parrent;
+            }
+            else
+            {
+                this.User = null;
+                this.Section_parrent = null;
+            }
         }
         }
 }

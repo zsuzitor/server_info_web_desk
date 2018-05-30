@@ -106,7 +106,7 @@ namespace server_info_web_desk.Controllers
                 if(!res.User.Open_data_info)
                     return Json(false, JsonRequestBehavior.AllowGet);
             }
-            res = new Article(res) { User=null };
+            res = new Article(res) { User = null, Section_parrent = null };
             return Json(res, JsonRequestBehavior.AllowGet);
         }
         //TODO
@@ -166,10 +166,14 @@ namespace server_info_web_desk.Controllers
             }
 
             db.Sections.Add(a);
+            a.Section_parrentId = parrent_sec.Id;
+            a.UserId = check_id;
             db.SaveChanges();
-            parrent_sec.Sections.Add(a);
-            parrent_sec.User.Sections.Add(a);
-            db.SaveChanges();
+            
+            //parrent_sec.Sections.Add(a);
+            
+           // parrent_sec.User.Sections.Add(a);
+            //db.SaveChanges();
 
 
             //var pers = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
@@ -202,7 +206,7 @@ namespace server_info_web_desk.Controllers
             db.SaveChanges();
 
 
-            return Json(new Article(a) { User = null, Section_parrent = null }, JsonRequestBehavior.AllowGet);
+            return Json(new Article(a,true) , JsonRequestBehavior.AllowGet);
         }
 
         //TODO
@@ -211,12 +215,12 @@ namespace server_info_web_desk.Controllers
         public JsonResult Edit_section([Bind(Include = "Id, Head")]Section a)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            bool success = true;
+            //bool success = true;
             
-            Section section = db.Sections.FirstOrDefault(x1 => x1.Id == a.Id);
-            db.Entry(section).Reference(x1 => x1.Section_parrent).Load();
-            CheckAccessSection(check_id, section.Section_parrent.Id, out success);
-            if (!success)
+            Section section = db.Sections.FirstOrDefault(x1 => x1.Id == a.Id&&x1.UserId== check_id);
+            //db.Entry(section).Reference(x1 => x1.Section_parrent).Load();
+            //CheckAccessSection(check_id, section.Section_parrent.Id, out success);
+            if (section==null)
             {
                 //TODO обработать ошибку
                 //return new HttpStatusCodeResult(423);//Locked
@@ -225,7 +229,7 @@ namespace server_info_web_desk.Controllers
             section.Head = a.Head;
             db.SaveChanges();
 
-            return Json(true, JsonRequestBehavior.AllowGet);
+            return Json(new Section(section,true) , JsonRequestBehavior.AllowGet);
         }
 
         //TODO
@@ -234,12 +238,12 @@ namespace server_info_web_desk.Controllers
         public JsonResult Edit_article([Bind(Include = "Id, Head, Body")]Article a)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            bool success = true;
+            //bool success = true;
 
-            Article article = db.Articles.FirstOrDefault(x1 => x1.Id == a.Id);
-            db.Entry(article).Reference(x1 => x1.Section_parrent).Load();
-            CheckAccessSection(check_id, article.Section_parrent.Id, out success);
-            if (!success)
+            Article article = db.Articles.FirstOrDefault(x1 => x1.Id == a.Id&&x1.UserId==check_id);
+            //db.Entry(article).Reference(x1 => x1.Section_parrent).Load();
+            //CheckAccessSection(check_id, article.Section_parrent.Id, out success);
+            if (article == null)
             {
                 //TODO обработать ошибку
                 //return new HttpStatusCodeResult(423);//Locked
@@ -251,7 +255,7 @@ namespace server_info_web_desk.Controllers
 
 
 
-            return Json(true, JsonRequestBehavior.AllowGet);
+            return Json(new Article(article,true), JsonRequestBehavior.AllowGet);
         }
 
         //TODO
@@ -280,7 +284,8 @@ namespace server_info_web_desk.Controllers
 
             //var gg = db.Articles.ToList();
             //var gg2 = db.Sections.ToList();
-            return Json("inside_"+id);
+            //return Json("inside_"+id);
+            return Json(new {main_id=id,parrent_id_main= sec.Section_parrentId, sec_list= sec_list });
         }
 
         //TODO

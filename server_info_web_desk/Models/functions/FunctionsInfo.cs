@@ -35,33 +35,33 @@ namespace server_info_web_desk.Models.functions
             }
             return;
         }
-        public static Section CheckAccessSection(string check_id, int? parrent_sec_id, out bool success)
+        public static Section CheckAccessSection(string check_id, int? section_id, out bool success)
         {
             success = true;
             Section parrent_sec = null;
             if (check_id == null)
             {
-                //TODO ошибку обработать
+                
                 success = false;
                 return null;
             }
-            if (parrent_sec_id == null)
+            if (section_id == null)
             {
-                //TODO ошибку обработать
+                
                 success = false;
                 return null;
             }
-             parrent_sec = db.Sections.FirstOrDefault(x1 => x1.Id == parrent_sec_id);
+             parrent_sec = db.Sections.FirstOrDefault(x1 => x1.Id == section_id);
             if (parrent_sec == null)
             {
-                //TODO ошибку обработать
+                
                 success = false;
                 return null;
             }
             db.Entry(parrent_sec).Reference(x1 => x1.User).Load();
             if (parrent_sec.User.Id != check_id)
             {
-                //TODO ошибку обработать
+              
                 success = false;
                 return null;
             }

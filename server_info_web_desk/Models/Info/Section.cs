@@ -41,16 +41,25 @@ namespace server_info_web_desk.Models.Info
             UserId = null;
             User = null;
         }
-        public Section(Section a)
+        public Section(Section a,bool with_out_reference=false)
         {
             this.Id = a.Id;
             this.Head = a.Head;
             this.UserId = a.UserId;
-            this.User = a.User;
             this.Section_parrentId = a.Section_parrentId;
+            if (!with_out_reference) { 
             this.Section_parrent = a.Section_parrent;
+            this.User = a.User;
             this.Sections = a.Sections;
             this.Articles = a.Articles;
+            }
+            else
+            {
+                this.Section_parrent = null;
+                this.User = null;
+                this.Sections = null;
+                this.Articles = null;
+            }
         }
         }
 }
