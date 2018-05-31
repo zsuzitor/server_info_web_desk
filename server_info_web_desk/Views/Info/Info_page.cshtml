@@ -10,8 +10,8 @@
     
     <div class="div_left_column" id="div_left_column_id">
         <div class="div_for_top_menu" id="div_for_top_menu_id">
-            <div class="top_menu_button top_menu_add_section" title="add section" onclick='add_form_right(1)'></div> <!-- добавить секцию -->
-            <div class="top_menu_button top_menu_add_article" title="add article" onclick='add_form_right(2)'></div> <!-- добавить статью -->
+            <div class="top_menu_button top_menu_add_section" title="add section" onclick='add_form_for_add_or_edit(null,1)'></div> <!-- добавить секцию -->
+            <div class="top_menu_button top_menu_add_article" title="add article" onclick='add_form_for_add_or_edit(null,2)'></div> <!-- добавить статью -->
             <div class="top_menu_button top_menu_dell_select" title="delete select" onclick='dell_select()'></div> <!-- удалить выбранное -->
             <div class="top_menu_button top_menu_home_button" title="Home" onclick='home_button_return_left()'>
                 <!-- восстановить меню -->
@@ -74,12 +74,13 @@
         <input name="id" id="id_article_for_delete_input" />
         <input id="id_article_for_delete_input_submit" type="submit" />
     }
-    @*сейчас не используется*@
-    <div id="div_form_for_add_section">
-        @using (Ajax.BeginForm("Add_section", "Info",new AjaxOptions { OnComplete = "OnComplete_Add_section",LoadingElementId= "Main_preloader_id", LoadingElementDuration=200 }))
-        {
-        }
+   @* <div id="div_all_form_js"></div>*@
+        @*сейчас не используется*@
+        <div id="div_form_for_add_section">
+            @using (Ajax.BeginForm("Add_section", "Info", new AjaxOptions { OnComplete = "OnComplete_Add_section", LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
+            {
+            }
+
+        </div>
 
     </div>
-
-</div>

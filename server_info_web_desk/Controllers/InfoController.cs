@@ -106,8 +106,8 @@ namespace server_info_web_desk.Controllers
                 if(!res.User.Open_data_info)
                     return Json(false, JsonRequestBehavior.AllowGet);
             }
-            res = new Article(res) { User = null, Section_parrent = null };
-            return Json(res, JsonRequestBehavior.AllowGet);
+            
+            return Json(new Article(res, true), JsonRequestBehavior.AllowGet);
         }
         //TODO
         [AllowAnonymous]
@@ -129,9 +129,7 @@ namespace server_info_web_desk.Controllers
             }
             db.Entry(section).Collection(x1=>x1.Sections).Load();
             db.Entry(section).Collection(x1=>x1.Articles).Load();
-            section = new Section(section);
-            section.User = null;
-            section.Section_parrent = null;
+            section = new Section(section) { User = null, Section_parrent = null };
             section.Articles=section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null,Section_parrentId=x1.Section_parrentId }).ToList();
             section.Sections=section.Sections.Select(x1 => x1 = new Section() { Id = x1.Id, Head = x1.Head, Section_parrentId = x1.Section_parrentId }).ToList();
             //return JsonConvert.SerializeObject(section);
@@ -179,8 +177,8 @@ namespace server_info_web_desk.Controllers
             //var pers = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
 
             
-            Section res = new Section(a) { User = null, Section_parrent = null };
-            return Json(res, JsonRequestBehavior.AllowGet);
+           
+            return Json(new Section(a,true), JsonRequestBehavior.AllowGet);
         }
 
         //TODO

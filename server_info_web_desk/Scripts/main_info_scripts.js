@@ -281,12 +281,12 @@ function OnComplete_load_article_body(data) {
 
 
 function OnComplete_Add_section(data) {
-    var dt = JSON.parse(data.responseText);
-    if (dt == false) {
+    
+    if (data == false) {
         alert("OnComplete_Add_section return false");
         return;
     }
-    var obj = { Id: dt.Id, Head: dt.Head, Section_parrentId: dt.Section_parrentId };
+    var obj = { Id: data.Id, Head: data.Head, Section_parrentId: data.Section_parrentId };
     mass_section.push(obj);
 
     document.getElementById("main_block_right_id").innerHTML = "";
@@ -297,12 +297,12 @@ function OnComplete_Add_section(data) {
         
 }
 function OnComplete_Add_article(data) {
-    var dt = JSON.parse(data.responseText);
-    if (dt == false) {
+    
+    if (data == false) {
         alert("OnComplete_Add_article return false");
         return;
     }
-    var obj = { Id: dt.Id, Head: dt.Head, Body: null, Section_parrentId: dt.Section_parrentId };
+    var obj = { Id: data.Id, Head: data.Head, Body: null, Section_parrentId: data.Section_parrentId };
     mass_article.push(obj)
     document.getElementById("main_block_right_id").innerHTML = "";
     var tmp = "";
@@ -312,16 +312,16 @@ function OnComplete_Add_article(data) {
 }
 
 function OnComplete_edit_section(data) {
-    var dt = JSON.parse(data.responseText);
-    if (dt == false) {
+    
+    if (data == false) {
         alert("OnComplete_edit_section return false");
         return;
     }
     
     for (var i = 0; i < mass_section.length; ++i) {
-        if (mass_section[i].Id == dt.Id) {
-            mass_section[i].Head = dt.Head;
-            document.getElementById("div_one_section_name_text_" + dt.Id).innerHTML = dt.Head;
+        if (mass_section[i].Id == data.Id) {
+            mass_section[i].Head = data.Head;
+            document.getElementById("div_one_section_name_text_" + data.Id).innerHTML = data.Head;
             
             break;
         }
@@ -329,17 +329,17 @@ function OnComplete_edit_section(data) {
     document.getElementById("main_block_right_id").innerHTML="";
 }
 function OnComplete_edit_article(data) {
-    var dt = JSON.parse(data.responseText);
-    if (dt == false) {
+   
+    if (data == false) {
         alert("OnComplete_edit_article return false");
         return;
     }
     for (var i = 0; i < mass_article.length; ++i) {
-        if (mass_article[i].Id == dt.Id) {
-            mass_article[i].Head = dt.Head;
-            mass_article[i].Body = dt.Body;
-            document.getElementById("div_one_article_name_" + dt.Id).innerHTML = dt.Head;
-            load_article(dt.Id);
+        if (mass_article[i].Id == data.Id) {
+            mass_article[i].Head = data.Head;
+            mass_article[i].Body = data.Body;
+            document.getElementById("div_one_article_name_" + data.Id).innerHTML = data.Head;
+            load_article(data.Id);
             break;
         }
     }
@@ -353,40 +353,19 @@ function edit_select() {
         return;
     }
     var id = last_click_name.split('_')[4];
-    var right_div = document.getElementById("main_block_right_id");
-
-    var res = '';
+    //var right_div = document.getElementById("main_block_right_id");
+    
+   // var res = '';
     if (last_click_name.indexOf("div_one_section_name") >= 0) {
-        res += add_form_for_edit(id, 1);
+        //res += add_form_for_add_or_edit(id, 1);
+        add_form_for_add_or_edit(id, 1);
     }
     else if (last_click_name.indexOf("div_one_article_name") >= 0) {
-        res += add_form_for_edit(id, 2);
+        //res += add_form_for_add_or_edit(id, 2);
+        add_form_for_add_or_edit(id, 2);
     }
-    right_div.innerHTML = res;
+    //right_div.innerHTML = res;
 }
-
-
-
-
-//TODO //add_article add_section
-function add_form_right(type) {//1-секция 2 -статья
-    if (type != 1 && type != 2) {
-        alert("Ошибка?")
-        return;
-    }
-    if (last_click_name != null)
-        if (last_click_name.indexOf('div_one_section_name_') < 0)
-            alert('выберите секцию');
-        else {
-            var right_div = document.getElementById("main_block_right_id");
-            var res = add_form_for_add(null, type);
-            right_div.innerHTML = res;
-        }
-    else
-        alert('выберите секцию');
-}
-
-
 
 
 
@@ -473,51 +452,102 @@ function OnComplete_delete_article(data) {
     document.getElementById('div_one_article_name_' + dt).remove();
 }
 
-//--------------------------------------------------------------
-function add_form_for_edit(id, type) {//1 секция 2 статья
 
-    //var block = find_in_mass(id, type);
-    var res = "<form action=\"/Info/";
-    if (type == 1)
-        res += 'Edit_section"';
-    else
-        res += 'Edit_article"';
-    res += 'data-ajax="true" data-ajax-complete="';
-    if (type == 1)
-        res += 'OnComplete_edit_section"';
-    else
-        res += 'OnComplete_edit_article"';
-    res += '" data-ajax-loading="#Main_preloader_id" data-ajax-loading-duration="200"  method="post">';
 
-    
-    res += add_form_for_add_or_edit(id, type);
-    res += '</form>';
-    return res;
+function send_form(type) {
+
+    switch (type) {
+        case 1:
+         
+  //          $.post("/Info/Add_section",
+  //              {
+  //                  Head: convert_string(document.getElementById("input_for_section_head").value),
+  //                  parrent_sec_id: document.getElementById("input_for_parrent_sec_id").value
+  //              })
+            //.done(OnComplete_Add_section);
+            var dt={'Head':convert_string(document.getElementById("input_for_section_head").value),'parrent_sec_id':document.getElementById("input_for_parrent_sec_id").value};
+            $.ajax({
+                url: "/Info/Add_section",
+                data:dt,
+                success: OnComplete_Add_section,
+                error: function () {
+                    alert("ошибка загрузки");
+                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                },
+                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                type: 'POST', dataType: 'json'
+            });
+            break;
+        case 2:
+
+            var dt = { 'Head': convert_string(document.getElementById("input_for_section_head").value), 'Id': document.getElementById("input_for_sec_id").value };
+            $.ajax({
+                url: "/Info/Edit_section",
+                data: dt,
+                success: OnComplete_edit_section,
+                error: function () {
+                    alert("ошибка загрузки");
+                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                },
+                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                type: 'POST', dataType: 'json'
+            });
+
+            break;
+        case 3:
+        
+            var dt = {
+                'Head': convert_string(document.getElementById("input_for_article_head").value),
+                'Body': convert_string(document.getElementById("input_for_article_body").value),
+                'parrent_sec_id': document.getElementById("input_for_parrent_sec_id").value
+            };
+            $.ajax({
+                url: "/Info/Add_article",
+                data: dt,
+                success: OnComplete_Add_article,
+                error: function () {
+                    alert("ошибка загрузки");
+                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                },
+                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                type: 'POST', dataType: 'json'
+            });
+
+            break;
+        case 4:
+
+            var dt = {
+                'Head': convert_string(document.getElementById("input_for_article_head").value),
+                'Body': convert_string(document.getElementById("input_for_article_body").value),
+                'Id': document.getElementById("input_for_art_id").value
+            };
+            $.ajax({
+                url: "/Info/Edit_article",
+                data: dt,
+                success: OnComplete_edit_article,
+                error: function () {
+                    alert("ошибка загрузки");
+                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                },
+                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                type: 'POST', dataType: 'json'
+            });
+
+            break;
+        default:
+            alert("что то пошло не так");
+            break;
+    }
+
 }
-function add_form_for_add(id, type) {//1 секция 2 статья
-
-    //var block = find_in_mass(id, type);
-    var res = "<form action=\"/Info/";
-    if(type==1)
-        res+='Add_section"';
-    else
-        res+='Add_article"';
-    res+='data-ajax="true" data-ajax-complete="';
-    if (type == 1)
-        res += 'OnComplete_Add_section"';
-    else
-        res += 'OnComplete_Add_article"';
-    res += '" data-ajax-loading="#Main_preloader_id" data-ajax-loading-duration="200"  method="post">';
-
-    //СЮДА переписать add_form_for_add_or_edit
-    res+=add_form_for_add_or_edit(id, type);
-    res += '</form>';
-    return res;
-}
-//function add_form_for_edit(id, type) {//1 секция 2 статья
 
 
-//}
+
+
 function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
     var res = '';
     switch (type) {
@@ -527,13 +557,13 @@ function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
             
             res += '<textarea name="Head" class="text_area_add_edit" id="input_for_section_head">' + (block == null ? '' : block.Head) + '</textarea>';
             if (block == null){
-                res += "<input name='parrent_sec_id' type='hidden' value=" + click_sect_id() + " />";
-                res += "<input value='Добавить секцию'  type='submit'/>";
+                res += "<input name='parrent_sec_id' id='input_for_parrent_sec_id' type='hidden' value=" + click_sect_id() + " />";
+                res += "<button   onclick='send_form(1)'>Добавить секцию</button>";
             }
                 
             else {
-                res += "<input name='Id' type='hidden' value=" + id + " />";
-                res += "<input value='Сохранить'  type='submit'/>";
+                res += "<input name='Id' id='input_for_sec_id' type='hidden' value=" + id + " />";
+                res += "<button  onclick='send_form(2)' >Сохранить</button>";
             }
                 
 
@@ -546,15 +576,16 @@ function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
             res += '<textarea name="Head" class="text_area_add_edit" id="input_for_article_head">' + (block == null ? '' : block.Head) + '</textarea>';
             res += '<div><label>Содержание</label></div>';
             res += '<textarea name="Body" class="text_area_add_edit" id="input_for_article_body">' + (block == null ? '' : block.Body) + '</textarea>';
-            if (block == null){
-                res += "<input value='Добавить статью'  type='submit'/>";
-                res += "<input name='parrent_sec_id' type='hidden' value=" + click_sect_id() + " />";
+            if (block == null) {
+                res += "<input name='parrent_sec_id' id='input_for_parrent_sec_id' type='hidden' value=" + click_sect_id() + " />";
+                res += "<button onclick='send_form(3)' >Добавить статью</button>";
+                
                 
             }
                
             else {
-                res += "<input name='Id' type='hidden' value=" + id + " />";
-                res += "<input value='Сохранить'  type='submit'/>";
+                res += "<input name='Id' id='input_for_art_id' type='hidden' value=" + id + " />";
+                res += "<button onclick='send_form(4)' >Сохранить</button>";
             }
                 
                 
@@ -564,7 +595,8 @@ function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
             alert("error");
             break;
     }
-    return res;
+    document.getElementById("main_block_right_id").innerHTML = res;
+    //return res;
 }
 
 function select_view_line(new_click_id) {
