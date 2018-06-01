@@ -56,7 +56,7 @@ input,
 
 
     /*-----------------------------------------------------------------------------*/
-    #Main_preloader_id{
+    div.Main_preloader{
         position:fixed;
     width:100px;
     height:100px;

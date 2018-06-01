@@ -16,7 +16,7 @@ namespace server_info_web_desk.Models
 
         public ICollection<Section> Sections { get; set; }
         public ICollection<Article> Articles { get; set; }
-
+        public ICollection<Image> Images { get; set; }
 
         public ApplicationUser() : base()
         {
@@ -40,6 +40,7 @@ namespace server_info_web_desk.Models
 
         public DbSet<Article> Articles { get; set; }
         public DbSet<Section> Sections { get; set; }
+        public DbSet<Image> Images { get; set; }
 
         public static ApplicationDbContext Create()
         {

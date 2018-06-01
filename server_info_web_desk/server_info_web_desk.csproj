@@ -211,8 +211,9 @@
     <Compile Include="Models\functions\FunctionsInfo.cs" />
     <Compile Include="Models\functions\FunctionsProject.cs" />
     <Compile Include="Models\IdentityModels.cs" />
+    <Compile Include="Models\Image.cs" />
+    <Compile Include="Models\Info\AllData.cs" />
     <Compile Include="Models\Info\Article.cs" />
-    <Compile Include="Models\Info\ListData.cs" />
     <Compile Include="Models\Info\Section.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModel\IndexInfoView.cs" />

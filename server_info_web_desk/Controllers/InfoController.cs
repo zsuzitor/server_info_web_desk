@@ -121,6 +121,8 @@ namespace server_info_web_desk.Controllers
 
 
             var section = db.Sections.FirstOrDefault(x1 => x1.Id == id);//AsNoTracking()
+            if(section==null)
+                return Json(false, JsonRequestBehavior.AllowGet);
             db.Entry(section).Reference(x1 => x1.User).Load();
             if (!section.User.Open_data_info&& section.User.Id != check_id)
             {
@@ -277,13 +279,14 @@ namespace server_info_web_desk.Controllers
             }
             Get_inside_id((int)id, sec_list, art_list);
             var section_for_delete = db.Sections.Join(sec_list, p => p.Id, c => c, (p, c) => p);
+            int? parrent_id = sec.Section_parrentId;
             db.Sections.RemoveRange(section_for_delete);
             db.SaveChanges();
 
             //var gg = db.Articles.ToList();
             //var gg2 = db.Sections.ToList();
             //return Json("inside_"+id);
-            return Json(new {main_id=id,parrent_id_main= sec.Section_parrentId, sec_list= sec_list });
+            return Json(new {main_id=id,parrent_id_main= parrent_id, sec_list= sec_list });
         }
 
         //TODO
@@ -307,29 +310,27 @@ namespace server_info_web_desk.Controllers
         //TODO
 
             //загрузка и обновление всей db из файла\текста пользователя
-        [Authorize]
-        [HttpPost]
-        public ActionResult Load_all_data_in_db(string a)
-        {
-            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            ListData data = null;
-            try
-            {
-                data = JsonConvert.DeserializeObject<ListData>(a);
-            }
-            catch {
-                //TODO обработать ошибку
-                //return RedirectToAction("Send_error","Home",new { ret=2, code="Произошла ошибка" });
-                //return StatusCode(418);
-                return new HttpStatusCodeResult(400);//bad request
-            }
+        //[Authorize]
+        //[HttpPost]
+        //public ActionResult Load_all_data_in_db(string a)
+        //{
+        //    var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+        //    ListData data = null;
+        //    try
+        //    {
+        //        data = JsonConvert.DeserializeObject<ListData>(a);
+        //    }
+        //    catch {
+                
+        //        return new HttpStatusCodeResult(400);//bad request
+        //    }
 
-            db.Articles.RemoveRange(db.Articles.Where(x1 => x1.UserId == check_id));
-            db.Sections.RemoveRange(db.Sections.Where(x1 => x1.UserId == check_id));
+        //    db.Articles.RemoveRange(db.Articles.Where(x1 => x1.UserId == check_id));
+        //    db.Sections.RemoveRange(db.Sections.Where(x1 => x1.UserId == check_id));
 
 
-            return View();
-        }
+        //    return View();
+        //}
 
 
 
@@ -357,7 +358,146 @@ namespace server_info_web_desk.Controllers
             return PartialView();
         }
 
+        [Authorize]
+        
+        public JsonResult Download_data_file()
+        {
+            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
+            AllData res = new AllData();
+            
+            res.Articles.AddRange(db.Articles.Where(x1 => x1.UserId == check_id).ToList().Select(x1 => new Article(x1, true) { UserId = null }));
+            res.Sections.AddRange(db.Sections.Where(x1 => x1.UserId == check_id).ToList().Select(x1 => new Section(x1, true) { UserId=null }));
+            foreach(var i in res.Articles)
+            {
+                try
+                {
+                    res.Images.AddRange(db.Images.Where(x1 => x1.Article_parrentId == i.Id).ToList().Select(x1 => new Image(x1, true)));
+                }
+                catch { }
+              
+            }
+
+            return Json(res);
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        public JsonResult Upload_data_file_text(string upload_text)
+        {
+
+            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            AllData data = null;
+            try
+            {
+                data = JsonConvert.DeserializeObject<AllData>(upload_text);
+               
+            }
+            catch
+            {
+                return Json(false); //bad request
+            }
+
+
+
+
+            //db.Articles.RemoveRange(db.Articles.Where(x1 => x1.UserId == check_id));
+            //db.Sections.RemoveRange(db.Sections.Where(x1 => x1.UserId == check_id));
+
+
+            //TODO  тут данные не удалять а изменять??? 
+            //идти по бд и сравнивать со строкой и удалять менять 
+            //идти по файлу и сравнивать с бд менять
+            //если в файле есть блок которого нет в бд то добавлять
+
+
+            var lst_sec = db.Sections.Where(x1 => x1.UserId == check_id).ToList();
+            foreach(var i in lst_sec)
+            {
+                var tmp_sec=data.Sections.FirstOrDefault(x1 => x1.Id == i.Id);
+                if (tmp_sec == null)
+                    db.Sections.Remove(i);
+                else
+                {
+                    if (!i.Head.Equals(tmp_sec.Head))
+                    {
+                        tmp_sec.Head = tmp_sec.Head;
+                    }
+                    i.Order = tmp_sec.Order;
+                    i.Section_parrentId = tmp_sec.Section_parrentId;
+                    data.Sections.Remove(tmp_sec);
+                }
+            }
+            foreach (var i in data.Sections)
+            {
+                //if ()
+                    if (i.Section_parrentId == null||db.Sections.FirstOrDefault(x1 => x1.Id == i.Section_parrentId && x1.UserId == check_id) != null)
+                    {
+                        i.Id = 0;
+                        i.UserId = check_id;
+                        db.Sections.Add(i);
+                    }
+                
+            }
+            var lst_art = db.Articles.Where(x1 => x1.UserId == check_id).ToList();
+            foreach (var i in lst_art)
+            {
+                var tmp_art = data.Articles.FirstOrDefault(x1 => x1.Id == i.Id);
+                if (tmp_art == null)
+                    db.Articles.Remove(i);
+                else
+                {
+                    if (!i.Head.Equals(tmp_art.Head))
+                    {
+                        tmp_art.Head = tmp_art.Head;
+                    }
+                    if (!i.Body.Equals(tmp_art.Body))
+                    {
+                        tmp_art.Body = tmp_art.Body;
+                    }
+                    i.Order = tmp_art.Order;
+                    i.Section_parrentId = tmp_art.Section_parrentId;
+                    data.Articles.Remove(tmp_art);
+                }
+            }
+            foreach (var i in data.Articles)
+            {
+                //i.Section_parrentId ==0   НЕ УВЕРЕН ЧТО НУЖНО не знаю как json парсит null для типов INT
+                if (i.Section_parrentId ==0|| db.Sections.FirstOrDefault(x1 => x1.Id == i.Section_parrentId && x1.UserId == check_id) != null)
+                {
+                    i.Id = 0;
+                    i.UserId = check_id;
+                    db.Articles.Add(i);
+                }
+            }
+            var lst_img = db.Images.Where(x1 => x1.UserId == check_id).ToList();
+            foreach (var i in lst_img)
+            {
+                var tmp_img = data.Images.FirstOrDefault(x1 => x1.Id == i.Id);
+                if (tmp_img == null)
+                    db.Images.Remove(i);
+                else
+                {
+                    
+                    i.Data = tmp_img.Data;
+                    i.Article_parrentId = tmp_img.Article_parrentId;
+                    data.Images.Remove(tmp_img);
+                }
+            }
+            foreach (var i in data.Images)
+            {
+                if (i.Article_parrentId == null || db.Images.FirstOrDefault(x1 => x1.Id == i.Article_parrentId && x1.UserId == check_id) != null)
+                {
+                    i.Id = 0;
+                    i.UserId = check_id;
+                    db.Images.Add(i);
+                }
+            }
+
+            db.SaveChanges();
+            return Json(null);
+        }
 
         [Authorize]
         [HttpPost]

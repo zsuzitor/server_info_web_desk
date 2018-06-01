@@ -15,7 +15,9 @@ namespace server_info_web_desk.Models.Info
         public int Id { get; set; }
         //public int Parrent_id { get; set; }
 
-        [UIHint("MultilineText")]
+        public int Order { get; set; }
+        
+    [UIHint("MultilineText")]
         [Display(Name = "Название")]
         [Required(ErrorMessage = "Поле должно быть установлено")]
         public string Head { get; set; }
@@ -31,22 +33,25 @@ namespace server_info_web_desk.Models.Info
         public ICollection<Article> Articles { get; set; }
         public Section()
         {
-            Id = 0;
+            this.Id = 0;
+            this.Order = 0;
             //Parrent_id = 0;
-            Head = "";
-            Section_parrentId = null;
-            Articles = new List<Article>();
-            Sections = new List<Section>();
-            Section_parrent = null;
-            UserId = null;
-            User = null;
+            this.Head = "";
+            this.Section_parrentId = null;
+            this.Articles = new List<Article>();
+            this.Sections = new List<Section>();
+            this.Section_parrent = null;
+            this.UserId = null;
+            this.User = null;
         }
         public Section(Section a,bool with_out_reference=false)
         {
             this.Id = a.Id;
+            this.Order = a.Order;
             this.Head = a.Head;
             this.UserId = a.UserId;
             this.Section_parrentId = a.Section_parrentId;
+
             if (!with_out_reference) { 
             this.Section_parrent = a.Section_parrent;
             this.User = a.User;

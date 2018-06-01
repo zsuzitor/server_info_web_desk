@@ -25,7 +25,7 @@
                 <!-- Сохранить все изменения -->
                 <span class="span_top_menu_save">&#9883;</span>
             </div>
-            <div class="top_menu_button top_menu_fr_load_button" onclick='close_reload_list()' title="close all section">
+            <div class="top_menu_button top_menu_fr_load_button" onclick='upload_text_all_data()' title="close all section">@*close_reload_list()*@
                 <!-- Закрыть все секции -->
                 <span class="span_top_menu_cl_reload">&#9850;</span>
             </div>
@@ -53,34 +53,11 @@
 </div>
 @*формы для отправки всякого*@
 <div style="display:none;">
-    @using (Ajax.BeginForm("Load_inside_section","Info",new AjaxOptions {OnComplete= "OnComplete_load_inside_section", LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
-    {
-        <input name="id" id="id_section_for_load_input"/>  @*@Html.Editor("id_section_for_load_input", "id")*@
-        <input id="id_section_for_load_input_submit" type="submit"/>
-    }
-    @using (Ajax.BeginForm("Load_article_body", "Info", new AjaxOptions { OnComplete = "OnComplete_load_article_body", LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
-    {
-        <input name="id" id="id_article_for_load_input" />  @*@Html.Editor("id_section_for_load_input", "id")*@
-        <input id="id_article_for_load_input_submit" type="submit" />
-    }
+    
 
-    @using (Ajax.BeginForm("Delete_section", "Info", new AjaxOptions { OnComplete = "OnComplete_delete_section", LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
-    {
-        <input name="id" id="id_section_for_delete_input" />  
-        <input id="id_section_for_delete_input_submit" type="submit" />
-    }
-    @using (Ajax.BeginForm("Delete_article", "Info", new AjaxOptions { OnComplete = "OnComplete_delete_article", LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
-    {
-        <input name="id" id="id_article_for_delete_input" />
-        <input id="id_article_for_delete_input_submit" type="submit" />
-    }
+   
    @* <div id="div_all_form_js"></div>*@
         @*сейчас не используется*@
-        <div id="div_form_for_add_section">
-            @using (Ajax.BeginForm("Add_section", "Info", new AjaxOptions { OnComplete = "OnComplete_Add_section", LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
-            {
-            }
-
-        </div>
+        
 
     </div>

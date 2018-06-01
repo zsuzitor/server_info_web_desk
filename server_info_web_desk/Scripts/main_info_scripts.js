@@ -199,9 +199,21 @@ function click_name_section(a) {
     }
 
     if (need_load) {
-        var inp = document.getElementById("id_section_for_load_input");
-        inp.value = int_id;
-        document.getElementById("id_section_for_load_input_submit").click();
+        
+        var dt = { 'id': int_id};
+        $.ajax({
+            url: "/Info/Load_inside_section",
+            data: dt,
+            success: OnComplete_load_inside_section,
+            error: function () {
+                alert("ошибка загрузки");
+                document.getElementById('Main_preloader_id').style.display = 'none;';
+            },
+            beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+            complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+            type: 'POST', dataType: 'json'
+        });
+
 
     }
     else {
@@ -243,40 +255,40 @@ function open_section(id) {
 
 }
 function OnComplete_load_inside_section(data) {
-    var dt = JSON.parse(data.responseText);
+    
    // alert(dt);
-    if (dt == false) {
+    if (data == false) {
         alert("OnComplete_load_inside_section return false");
         return;
     }
        
-    for (var i = 0; i < dt.Sections.length; ++i) {
-        var obg_tmp = { Id: dt.Sections[i].Id, Head: dt.Sections[i].Head, Section_parrentId: dt.Sections[i].Section_parrentId };
+    for (var i = 0; i < data.Sections.length; ++i) {
+        var obg_tmp = { Id: data.Sections[i].Id, Head: data.Sections[i].Head, Section_parrentId: data.Sections[i].Section_parrentId };
         mass_section.push(obg_tmp)
     }
-    for (var i = 0; i < dt.Articles.length; ++i) {
-        var obg_tmp = { Id: dt.Articles[i].Id, Head: dt.Articles[i].Head, Body: null, Section_parrentId: dt.Articles[i].Section_parrentId };
+    for (var i = 0; i < data.Articles.length; ++i) {
+        var obg_tmp = { Id: data.Articles[i].Id, Head: data.Articles[i].Head, Body: null, Section_parrentId: data.Articles[i].Section_parrentId };
         mass_article.push(obg_tmp)
     }
 
-    var inside = document.getElementById("div_one_section_inside_" + dt.Id);
+    var inside = document.getElementById("div_one_section_inside_" + data.Id);
 
-    inside.innerHTML = load_one_section_data(dt.Id);
+    inside.innerHTML = load_one_section_data(data.Id);
     
     //= load_one_section(mass_section[0].Id);
     //left_div.innerHTML = str_add_name_section(mass_section[0].Id) + str_res_for_left_ul;
 
-    open_section(dt.Id);
+    open_section(data.Id);
 }
 function OnComplete_load_article_body(data) {
-    var dt = JSON.parse(data.responseText);
-    if (dt == false) {
+    //var dt = JSON.parse(data.responseText);
+    if (data == false) {
         alert("OnComplete_load_inside_section return false");
         return;
     }
-    var block = find_in_mass(dt.Id, 2);
-    block.Body = dt.Body;
-    show_article(dt);
+    var block = find_in_mass(data.Id, 2);
+    block.Body = data.Body;
+    show_article(data);
 }
 
 
@@ -391,65 +403,96 @@ function dell_select() {
     document.getElementById("main_block_right_id").innerHTML = "";
 }
 function delete_section_f(id) {
-    var inp = document.getElementById("id_section_for_delete_input");
-    inp.value = id;
-    document.getElementById("id_section_for_delete_input_submit").click();
+    
+    var dt = { 'id': id };
+    $.ajax({
+        url: "/Info/Delete_section",
+        data: dt,
+        success: OnComplete_delete_section,
+        error: function () {
+            alert("ошибка загрузки");
+            document.getElementById('Main_preloader_id').style.display = 'none;';
+        },
+        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        type: 'POST', dataType: 'json'
+    });
+
+
 }
 
 function delete_article_f(id) {
-    var inp = document.getElementById("id_article_for_delete_input");
-    inp.value = id;
-    document.getElementById("id_article_for_delete_input_submit").click();
+
+    var dt = { 'id': id };
+    $.ajax({
+        url: "/Info/Delete_article",
+        data: dt,
+        success: OnComplete_delete_article,
+        error: function () {
+            alert("ошибка загрузки");
+            document.getElementById('Main_preloader_id').style.display = 'none;';
+        },
+        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        type: 'POST', dataType: 'json'
+    });
+
 }
 function OnComplete_delete_section(data) {
-    var dt = JSON.parse(data.responseText);
-    if (dt == false) {
+    //var dt = JSON.parse(data.responseText);
+    if (data == false) {
         alert("OnComplete_Add_article return false");
         return;
     }
-    if (dt.parrent_id_main == null)
+    if (data.parrent_id_main == null)
         for (var i2 = 0; i2 < mass_article.length; ++i2)
-            if (mass_article[i2].Section_parrentId == dt.main_id)
+            if (mass_article[i2].Section_parrentId == data.main_id)
                 mass_article.splice(i2--, 1);
             
         
 
-    for (var i = 0; i < dt.sec_list.length; ++i) {
+    for (var i = 0; i < data.sec_list.length; ++i) {
         for (var i2 = 0; i2 < mass_article.length; ++i2) {
-            if (mass_article[i2].Section_parrentId == dt.sec_list[i]) {
+            if (mass_article[i2].Section_parrentId == data.sec_list[i]) {
                 mass_article.splice(i2--,1);
             }
         }
         go:
             for (var i2 = 0; i2 < mass_section.length; ++i2) 
-                if (mass_section[i2].Id == dt.sec_list[i]) {
+                if (mass_section[i2].Id == data.sec_list[i]) {
                     mass_section.splice(i2--, 1);
                     break go;
                 }
                    
             
     }
-
-    var inside = document.getElementById("div_one_section_inside_" + dt.main_id);
-
-    inside.innerHTML = load_one_section_data(dt.main_id);
+    if (data.parrent_id_main == null) {
+        var inside = document.getElementById("div_one_section_inside_" + data.main_id);
+        inside.innerHTML = load_one_section_data(data.main_id);
+    }
+    else {
+        document.getElementById("div_one_section_name_" + data.main_id).remove();
+        document.getElementById("div_one_section_inside_" + data.main_id).remove();
+        
+    }
+    
    
    
 }
 function OnComplete_delete_article(data) {
-    var dt = JSON.parse(data.responseText);
-    if (dt == false) {
+   // var dt = JSON.parse(data.responseText);
+    if (data == false) {
         alert("OnComplete_Add_article return false");
         return;
     }
     for (var i2 = 0; i2 < mass_article.length; ++i2) {
-        if (mass_article[i2].Id == dt) {
+        if (mass_article[i2].Id == data) {
             mass_article.splice(i2--, 1);
             break;
         }
     }
 
-    document.getElementById('div_one_article_name_' + dt).remove();
+    document.getElementById('div_one_article_name_' + data).remove();
 }
 
 
@@ -621,8 +664,22 @@ function load_article(id_ar) {
     
         if (article == null||article.Body == null) {
             //TODO загрузить статью
-            document.getElementById("id_article_for_load_input").value = id_ar;
-            document.getElementById("id_article_for_load_input_submit").click();
+
+            var dt = { 'id': id_ar };
+            $.ajax({
+                url: "/Info/Load_article_body",
+                data: dt,
+                success: OnComplete_load_article_body,
+                error: function () {
+                    alert("ошибка загрузки");
+                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                },
+                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                type: 'POST', dataType: 'json'
+            });
+
+
         }
         else
             show_article(article);
@@ -669,6 +726,71 @@ function home_button_return_left() {
     alert("home_button_return_left currently not implemented");
 }
 
+function OnComplete_load_all_data_for_save_file(data) {
+    if (data == false) {
+        alert("OnComplete_load_all_data_for_save_file return false");
+        return;
+    }
+    var pom = document.createElement('a');
+    pom.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(JSON.stringify(data)));
+    pom.setAttribute('download', 'data.json');
+    pom.click();
+}
+function save_server_db() {
+    $.ajax({
+        url: "/Info/Download_data_file",
+        data: null,
+        success: OnComplete_load_all_data_for_save_file,
+        error: function () {
+            alert("ошибка загрузки");
+            document.getElementById('Main_preloader_id').style.display = 'none;';
+        },
+        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        type: 'POST', dataType: 'json'
+    });
+}
+
+function OnComplete_load_all_data_for_save_server(data) {
+
+    if (data == false) {
+        alert("OnComplete_load_all_data_for_save_server return false");
+        return;
+    }
+    location.href = '/Info/Info_page';
+
+
+
+}
+
+function upload_text_all_data() {
+    var div=document.getElementById("main_block_right_id");
+    var res = "<div>";
+    res += '<textarea name="upload_text" class="text_area_add_edit" id="input_for_text_all_data"></textarea>';
+    res+="<button onclick='before_load_all_data_text()'>Загрузить</button>";
+    res += "</div>";
+    div.innerHTML = res;
+}
+
+function before_load_all_data_text() {
+    if (!confirm("ВНИМАНИЕ!!! ВСЕ данные на сервере(список секций, статей, картинок из статей) будут перезаписаны на указанные в поле! Продолжить??"))
+        return;
+    var string = convert_string(document.getElementById("input_for_text_all_data").value);
+    var dt = { upload_text: string };
+    $.ajax({
+        url: "/Info/Upload_data_file_text",
+        data: dt,
+        success: OnComplete_load_all_data_for_save_server,
+        error: function () {
+            alert("ошибка загрузки");
+            document.getElementById('Main_preloader_id').style.display = 'none;';
+        },
+        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        type: 'POST', dataType: 'json'
+    });
+
+}
 function show_top_menu() {
     var top_menu = document.getElementById("div_for_top_menu_id");
     top_menu.style.left = "0";

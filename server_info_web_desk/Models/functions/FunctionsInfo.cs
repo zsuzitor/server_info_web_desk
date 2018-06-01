@@ -11,6 +11,7 @@ namespace server_info_web_desk.Models.functions
     public static class FunctionsInfo
     {
         //массивы только дополнять
+        //только внешний уровень возвращается
         public static bool GetSectionInside(int id_section,List<Section> section, List<Article> article)
         {
             //ListData res = null;
@@ -22,7 +23,7 @@ namespace server_info_web_desk.Models.functions
             return true;
         }
 
-
+        //ВСЕ вложенные
         public static void Get_inside_id(int id,List<int>sections_id, List<int> articles_id)
         {
             var sec_list=db.Sections.Where(x1 => x1.Section_parrentId == id).Select(x1=>x1.Id).ToList();
