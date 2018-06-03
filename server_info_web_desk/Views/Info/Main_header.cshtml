@@ -10,13 +10,9 @@
         </div>
         <div class="div_inline_block div_search_input_block">
 
-            @using (Ajax.BeginForm("Start_search", "Info", new AjaxOptions { UpdateTargetId = "main_block_left_id" }))
-            {
-
+           
                 <input id="search_string_client" type="text">
-                <input type="submit" id="submit_button_search" />
-
-            }
+                
         </div>
     </div>
 
@@ -39,6 +35,12 @@
         </div>
     </div>
     }
-    <div class="div_inline_block info_log_partial_div">@Html.Partial("_LoginPartial")</div>
+    <div class="div_inline_block info_log_partial_div">
+    @if (ViewBag.action_name == "index")
+    {
+        @Html.ActionLink("Главная страница ресурса","Index","Home")
+        @Html.Partial("_LoginPartial")
+    }
+    </div>
 </div>
 

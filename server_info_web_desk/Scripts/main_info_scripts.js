@@ -723,7 +723,8 @@ function save_server_db() {
 }
 function home_button_return_left() {
 
-    alert("home_button_return_left currently not implemented");
+    location.href = '/Info/Index';
+    //alert("home_button_return_left currently not implemented");
 }
 
 function OnComplete_load_all_data_for_save_file(data) {
@@ -759,8 +760,51 @@ function OnComplete_load_all_data_for_save_server(data) {
     }
     location.href = '/Info/Info_page';
 
+}
 
 
+function OnComplete_search(data) {
+    
+    if (data == false) {
+        alert("OnComplete_search return false");
+        return;
+    }
+
+
+    data.sort(funct_sort);
+
+    var mass_inside = [];
+    for (var i = 0; i < data.length; ++i) {
+        if (data[i].inside) 
+            mass_inside.push(data[i]);
+        
+    }
+    var div = document.getElementById("main_block_left_id");
+    div.innerHTML = "";
+    var res = "";
+
+    res += "<div>";
+    //res += "<div class='div_one_article_name' id='div_one_article_name_" + mass_article[i].Id + "' onclick='load_article(" + mass_article[i].Id + ")'>" + mass_article[i].Head + "</div>";//convert_string(mass_article[i].Head)
+    for (var i = 0; i < mass_inside.length; ++i) {
+        res += "<div class='div_one_article_name' id='div_one_article_name_"
+            + mass_inside[i].Id + "' onclick='load_article(" + mass_inside[i].Id + ")'>"
+            + mass_inside[i].Head + "</div>";
+    }
+    res += "</div>";
+    //
+    res += "<div>";
+
+    for (var i = 0; i < data.length; ++i) {
+        res += "<div class='div_one_article_name' id='div_one_article_name_"
+            + data[i].Id + "' onclick='load_article(" + data[i].Id + ")'>"
+            + data[i].Head + "</div>";
+    }
+
+    res += "</div>";
+    var funct_sort = function (a, b) {
+        if (a.Mark < b.Mark) return 1;
+        if (a.Mark > b.Mark) return -1;
+    };
 }
 
 function upload_text_all_data() {
@@ -898,4 +942,40 @@ function click_on_centre_settings(flag) {
 function move_search_div(marginleft) {
     var search_div = document.getElementById("div_search_id");
     search_div.style.marginLeft = marginleft + 'px';
+}
+
+
+function start_search() {
+    var string = document.getElementById("search_string_client").value;
+   
+    var dt = { src: str_to_str_search(string), id_for_search: click_sect_id() };
+    $.ajax({
+        url: "/Info/Start_search",
+        data: dt,
+        success: OnComplete_search,
+        error: function () {
+            alert("ошибка загрузки");
+            document.getElementById('Main_preloader_id').style.display = 'none;';
+        },
+        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        type: 'POST', dataType: 'json'
+    });
+
+    
+    
+
+
+    function str_to_str_search(str) {
+        //var res=[];
+        //var reg1 = new RegExp("(\w+)(\s*\+\s*|\s*#\s*|\s*(\(.*\))?\s*)", "gi");
+        var reg1 = new RegExp("(\\w+)(\\s*\\+\\s*)", "gi");
+        str = str.replace(reg1, '$1 + ');
+        reg1 = new RegExp("(\\w+)(\\s*#\\s*)", "gi");
+        str = str.replace(reg1, '$1 # ');
+        reg1 = new RegExp("\\s*\\((.*?)\\)\\s*", "gi");//"(\\w+)(\\s*\(.*?\)\\s*)", "gi"
+        str = str.replace(reg1, '( $1 )');
+        return str;
+    }
+
 }

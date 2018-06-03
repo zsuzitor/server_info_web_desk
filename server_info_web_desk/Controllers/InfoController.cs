@@ -268,7 +268,7 @@ namespace server_info_web_desk.Controllers
             if(sec==null)
                 return Json(false);
             List<int> sec_list = new List<int>();
-            List<int> art_list = new List<int>();
+            //List<int> art_list = new List<int>();
             if (sec.Section_parrentId != null)
                 sec_list.Add(sec.Id);
             else
@@ -277,7 +277,7 @@ namespace server_info_web_desk.Controllers
                 if(lst.Count>0)
                 db.Articles.RemoveRange(lst);
             }
-            Get_inside_id((int)id, sec_list, art_list);
+            Get_inside_id((int)id, sec_list, null);
             var section_for_delete = db.Sections.Join(sec_list, p => p.Id, c => c, (p, c) => p);
             int? parrent_id = sec.Section_parrentId;
             db.Sections.RemoveRange(section_for_delete);
@@ -340,12 +340,93 @@ namespace server_info_web_desk.Controllers
         //TODO
         [AllowAnonymous]
         [HttpPost]
-        public ActionResult Start_search(string src)
+        public JsonResult Start_search(int? id_for_search,string src,string user_id)
         {
+            //OnComplete_search  start_search
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            if (user_id == null)
+            {
+                return Json(false);
+            }
+            if (check_id != user_id)
+            {
+                bool? sc = db.Users.FirstOrDefault(x1 => x1.Id == user_id)?.Open_data_info;
+                if(sc!=true)
+                    return Json(false);
+            }
+           
 
 
-            return View();
+            var mass_words = src.Split(' ');
+            var art = db.Articles.AsNoTracking().Where(x1 => x1.UserId == user_id).ToList();
+            //Dictionary<int, double> Mark = new Dictionary<int, double>();
+
+            List<int> atr_list_id = new List<int>();
+            if (id_for_search != null)
+            {
+                //Get_inside_id
+                //добавить список вложенных статей к результату для отрисовки на клиенте доп поля
+                Get_inside_id((int)id_for_search, null, atr_list_id);
+            }
+
+            List<dynamic> Mark = new List<dynamic>();
+            foreach (var i in art)
+            {
+                int? tmp=atr_list_id.FirstOrDefault(x1 => x1 == i.Id);
+                Mark.Add(new { Id = i.Id, Mark = GetMarkArticle(i, mass_words),
+                    Head = i.Head, inside = tmp == null ? false : true
+                });
+
+            }
+           
+
+            //var main_mass_obj_articles =[];
+            //var not_main_mass_obj_articles =[];
+            //List<List<string>> mass_bracket =new List<List<string>>();
+            //List<List<string>> mass_plus =new List<List<string>>();
+            //List<string> mass_tag =new List<string>();
+            //for (var i = 0; i < mass_words.Count(); ++i)
+            //{
+            //    if (mass_words[i] == "+")
+            //    {
+            //        List<string> tmp_mass =new List<string>();
+            //        tmp_mass.Add(mass_words[i - 1]);
+            //        tmp_mass.Add(mass_words[++i]);
+            //        while (++i < mass_words.Count() && mass_words[i] == "+")
+            //        {
+            //            tmp_mass.Add(mass_words[++i]);
+            //        }
+
+            //        mass_plus.Add(tmp_mass);
+
+
+            //    }
+            //    if (mass_words[i] == "(")
+            //    {
+            //        List<string> tmp_mass =new List<string>();
+            //        tmp_mass.Add(mass_words[++i]);
+            //        while (++i < mass_words.Count() && mass_words[i] != ")")
+            //        {
+            //            tmp_mass.Add(mass_words[i]);
+            //        }
+
+            //        mass_bracket.Add(tmp_mass);
+            //    }
+            //    if (mass_words[i] == "#")
+            //    {
+            //        mass_tag.Add("#" + mass_words[++i]);
+            //    }
+            //}
+
+
+
+
+
+
+
+
+            //foreach i.Key, i.Value
+            return Json( Mark );//,art_id_list_inside= atr_list_id
         }
 
         [AllowAnonymous]
@@ -425,14 +506,22 @@ namespace server_info_web_desk.Controllers
                         tmp_sec.Head = tmp_sec.Head;
                     }
                     i.Order = tmp_sec.Order;
-                    i.Section_parrentId = tmp_sec.Section_parrentId;
+                    bool owner_sec=true;
+                    if (i.Section_parrentId != tmp_sec.Section_parrentId)
+                    {
+                        CheckAccessSection(check_id, tmp_sec.Section_parrentId,out owner_sec);
+                    }
+                    if (owner_sec)
+                        i.Section_parrentId = tmp_sec.Section_parrentId;
                     data.Sections.Remove(tmp_sec);
                 }
             }
             foreach (var i in data.Sections)
             {
-                //if ()
-                    if (i.Section_parrentId == null||db.Sections.FirstOrDefault(x1 => x1.Id == i.Section_parrentId && x1.UserId == check_id) != null)
+                bool owner_sec = true;
+                //тут мб при ошибке проставлять Section_parrentId id главной секции?
+                CheckAccessSection(check_id, i.Section_parrentId, out owner_sec);
+                    if (i.Section_parrentId == null|| owner_sec)
                     {
                         i.Id = 0;
                         i.UserId = check_id;
@@ -457,15 +546,25 @@ namespace server_info_web_desk.Controllers
                         tmp_art.Body = tmp_art.Body;
                     }
                     i.Order = tmp_art.Order;
-                    i.Section_parrentId = tmp_art.Section_parrentId;
+                    bool owner_sec = true;
+                    if (i.Section_parrentId != tmp_art.Section_parrentId)
+                    {
+                        CheckAccessSection(check_id, tmp_art.Section_parrentId, out owner_sec);
+                    }
+                    if (owner_sec)
+                        i.Section_parrentId = tmp_art.Section_parrentId;
                     data.Articles.Remove(tmp_art);
                 }
             }
             foreach (var i in data.Articles)
             {
-                //i.Section_parrentId ==0   НЕ УВЕРЕН ЧТО НУЖНО не знаю как json парсит null для типов INT
-                if (i.Section_parrentId ==0|| db.Sections.FirstOrDefault(x1 => x1.Id == i.Section_parrentId && x1.UserId == check_id) != null)
+                //i.Section_parrentId ==0   НЕ УВЕРЕН ЧТО НУЖНО не знаю как json парсит null для типов INT //i.Section_parrentId ==0||
+                bool owner_sec = true;
+                //тут мб при ошибке проставлять Section_parrentId id главной секции?
+                CheckAccessSection(check_id, i.Section_parrentId, out owner_sec);
+                if (owner_sec)
                 {
+                    
                     i.Id = 0;
                     i.UserId = check_id;
                     db.Articles.Add(i);
@@ -481,13 +580,19 @@ namespace server_info_web_desk.Controllers
                 {
                     
                     i.Data = tmp_img.Data;
-                    i.Article_parrentId = tmp_img.Article_parrentId;
+                    bool owner_sec = true;
+                    if (i.Article_parrentId != tmp_img.Article_parrentId)
+                    {
+                        CheckAccessSection(check_id, db.Articles.FirstOrDefault(x1=>x1.Id== tmp_img.Article_parrentId)?.Section_parrentId, out owner_sec);
+                    }
+                    if (owner_sec)
+                        i.Article_parrentId = tmp_img.Article_parrentId;
                     data.Images.Remove(tmp_img);
                 }
             }
             foreach (var i in data.Images)
             {
-                if (i.Article_parrentId == null || db.Images.FirstOrDefault(x1 => x1.Id == i.Article_parrentId && x1.UserId == check_id) != null)
+                if (i.Article_parrentId == null || db.Articles.FirstOrDefault(x1 => x1.Id == i.Article_parrentId && x1.UserId == check_id) != null)
                 {
                     i.Id = 0;
                     i.UserId = check_id;
@@ -496,7 +601,7 @@ namespace server_info_web_desk.Controllers
             }
 
             db.SaveChanges();
-            return Json(null);
+            return Json(true);
         }
 
         [Authorize]
