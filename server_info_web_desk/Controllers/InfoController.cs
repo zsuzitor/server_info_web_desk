@@ -346,7 +346,13 @@ namespace server_info_web_desk.Controllers
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             if (user_id == null)
             {
+                //return Json(false);
+                user_id = check_id;
+            }
+            if (user_id == null)
+            {
                 return Json(false);
+               // user_id = check_id;
             }
             if (check_id != user_id)
             {
@@ -372,9 +378,9 @@ namespace server_info_web_desk.Controllers
             List<dynamic> Mark = new List<dynamic>();
             foreach (var i in art)
             {
-                int? tmp=atr_list_id.FirstOrDefault(x1 => x1 == i.Id);
+                int tmp=atr_list_id.FirstOrDefault(x1 => x1 == i.Id);
                 Mark.Add(new { Id = i.Id, Mark = GetMarkArticle(i, mass_words),
-                    Head = i.Head, inside = tmp == null ? false : true
+                    Head = i.Head, inside = tmp == 0 ? false : true
                 });
 
             }

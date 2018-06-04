@@ -242,11 +242,19 @@ function open_section(id) {
             
         }
     };
-
-    if (div.style.display == '' || div.style.display == 'inline-block') {
+    var open = false;
+    for (var i = 0; i < mass_section_open.length; ++i) {
+        if (mass_section_open[i] == id) {
+            open = true;
+            mass_section_open.splice(i, 1);
+            break;
+        }
+    }
+    if (open) {
         f1_();
     }
     else {
+        mass_section_open.push(id);
         f2_();
     }
 
@@ -764,7 +772,12 @@ function OnComplete_load_all_data_for_save_server(data) {
 
 
 function OnComplete_search(data) {
-    
+    var funct_sort = function (a, b) {
+        if (a.Mark < b.Mark) return 1;
+        if (a.Mark > b.Mark) return -1;
+    };
+
+
     if (data == false) {
         alert("OnComplete_search return false");
         return;
@@ -773,38 +786,78 @@ function OnComplete_search(data) {
 
     data.sort(funct_sort);
 
-    var mass_inside = [];
-    for (var i = 0; i < data.length; ++i) {
-        if (data[i].inside) 
-            mass_inside.push(data[i]);
+    //var mass_inside = [];
+    //for (var i = 0; i < data.length; ++i) {
+    //    if (data[i].inside) 
+    //        mass_inside.push(data[i]);
         
-    }
+    //}
     var div = document.getElementById("main_block_left_id");
     div.innerHTML = "";
-    var res = "";
-
-    res += "<div>";
+    var res1 = "<div class='div_inside_articles'>";
+    var res2 = "<div class='div_inside_articles'>";
+    
     //res += "<div class='div_one_article_name' id='div_one_article_name_" + mass_article[i].Id + "' onclick='load_article(" + mass_article[i].Id + ")'>" + mass_article[i].Head + "</div>";//convert_string(mass_article[i].Head)
-    for (var i = 0; i < mass_inside.length; ++i) {
-        res += "<div class='div_one_article_name' id='div_one_article_name_"
-            + mass_inside[i].Id + "' onclick='load_article(" + mass_inside[i].Id + ")'>"
-            + mass_inside[i].Head + "</div>";
-    }
-    res += "</div>";
-    //
-    res += "<div>";
-
     for (var i = 0; i < data.length; ++i) {
-        res += "<div class='div_one_article_name' id='div_one_article_name_"
+        var tmp_art = "<div class='div_one_article_name' id='div_one_article_name_"
             + data[i].Id + "' onclick='load_article(" + data[i].Id + ")'>"
             + data[i].Head + "</div>";
+        if (data[i].inside)
+            res1 += tmp_art;
+        else
+            res2 += tmp_art;
+    }
+    res1 += "</div>";
+    res2 += "</div>";
+    //
+    //res += "<div>";
+
+    //for (var i = 0; i < data.length; ++i) {
+    //    res += "<div class='div_one_article_name' id='div_one_article_name_"
+    //        + data[i].Id + "' onclick='load_article(" + data[i].Id + ")'>"
+    //        + data[i].Head + "</div>";
+    //}
+
+    //res += "</div>";
+    div.innerHTML = res1 +"<hr/>"+ res2;
+   
+}
+
+function load_left_block() {
+    function get_all_parrent(id,mass) {
+
+        //var res = [];
+        for (var i = 0; i < mass_section.length; ++i) 
+            if (mass_section[i].Id == id) {
+                if (mass_section[i].Section_parrent != null) {
+                    for (var i2 = 0; i2 < mass; ++i2) {
+                        ТУТ не надо добавлять в массив + и родителей тоже если уже есть в последовательности
+                    }
+                    mass.push(mass_section[i].Section_parrent);
+                    get_all_parrent(mass_section[i].Section_parrent, mass);
+                }
+                break;
+            }
+        
+        return ;
     }
 
-    res += "</div>";
-    var funct_sort = function (a, b) {
-        if (a.Mark < b.Mark) return 1;
-        if (a.Mark > b.Mark) return -1;
-    };
+    var div = document.getElementById("main_block_left_id");
+
+    var mass_parrent = [];
+
+    for(var i=0;i<mass_section_open.length;++i){
+        get_all_parrent(mass_section_open[i], mass_parrent);
+    }
+    
+
+    var res = "";
+
+
+
+
+
+    div.innerHTML = res;
 }
 
 function upload_text_all_data() {

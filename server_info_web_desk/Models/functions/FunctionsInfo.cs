@@ -35,7 +35,8 @@ namespace server_info_web_desk.Models.functions
                 var art_list = db.Articles.Where(x1 => x1.Section_parrentId == id).Select(x1=>x1.Id).ToList();
                 articles_id.AddRange(art_list);
             }
-
+            if (sections_id == null)
+                sections_id = new List<int>();
             sections_id.AddRange(sec_list);
             foreach (var i in sec_list)
             {
@@ -94,18 +95,19 @@ namespace server_info_web_desk.Models.functions
 
             }
 
-            for (var num_count = 1; num_count < mass_not_tag.Count;++num_count)
-                for (var i = 0; i < mass_not_tag.Count; ++i)
+            for (var num_count = 1; num_count <= mass_not_tag.Count;++num_count)
+                for (var i = 0; i+ num_count <= mass_not_tag.Count; ++i)
                 {
                     string tmp = "";
-                    int count_word = 1;
+                    //int count_word = 1;
                     for (var i2 = i; i2 < num_count + i; tmp += mass_not_tag[i2++]+" ") ;
-                    int count = new Regex(tmp).Matches(art.Head).Count;
-                    count_word = tmp.Split(' ').Count();
-                    res += count* count_word;
-                    
-                    count = new Regex(tmp).Matches(art.Body).Count;
-                    res += count * count_word*0.7;
+
+                    string pattern = tmp.Trim(' ');
+                    int count = new Regex(pattern, RegexOptions.IgnoreCase).Matches(art.Head).Count; //
+                    res += count * num_count;
+
+                    count = new Regex(pattern).Matches(art.Body).Count;
+                    res += count * num_count * 0.7;
                 }
 
             for(var i = 0; i < mass_tag.Count; ++i)
