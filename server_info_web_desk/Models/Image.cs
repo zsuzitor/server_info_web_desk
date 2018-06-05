@@ -7,7 +7,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models
 {
-    public class Image
+    public class Image: server_info_web_desk.Models.Interfaces.IImage
     {
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }

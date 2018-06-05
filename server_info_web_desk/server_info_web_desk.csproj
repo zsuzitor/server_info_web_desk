@@ -215,6 +215,7 @@
     <Compile Include="Models\Info\AllData.cs" />
     <Compile Include="Models\Info\Article.cs" />
     <Compile Include="Models\Info\Section.cs" />
+    <Compile Include="Models\Interfaces\Interfaces.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
     <Compile Include="Models\ViewModel\IndexInfoView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -293,6 +294,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="Models\SocialNetwork\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

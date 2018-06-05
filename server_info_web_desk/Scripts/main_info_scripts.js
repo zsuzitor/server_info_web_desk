@@ -179,7 +179,7 @@ function convert_string(str) {
 }
 
 
-function click_name_section(a) {
+function click_name_section(a) {//,open
     //проверять если есть блоки с parrent id то загружать не надо
     select_view_line(a.id);
     var int_id = a.id.split("_")[4];
@@ -217,7 +217,8 @@ function click_name_section(a) {
 
     }
     else {
-        open_section(int_id);
+        //if (!open)
+            open_section(int_id);
     }
 }
 
@@ -824,41 +825,97 @@ function OnComplete_search(data) {
 }
 
 function load_left_block() {
+    //var funct_sort = function (a, b) {
+    //    if (a.Id < b.Id) return 1;
+    //    if (a.Id > b.Id) return -1;
+    //};
     function get_all_parrent(id,mass) {
 
         //var res = [];
         for (var i = 0; i < mass_section.length; ++i) 
             if (mass_section[i].Id == id) {
-                if (mass_section[i].Section_parrent != null) {
+                if (mass_section[i].Section_parrentId != null) {
+                    var break_=false;
                     for (var i2 = 0; i2 < mass; ++i2) {
-                        ТУТ не надо добавлять в массив + и родителей тоже если уже есть в последовательности
+                        // ТУТ не надо добавлять в массив + и родителей тоже если уже есть в последовательности
+                        if (mass[i2] == mass_section[i].Section_parrentId) {
+                            break_ = true;
+                        }
+
                     }
-                    mass.push(mass_section[i].Section_parrent);
-                    get_all_parrent(mass_section[i].Section_parrent, mass);
+                    if (!break_) {
+                        mass.push(mass_section[i].Section_parrentId);
+                        get_all_parrent(mass_section[i].Section_parrentId, mass);
+                    }
+                   
                 }
                 break;
             }
         
         return ;
     }
+    function load_sec(id, mass) {
 
+        for (var i = 0; i < mass_section.length; ++i) {
+            if (mass_section[i].Section_parrentId == id) {
+                for (var i2 = 0; i2 < mass.length; ++i2) {
+                    if (mass[i2] == mass_section[i].Id) {
+                        mass.splice(i2, 1);
+                        //click_name_section(document.getElementById("div_one_section_name_" + mass_section[i].Id), true);
+
+                        //var div;
+                        //div.innerHTML = str_add_name_section(main_sec_id) + load_one_section(main_sec_id);
+                        var inside = document.getElementById("div_one_section_inside_" + mass_section[i].Id);
+
+                        inside.innerHTML = load_one_section_data(mass_section[i].Id);
+
+
+                        load_sec(mass_section[i].Id,mass);
+                    }
+                }
+                
+
+            }
+        }
+
+    }
     var div = document.getElementById("main_block_left_id");
 
-    var mass_parrent = [];
+    var mass_parrent = mass_section_open.slice();
 
     for(var i=0;i<mass_section_open.length;++i){
         get_all_parrent(mass_section_open[i], mass_parrent);
     }
     
+    var main_sec_id = null;
+    for (var i = 0; i < mass_section.length; ++i) {
 
-    var res = "";
+        if(main_sec_id==null||main_sec_id>mass_section[i].Id)
+            main_sec_id = mass_section[i].Id;
+    }
 
+    //var res = "";
 
+    
+    div.innerHTML = str_add_name_section(main_sec_id) + load_one_section(main_sec_id);
+    var inside = document.getElementById("div_one_section_inside_" + main_sec_id);
 
-
-
-    div.innerHTML = res;
+    inside.innerHTML = load_one_section_data(main_sec_id);
+    //click_name_section(document.getElementById("div_one_section_name_" + main_sec_id),true);
+    load_sec(main_sec_id, mass_parrent);
+    //div.innerHTML = res;
+    var mass_sec_open_ = mass_section_open.slice();
+    mass_section_open = [];
+    for (var i = 0; i < mass_sec_open_.length;++i) {
+        //click_name_section(document.getElementById("div_one_section_name_" + mass_section_open[i]));
+        //mass_sec_open_.splice(i, 1);
+        open_section(mass_sec_open_[i]);
+    }
 }
+
+
+
+
 
 function upload_text_all_data() {
     var div=document.getElementById("main_block_right_id");

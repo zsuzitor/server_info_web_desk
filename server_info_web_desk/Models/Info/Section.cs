@@ -11,6 +11,7 @@ namespace server_info_web_desk.Models.Info
 {
     public class Section
     {
+        [Key]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
         //public int Parrent_id { get; set; }

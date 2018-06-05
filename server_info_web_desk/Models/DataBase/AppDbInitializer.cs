@@ -36,6 +36,8 @@ namespace server_info_web_desk.Models.DataBase
                 userManager.AddToRole(admin.Id, role1.Name);
                 userManager.AddToRole(admin.Id, role2.Name);
             }
+            //CONSTRAINT [FK_dbo.Articles_dbo.Sections_Section_parrentId] FOREIGN KEY ([Section_parrentId]) REFERENCES [dbo].[Sections] ([Id]) ON DELETE CASCADE
+            context.Database.ExecuteSqlCommand("ALTER TABLE dbo.Sections ADD CONSTRAINT Delete_section_cascade FOREIGN KEY (Section_parrentId) REFERENCES dbo.Sections (Id) ON DELETE CASCADE");
 
             base.Seed(context);
         }

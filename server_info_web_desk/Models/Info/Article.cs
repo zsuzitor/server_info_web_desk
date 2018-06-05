@@ -9,6 +9,7 @@ namespace server_info_web_desk.Models.Info
 {
     public class Article
     {
+        [Key]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
 
