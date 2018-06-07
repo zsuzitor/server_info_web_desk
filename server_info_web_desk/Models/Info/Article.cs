@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -29,18 +30,19 @@ namespace server_info_web_desk.Models.Info
 
         public ICollection<Image> Images { get; set; }
 
-        public int Section_parrentId { get; set; }
-        public Section Section_parrent { get; set; }
+        [JsonProperty("Section_parrentId")]
+        public int SectionParrentId { get; set; }
+        public Section SectionParrent { get; set; }
         public Article()
         {
             this.Id = 0;
             this.Order = 0;
-            this.Section_parrent = null;
+            this.SectionParrent = null;
             this.Head = null;
             this.Body = null;
             this.UserId = null;
             this.User = null;
-            this.Section_parrentId = 0;
+            this.SectionParrentId = 0;
             this.Images = new List<Image>();
         }
         public Article(Article a, bool with_out_reference = false)
@@ -50,17 +52,17 @@ namespace server_info_web_desk.Models.Info
             this.Head = a.Head;
             this.Body = a.Body;
             this.UserId = a.UserId;
-            this.Section_parrentId = a.Section_parrentId;
+            this.SectionParrentId = a.SectionParrentId;
             if (!with_out_reference)
             {
                 this.User = a.User;
-                this.Section_parrent = a.Section_parrent;
+                this.SectionParrent = a.SectionParrent;
                 this.Images = a.Images;
             }
             else
             {
                 this.User = null;
-                this.Section_parrent = null;
+                this.SectionParrent = null;
                 this.Images = null;
             }
         }

@@ -211,12 +211,19 @@
     <Compile Include="Models\functions\FunctionsInfo.cs" />
     <Compile Include="Models\functions\FunctionsProject.cs" />
     <Compile Include="Models\IdentityModels.cs" />
-    <Compile Include="Models\Image.cs" />
     <Compile Include="Models\Info\AllData.cs" />
     <Compile Include="Models\Info\Article.cs" />
+    <Compile Include="Models\Info\Image.cs" />
     <Compile Include="Models\Info\Section.cs" />
     <Compile Include="Models\Interfaces\Interfaces.cs" />
     <Compile Include="Models\ManageViewModels.cs" />
+    <Compile Include="Models\SocialNetwork\Album.cs" />
+    <Compile Include="Models\SocialNetwork\Chat.cs" />
+    <Compile Include="Models\SocialNetwork\Comment.cs" />
+    <Compile Include="Models\SocialNetwork\Group.cs" />
+    <Compile Include="Models\SocialNetwork\Image.cs" />
+    <Compile Include="Models\SocialNetwork\Meme.cs" />
+    <Compile Include="Models\SocialNetwork\Message.cs" />
     <Compile Include="Models\ViewModel\IndexInfoView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -294,7 +301,6 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
-    <Folder Include="Models\SocialNetwork\" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="fonts\glyphicons-halflings-regular.woff" />

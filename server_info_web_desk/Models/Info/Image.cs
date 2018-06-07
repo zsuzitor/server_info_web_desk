@@ -1,36 +1,36 @@
-﻿using server_info_web_desk.Models.Info;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 
-namespace server_info_web_desk.Models
+namespace server_info_web_desk.Models.Info
 {
-    public class Image: server_info_web_desk.Models.Interfaces.IImage
+    public class Image : server_info_web_desk.Models.Interfaces.AImage
     {
-        [HiddenInput(DisplayValue = false)]
-        public int Id { get; set; }
-        public byte[] Data { get ; set;}
-        //public string Base_url_img { get; set; }
+        //[HiddenInput(DisplayValue = false)]
+        //public int Id { get; set; }
+        //public byte[] Data { get ; set;}
+
 
         public int? Article_parrentId { get; set; }//для главной секции будет у всех пользователей null
         public Article Article_parrent { get; set; }
 
-        public string UserId { get; set; }
-        public ApplicationUser User { get; set; }
+        //public string UserId { get; set; }
+        //public ApplicationUser User { get; set; }
 
-        public Image()
+        public Image() : base()
         {
-            Id = 0;
-            Data = null;
+            //Id = 0;
+            //Data = null;
             Article_parrentId = null;
             Article_parrent = null;
-            UserId = null;
-            User = null;
+            //UserId = null;
+            //User = null;
+
             //Base_url_img = "/Content/images/camera_200.png";
         }
-        public Image(Image a,bool with_out_reference=false)
+        public Image(Image a, bool with_out_reference = false)
         {
             Id = a.Id;
             Data = a.Data;

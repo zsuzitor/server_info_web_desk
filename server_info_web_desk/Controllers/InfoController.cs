@@ -57,7 +57,7 @@ namespace server_info_web_desk.Controllers
             {
                 //var first_sec_id = db.Sections.AsNoTracking().Where(x1 => x1.UserId == person_id).Min(x1 => x1.Id);
                 //first_sec = db.Sections.AsNoTracking().First(x1 => x1.Id == first_sec_id);
-                first_sec = db.Sections.Where(x1 => x1.UserId == person_id).First(x1=>x1.Section_parrentId==null);
+                first_sec = db.Sections.Where(x1 => x1.UserId == person_id).First(x1=>x1.SectionParrentId == null);
                 if (person_id != check_id)
                 {
                     db.Entry(first_sec).Reference(x1 => x1.User).Load();
@@ -131,9 +131,9 @@ namespace server_info_web_desk.Controllers
             }
             db.Entry(section).Collection(x1=>x1.Sections).Load();
             db.Entry(section).Collection(x1=>x1.Articles).Load();
-            section = new Section(section) { User = null, Section_parrent = null };
-            section.Articles=section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null,Section_parrentId=x1.Section_parrentId }).ToList();
-            section.Sections=section.Sections.Select(x1 => x1 = new Section() { Id = x1.Id, Head = x1.Head, Section_parrentId = x1.Section_parrentId }).ToList();
+            section = new Section(section) { User = null, SectionParrentId = null };
+            section.Articles=section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null, SectionParrentId = x1.SectionParrentId }).ToList();
+            section.Sections=section.Sections.Select(x1 => x1 = new Section() { Id = x1.Id, Head = x1.Head, SectionParrentId = x1.SectionParrentId }).ToList();
             //return JsonConvert.SerializeObject(section);
             return Json(section, JsonRequestBehavior.AllowGet);
             /*
@@ -166,7 +166,7 @@ namespace server_info_web_desk.Controllers
             }
 
             db.Sections.Add(a);
-            a.Section_parrentId = parrent_sec.Id;
+            a.SectionParrentId = parrent_sec.Id;
             a.UserId = check_id;
             db.SaveChanges();
             
@@ -197,7 +197,7 @@ namespace server_info_web_desk.Controllers
                 //return new HttpStatusCodeResult(423);//Locked
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
-            a.Section_parrentId = (int)parrent_sec_id;
+            a.SectionParrentId = (int)parrent_sec_id;
             a.UserId = check_id;
 
            
@@ -269,17 +269,17 @@ namespace server_info_web_desk.Controllers
                 return Json(false);
             List<int> sec_list = new List<int>();
             //List<int> art_list = new List<int>();
-            if (sec.Section_parrentId != null)
+            if (sec.SectionParrentId != null)
                 sec_list.Add(sec.Id);
             else
             {
-                var lst = db.Articles.Where(x1 => x1.Section_parrentId == sec.Id).ToList();
+                var lst = db.Articles.Where(x1 => x1.SectionParrentId == sec.Id).ToList();
                 if(lst.Count>0)
                 db.Articles.RemoveRange(lst);
             }
             Get_inside_id((int)id, sec_list, null);
             var section_for_delete = db.Sections.Join(sec_list, p => p.Id, c => c, (p, c) => p);
-            int? parrent_id = sec.Section_parrentId;
+            int? parrent_id = sec.SectionParrentId;
             db.Sections.RemoveRange(section_for_delete);
             db.SaveChanges();
 
@@ -459,7 +459,7 @@ namespace server_info_web_desk.Controllers
             {
                 try
                 {
-                    res.Images.AddRange(db.Images.Where(x1 => x1.Article_parrentId == i.Id).ToList().Select(x1 => new Image(x1, true)));
+                    res.Images.AddRange(db.ImagesInfo.Where(x1 => x1.Article_parrentId == i.Id).ToList().Select(x1 => new Image(x1, true)));
                 }
                 catch { }
               
@@ -513,12 +513,12 @@ namespace server_info_web_desk.Controllers
                     }
                     i.Order = tmp_sec.Order;
                     bool owner_sec=true;
-                    if (i.Section_parrentId != tmp_sec.Section_parrentId)
+                    if (i.SectionParrentId != tmp_sec.SectionParrentId)
                     {
-                        CheckAccessSection(check_id, tmp_sec.Section_parrentId,out owner_sec);
+                        CheckAccessSection(check_id, tmp_sec.SectionParrentId, out owner_sec);
                     }
                     if (owner_sec)
-                        i.Section_parrentId = tmp_sec.Section_parrentId;
+                        i.SectionParrentId = tmp_sec.SectionParrentId;
                     data.Sections.Remove(tmp_sec);
                 }
             }
@@ -526,8 +526,8 @@ namespace server_info_web_desk.Controllers
             {
                 bool owner_sec = true;
                 //тут мб при ошибке проставлять Section_parrentId id главной секции?
-                CheckAccessSection(check_id, i.Section_parrentId, out owner_sec);
-                    if (i.Section_parrentId == null|| owner_sec)
+                CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
+                    if (i.SectionParrentId == null|| owner_sec)
                     {
                         i.Id = 0;
                         i.UserId = check_id;
@@ -553,12 +553,12 @@ namespace server_info_web_desk.Controllers
                     }
                     i.Order = tmp_art.Order;
                     bool owner_sec = true;
-                    if (i.Section_parrentId != tmp_art.Section_parrentId)
+                    if (i.SectionParrentId != tmp_art.SectionParrentId)
                     {
-                        CheckAccessSection(check_id, tmp_art.Section_parrentId, out owner_sec);
+                        CheckAccessSection(check_id, tmp_art.SectionParrentId, out owner_sec);
                     }
                     if (owner_sec)
-                        i.Section_parrentId = tmp_art.Section_parrentId;
+                        i.SectionParrentId = tmp_art.SectionParrentId;
                     data.Articles.Remove(tmp_art);
                 }
             }
@@ -567,7 +567,7 @@ namespace server_info_web_desk.Controllers
                 //i.Section_parrentId ==0   НЕ УВЕРЕН ЧТО НУЖНО не знаю как json парсит null для типов INT //i.Section_parrentId ==0||
                 bool owner_sec = true;
                 //тут мб при ошибке проставлять Section_parrentId id главной секции?
-                CheckAccessSection(check_id, i.Section_parrentId, out owner_sec);
+                CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
                 if (owner_sec)
                 {
                     
@@ -576,12 +576,12 @@ namespace server_info_web_desk.Controllers
                     db.Articles.Add(i);
                 }
             }
-            var lst_img = db.Images.Where(x1 => x1.UserId == check_id).ToList();
+            var lst_img = db.ImagesInfo.Where(x1 => x1.UserId == check_id).ToList();
             foreach (var i in lst_img)
             {
                 var tmp_img = data.Images.FirstOrDefault(x1 => x1.Id == i.Id);
                 if (tmp_img == null)
-                    db.Images.Remove(i);
+                    db.ImagesInfo.Remove(i);
                 else
                 {
                     
@@ -589,7 +589,7 @@ namespace server_info_web_desk.Controllers
                     bool owner_sec = true;
                     if (i.Article_parrentId != tmp_img.Article_parrentId)
                     {
-                        CheckAccessSection(check_id, db.Articles.FirstOrDefault(x1=>x1.Id== tmp_img.Article_parrentId)?.Section_parrentId, out owner_sec);
+                        CheckAccessSection(check_id, db.Articles.FirstOrDefault(x1=>x1.Id== tmp_img.Article_parrentId)?.SectionParrentId, out owner_sec);
                     }
                     if (owner_sec)
                         i.Article_parrentId = tmp_img.Article_parrentId;
@@ -602,7 +602,7 @@ namespace server_info_web_desk.Controllers
                 {
                     i.Id = 0;
                     i.UserId = check_id;
-                    db.Images.Add(i);
+                    db.ImagesInfo.Add(i);
                 }
             }
 
