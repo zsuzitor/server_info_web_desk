@@ -28,7 +28,7 @@ namespace server_info_web_desk.Models.Info
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
 
-        public ICollection<Image> Images { get; set; }
+        public ICollection<ImageInfo> Images { get; set; }
 
         [JsonProperty("Section_parrentId")]
         public int SectionParrentId { get; set; }
@@ -43,7 +43,7 @@ namespace server_info_web_desk.Models.Info
             this.UserId = null;
             this.User = null;
             this.SectionParrentId = 0;
-            this.Images = new List<Image>();
+            this.Images = new List<ImageInfo>();
         }
         public Article(Article a, bool with_out_reference = false)
         {

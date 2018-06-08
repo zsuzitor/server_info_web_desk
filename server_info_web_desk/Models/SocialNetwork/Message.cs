@@ -25,6 +25,9 @@ namespace server_info_web_desk.Models.SocialNetwork
         public int? MemeId { get; set; }
         public Meme Meme { get; set; }
 
+        public int? ChatId { get; set; }
+        public Chat Chat { get; set; }
+
         public ICollection<Image> Images { get; set; }
         //public ICollection<ApplicationUser> Users { get; set; }
 
@@ -39,7 +42,9 @@ namespace server_info_web_desk.Models.SocialNetwork
             Сreator = null;
             MemeId = null;
             Meme = null;
-            Images = null;
+            Chat = null;
+            ChatId = null;
+            Images = new List<Image>();
 
 
         }

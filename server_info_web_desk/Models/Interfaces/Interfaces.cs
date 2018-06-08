@@ -11,7 +11,7 @@ namespace server_info_web_desk.Models.Interfaces
         //int Id { get; set; }
         [HiddenInput(DisplayValue = false)]
          public int Id { get; set; }
-
+        public DateTime Birthday { get; set; }
         public byte[] Data { get; set; }
 
         public string UserId { get; set; }
@@ -21,10 +21,15 @@ namespace server_info_web_desk.Models.Interfaces
         {
             Id = 0;
             Data = null;
-            
+            Birthday = DateTime.Now;
             UserId = null;
             User = null;
         }
+    }
+
+    public interface Iuser
+    {
+
     }
 
 

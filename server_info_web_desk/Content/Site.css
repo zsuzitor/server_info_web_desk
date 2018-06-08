@@ -51,8 +51,35 @@ input,
    
 
 
+    .link_standart_for_div {
+    display: block; /* Ссылка как блочный элемент */
+    text-align: center; /* Выравнивание по центру */
+    height: 100%; /* Высота на весь слой */
+    color: black; /* Цвет ссылки */
+}
+    img {
+    width: 100%;
+    height: 100%;
+}
+li {
+    list-style-type: none; /* Убираем маркеры */
+}
 
+ul {
+    margin-left: 0; /* Отступ слева в браузере IE и Opera */
+    padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
+}
 
+.text-box {
+    line-height: 30px;
+    height: 30px;
+    font-size: 14pt;
+    width: 100%;
+}
+div.div_inline_block {
+    display: inline-block;
+    vertical-align: top;
+}
 
 
     /*-----------------------------------------------------------------------------*/
@@ -66,4 +93,21 @@ input,
     background-image: url(/Content/images/preloader_cat.gif);
     background-size: 100% 100%;
     z-index:5;
+    }
+
+
+    div.Main_header_soc_all{
+        background-color:blue;
+        border:2px solid black;
+    }
+
+
+    div.main_header_login_p{
+        float:right;
+        border:2px solid black;
+    }
+
+    div.main_header_main_p_link{
+        float:left;
+        border:2px solid black;
     }

@@ -36,13 +36,17 @@
     @if (controller_name == "info")
     {
        
-
     @Html.Action("Main_header","Info",new { action_name= action_name })
+    }
+    @if (controller_name == "socialnetworkcontroller")
+    {
+
+        @Html.Action("MainHeader", "SocialNetworkController", new {  })
     }
     @if (controller_name != "info")
     {
         //@Html.Action("Main_header","Home")
-        <div>HEADER HOME</div>
+        <div>HEADER ??????????</div>
         <div class="">@Html.Partial("_LoginPartial")</div>
     }
     

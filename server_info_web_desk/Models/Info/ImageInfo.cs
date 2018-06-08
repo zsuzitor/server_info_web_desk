@@ -6,7 +6,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.Info
 {
-    public class Image : server_info_web_desk.Models.Interfaces.AImage
+    public class ImageInfo : server_info_web_desk.Models.Interfaces.AImage
     {
         //[HiddenInput(DisplayValue = false)]
         //public int Id { get; set; }
@@ -19,7 +19,7 @@ namespace server_info_web_desk.Models.Info
         //public string UserId { get; set; }
         //public ApplicationUser User { get; set; }
 
-        public Image() : base()
+        public ImageInfo() : base()
         {
             //Id = 0;
             //Data = null;
@@ -30,7 +30,7 @@ namespace server_info_web_desk.Models.Info
 
             //Base_url_img = "/Content/images/camera_200.png";
         }
-        public Image(Image a, bool with_out_reference = false)
+        public ImageInfo(ImageInfo a, bool with_out_reference = false)
         {
             Id = a.Id;
             Data = a.Data;

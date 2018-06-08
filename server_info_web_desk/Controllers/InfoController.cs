@@ -459,10 +459,10 @@ namespace server_info_web_desk.Controllers
             {
                 try
                 {
-                    res.Images.AddRange(db.ImagesInfo.Where(x1 => x1.Article_parrentId == i.Id).ToList().Select(x1 => new Image(x1, true)));
+                    res.Images.AddRange(db.ImagesInfo.Where(x1 => x1.Article_parrentId == i.Id).ToList().Select(x1 => new ImageInfo(x1, true)));
                 }
                 catch { }
-              
+               
             }
 
             return Json(res);

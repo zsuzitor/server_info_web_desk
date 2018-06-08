@@ -32,8 +32,9 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         public ICollection<Image> Images { get; set; }
-        public ICollection<ApplicationUser> Users_likes { get; set; }
-        public ICollection<ApplicationUser> Users_ripostes { get; set; }
+        public ICollection<ApplicationUser> UsersLikes { get; set; }
+        public ICollection<ApplicationUser> UsersRipostes { get; set; }
+        public ICollection<ApplicationUser> UsersNews { get; set; }
         public ICollection<Message> Messages { get; set; }//мем отправляется в сообщении
         public ICollection<Comment> Comments { get; set; }
 
