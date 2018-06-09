@@ -225,6 +225,8 @@
     <Compile Include="Models\SocialNetwork\Image.cs" />
     <Compile Include="Models\SocialNetwork\Meme.cs" />
     <Compile Include="Models\SocialNetwork\Message.cs" />
+    <Compile Include="Models\SocialNetwork\Record.cs" />
+    <Compile Include="Models\ViewModel\GroupRecordView.cs" />
     <Compile Include="Models\ViewModel\IndexInfoView.cs" />
     <Compile Include="Models\ViewModel\PersonalRecordView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -301,6 +303,9 @@
     <Content Include="Views\Info\Info_page.cshtml" />
     <Content Include="Views\Info\Main_header.cshtml" />
     <Content Include="Views\SocialNetwork\MainHeader.cshtml" />
+    <Content Include="Views\SocialNetwork\PersonalRecord.cshtml" />
+    <Content Include="Views\SocialNetwork\LeftMenuPersonal.cshtml" />
+    <Content Include="Views\SocialNetwork\Index.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

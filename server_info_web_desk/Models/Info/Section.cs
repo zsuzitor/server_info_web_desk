@@ -32,9 +32,9 @@ namespace server_info_web_desk.Models.Info
         public int? SectionParrentId { get; set; }//для главной секции будет у всех пользователей null
         public Section SectionParrent { get; set; }
 
-        public ICollection<Section> Sections { get; set; }
+        public List<Section> Sections { get; set; }
 
-        public ICollection<Article> Articles { get; set; }
+        public List<Article> Articles { get; set; }
         public Section()
         {
             this.Id = 0;

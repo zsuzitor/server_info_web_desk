@@ -38,27 +38,41 @@
        
     @Html.Action("Main_header","Info",new { action_name= action_name })
     }
-    @if (controller_name == "socialnetworkcontroller")
+    @if (controller_name == "socialnetwork")
     {
 
-        @Html.Action("MainHeader", "SocialNetworkController", new {  })
+        @Html.Action("MainHeader", "SocialNetwork", new {  })
+        
     }
-    @if (controller_name != "info")
+    @if (controller_name != "info"&& controller_name != "socialnetwork")
     {
         //@Html.Action("Main_header","Home")
         <div>HEADER ??????????</div>
         <div class="">@Html.Partial("_LoginPartial")</div>
     }
     
-    
-        @RenderBody()
-@if (controller_name != "info")
-{
-        <hr />
-        <footer>
-            <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
-        </footer>
-}
+    <div class="main_div_body_all">
+        <div class="main_div_body_layout">
+            @if (controller_name == "socialnetwork")
+            {
+
+                @Html.Action("LeftMenuPersonal", "SocialNetwork", new { })
+
+            }
+            <div class="main_div_body">
+                @RenderBody()
+                @if (controller_name != "info")
+            {
+                    <hr />
+                    <footer>
+                        <p>&copy; @DateTime.Now.Year - My ASP.NET Application</p>
+                    </footer>
+                }
+            </div>
+            
+        </div>
+        </div>
+        
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")

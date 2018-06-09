@@ -1,5 +1,131 @@
 ﻿@using server_info_web_desk.Models.Info;
 
-@helper Load_sections(Article article, Section section) {
-   
+@using server_info_web_desk.Models;
+@using server_info_web_desk.Models.SocialNetwork;
+@using System.Web.Mvc;
+@using System.Web;
+
+@helper UserShort(ApplicationUserShort a,int size)
+{
+<div class="small_block_circle_size_@size" title="@a.Name @a.Surname">
+    <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.PageId">
+        <div>
+            <div class="small_block_img_circle">
+                @if (a?.Image?.Data != null)
+                {
+                    <div class="" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(a.Image.Data) ) no-repeat;background-size: cover;">
+
+
+                    </div>
+                }
+                @if (a?.Image?.Data == null)
+                {
+
+                    <img src="~/Content/images/camera_200.png" />
+
+                }
+            </div>
+        </div>
+        <div>@Html.Label(a.Name + " " + a.Surname)</div>
+    </a>
+</div>
+}
+
+
+
+@helper GroupShort(GroupShort a, int size)
+{
+    <div class="small_block_circle_size_@size" title="@a.Name">
+        <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Id">
+            <div>
+                <div class="small_block_img_circle">
+                    @if (a?.Image?.Data != null)
+                    {
+                        <div class="" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(a.Image.Data) ) no-repeat;background-size: cover;">
+
+
+                        </div>
+                    }
+                    @if (a?.Image?.Data == null)
+                    {
+
+                        <img src="~/Content/images/camera_200.png" />
+
+                    }
+                </div>
+            </div>
+            <div>@Html.Label(a.Name)</div>
+        </a>
+    </div>
+}
+
+
+@helper Album(AlbumShort a)
+{
+    <div class="one_album_short_block">
+        <a class="link_standart_for_div" href="/SocialNetwork/Album/@a.Id">
+            <div>
+                
+                @if (a?.Image?.Data != null)
+                {
+                    <div class="" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(a.Image.Data) ) no-repeat;background-size: cover;">
+
+
+                    </div>
+                }
+                @if (a?.Image?.Data == null)
+                {
+
+                    <img src="~/Content/images/camera_200.png" />
+
+                }
+            </div>
+            <div class="one_album_short_name">
+                <p>@a.Name</p>
+            </div>
+
+        </a>
+
+    </div>
+
+}
+
+
+@helper ImageSmall(Image a)
+{
+    <div class="one_image_small_block">
+        <a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">
+                @if (a?.Data != null)
+                {
+                    <div class="" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(a.Data) ) no-repeat;background-size: cover;">
+                    </div>
+                }
+                @if (a?.Data == null)
+                {
+                    <img src="~/Content/images/camera_200.png" />
+                }
+        </a>
+    </div>
+
+}
+
+@helper MemeRecord(Record a)
+{
+    <div class="">
+        <a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">
+            @if (a?.Data != null)
+            {
+                <div class="" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(a.Data) ) no-repeat;background-size: cover;">
+                </div>
+            }
+            @if (a?.Data == null)
+            {
+                <img src="~/Content/images/camera_200.png" />
+            }
+        </a>
+    </div>
+
+}
+
+
 }

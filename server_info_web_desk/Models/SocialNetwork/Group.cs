@@ -27,11 +27,13 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string MainAdminId { get; set; }
         public ApplicationUser MainAdmin { get; set; }
 
+        public ICollection<Record> RecordCreated { get; set; }
+
         public ICollection<ApplicationUser> Users { get; set; }
         public ICollection<ApplicationUser> Admins { get; set; }
 
         public ICollection<Album> Albums { get; set; }
-        public ICollection<Meme> WallMeme { get; set; }
+        public ICollection<Record> WallRecord { get; set; }
 
 
 
@@ -47,8 +49,9 @@ namespace server_info_web_desk.Models.SocialNetwork
             MainAdmin = null;
             Users = new List<ApplicationUser>();
             Admins = new List<ApplicationUser>();
-            Albums = new List<Album>(); 
-            WallMeme = new List<Meme>();
+            Albums = new List<Album>();
+            WallRecord = new List<Record>();
+            RecordCreated = new List<Record>();
 
         }
 
@@ -78,7 +81,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Id = a.Id;
             Name = a.Name;
             Status = a.Status;
-            Image = a.Albums.FirstOrDefault()?.Images.Last();
+            Image = a.Albums.FirstOrDefault()?.Images.Last()?.Image;
             CountFollowers = a.Users.Count;
         }
     }

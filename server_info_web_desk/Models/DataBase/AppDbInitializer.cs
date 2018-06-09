@@ -25,9 +25,25 @@ namespace server_info_web_desk.Models.DataBase
             roleManager.Create(role2);
 
             // создаем пользователей
+           
             var admin = new ApplicationUser { Email = "admin@mail.ru", UserName = "admin@mail.ru" };
             string password = "Admin1!";
             var result = userManager.Create(admin, password);
+
+            server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album()
+            {
+                Name = "Main",
+                Description = "Сюда добавляются главные фотографии с вашей страницы",
+                //User = admin
+                UserId = admin.Id
+            });
+            server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album()
+            {
+                Name = "NotMain",
+                Description = "Сюда добавляются фотографии с вашей страницы",
+                UserId = admin.Id
+            });
+            server_info_web_desk.Models.DataBase.DataBase.db.SaveChanges();
 
             // если создание пользователя прошло успешно
             if (result.Succeeded)

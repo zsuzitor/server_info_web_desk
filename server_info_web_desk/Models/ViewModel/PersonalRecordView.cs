@@ -23,14 +23,16 @@ namespace server_info_web_desk.Models.ViewModel
         public string Street { get; set; }
         public bool Online { get; set; }
         public string Description { get; set; }
-        public Image MainImage { get; set; }
+        public Record MainImage { get; set; }
 
         public int AlbumCount { get; set; }
         public int ImageCount { get; set; }
         public int WallMemeCount { get; set; }
         public int GroupCount { get; set; }
 
-        public List<Meme> WallMeme { get; set; }
+        public List<ApplicationUserShort> Friends { get; set; }
+
+        public List<Record> WallMeme { get; set; }
        
         public List<AlbumShort> Albums { get; set; }
         public List<GroupShort> Group { get; set; }
@@ -57,9 +59,11 @@ namespace server_info_web_desk.Models.ViewModel
             WallMemeCount = 0;
             GroupCount = 0;
 
-            WallMeme = new List<Meme>();
+            Friends = new List<ApplicationUserShort>();
+            WallMeme = new List<Record>();
             Albums = new List<AlbumShort>();
             Group = new List<GroupShort>();
+            Image = new List<Image>();
         }
 
         public PersonalRecordView(ApplicationUser a)
@@ -80,9 +84,11 @@ namespace server_info_web_desk.Models.ViewModel
             //о себе 
             Description = null;
 
-            WallMeme = null;
-            Albums = null;
-            Group = null;
+            Friends = new List<ApplicationUserShort>();
+            WallMeme = new List<Record>();
+            Albums = new List<AlbumShort>();
+            Group = new List<GroupShort>();
+            Image = new List<Image>();
         }
 
 

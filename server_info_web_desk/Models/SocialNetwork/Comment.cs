@@ -27,11 +27,11 @@ namespace server_info_web_desk.Models.SocialNetwork
         public ICollection<Comment> AnswerComments { get; set; }//комментарии которые ответили на этот коммент
 
 
-        public int? MemeId { get; set; }
-        public Meme Meme { get; set; }//запись к которой написали коммент
+        public int? RecordId { get; set; }
+        public Record Record { get; set; }//запись к которой написали коммент
 
-        public int? ImageId { get; set; }
-        public Image Image { get; set; }//картинка к которой написали коммент
+        //public int? ImageId { get; set; }
+        //public Image Image { get; set; }//картинка к которой написали коммент
 
         public ICollection<Image> Images { get; set; }//список картинок в комменте
         public ICollection<ApplicationUser> UsersLikes { get; set; }//список лайкнувших
@@ -45,10 +45,10 @@ namespace server_info_web_desk.Models.SocialNetwork
             Сreator= null;
             AnswerCommentId = null;
             AnswerComment = null;
-            MemeId = null;
-            Meme = null;
-            ImageId = null;
-            Image = null;
+            Record = null;
+            Record = null;
+            //ImageId = null;
+            //Image = null;
             Images = new List<Image>();
             UsersLikes = new List<ApplicationUser>();
 

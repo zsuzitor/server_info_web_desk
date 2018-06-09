@@ -168,7 +168,20 @@ namespace server_info_web_desk.Controllers
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
                     server_info_web_desk.Models.DataBase.DataBase.db.Sections.Add(new server_info_web_desk.Models.Info.Section() { Head = "ALL", User = user });
+                    
+
+                    server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album() { Name="Main",
+                        Description ="Сюда добавляются главные фотографии с вашей страницы",
+                        User=user
+                    });
+                    server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album()
+                    {
+                        Name = "NotMain",
+                        Description = "Сюда добавляются фотографии с вашей страницы",
+                        User = user
+                    });
                     server_info_web_desk.Models.DataBase.DataBase.db.SaveChanges();
+
 
                     return RedirectToAction("Index", "Home");
                 }

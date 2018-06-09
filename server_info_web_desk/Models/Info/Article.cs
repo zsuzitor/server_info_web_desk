@@ -28,7 +28,7 @@ namespace server_info_web_desk.Models.Info
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
 
-        public ICollection<ImageInfo> Images { get; set; }
+        public List<ImageInfo> Images { get; set; }
 
         [JsonProperty("Section_parrentId")]
         public int SectionParrentId { get; set; }

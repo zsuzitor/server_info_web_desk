@@ -12,10 +12,10 @@ namespace server_info_web_desk.Models.SocialNetwork
         [Key]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
-        [UIHint("Html")]
+        //[UIHint("Html")]
         [Display(Name = "Название")]
         public string Name { get; set; }
-        [UIHint("MultilineText")]
+        //[UIHint("MultilineText")]
         [Display(Name = "Описание")]
         public string Description { get; set; }
         public bool PublicAlbum { get; set; }
@@ -30,7 +30,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
 
-        public ICollection<Image> Images { get; set; }
+        public ICollection<Record> Images { get; set; }
 
 
         public Album()
@@ -43,7 +43,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Group = null;
             UserId = null;
             User = null;
-            Images = new List<Image>();
+            Images = new List<Record>();
 
 
         }
@@ -72,7 +72,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Id = a.Id;
             Name = a.Name;
             CountImage = a.Images.Count;
-            Image = a.Images.Last();
+            Image = a.Images.LastOrDefault()?.Image;
         }
     }
 }

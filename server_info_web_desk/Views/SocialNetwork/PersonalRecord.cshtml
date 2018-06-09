@@ -1,0 +1,126 @@
+﻿@model server_info_web_desk.Models.ViewModel.PersonalRecordView
+
+@{
+    ViewBag.Title = "PersonalRecord";
+}
+
+<h2>PersonalRecord</h2>
+
+<div>
+    <div class="PersonalRecord_left div_inline_block">
+        <div class="div_color_white PersonalRecord_main_img_all">
+            <div class="PersonalRecord_main_img_div">
+                <div class="PersonalRecord_main_img_d">
+
+                    @if (Model.MainImage?.Image?.Data != null)
+                    {
+                        <div class="" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(Model.MainImage.Image.Data) ) no-repeat;background-size: cover;">
+                            @*@Ajax.ActionLink(" ", "Record_photo_page", "Home", new { from_id = Model.db.Id, main_img = true, id_image = Model.Main_images[0].db.Id, from_type = "Personal_record" }, new AjaxOptions { UpdateTargetId = "Record_photo_page_one_photo_block_id" }, new { @class = "link_standart_for_div" })*@
+
+
+                        </div>
+                    }
+                    @if (Model.MainImage?.Image?.Data == null)
+                    {
+
+                        <img src="~/Content/images/camera_200.png" />
+
+                    }
+
+
+                </div>
+
+            </div>
+            <div>
+                <p>Редактировать</p>
+                <p>Добавить в друзья</p>
+                <p>Соообщенийе</p>
+            </div>
+        </div>
+
+        @*блок с друзьями*@
+        <div class="div_color_white">
+            <p>@Html.ActionLink("Друзья", "Friends", "SocialNetwork", new {id=Model.IdPage })</p>
+            <div>
+                @foreach (var i in Model.Friends)
+                {
+                    @Healpers.UserShort(i, 1)
+                }
+               
+            </div>
+
+        </div>
+
+        @*блок с группами*@
+        <div class="div_color_white">
+            <p>@Html.ActionLink("Группы", "Groups", "SocialNetwork", new { id = Model.IdPage })</p>
+            <div>
+                @foreach (var i in Model.Friends)
+                {
+                    @Healpers.UserShort(i, 1)
+                }
+
+            </div>
+
+        </div>
+
+
+        @*блок с альбомами*@
+        <div class="div_color_white">
+            <p>@Html.ActionLink("Альбомы", "AlbumsPerson", "SocialNetwork", new { id = Model.IdPage })</p>
+            <div>
+                @foreach (var i in Model.Albums)
+                {
+                    @Healpers.Album(i)
+                }
+
+            </div>
+
+        </div>
+
+    </div>
+    <div class="PersonalRecord_right div_inline_block">
+        <div class="div_color_white">
+            <div>
+                @Model.Name @Model.Surname
+            </div>
+            <div>
+                @Model.Status
+            </div>
+            <hr />
+
+            @*блок с информацией*@
+            <div>
+                @Model.Town
+                @Model.Street
+                @Model.Birthday
+                @*доп инфа которая будет по клику открываться*@
+                <div>
+
+                </div>
+            </div>
+        </div>
+        <div class="div_color_white">
+            @Html.ActionLink("Фотографии","", "SocialNetwork")
+            @foreach (var i in Model.Image)
+            {
+                @Healpers.ImageSmall(i)
+            }
+        </div>
+
+
+
+
+        <div class="div_color_white">
+            <p>Стена</p>
+            @foreach (var i in Model.WallMeme)
+            {
+                @Healpers.MemeRecord(i)
+            }
+        </div>
+
+
+        </div>
+
+
+</div>

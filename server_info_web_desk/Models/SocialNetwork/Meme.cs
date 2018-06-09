@@ -22,21 +22,26 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string СreatorId { get; set; }
         public ApplicationUser Сreator { get; set; }//создатель
 
-        public int? GroupId { get; set; }
-        public Group Group { get; set; }
-        public string UserId { get; set; }//чья страница на которой мем
-        public ApplicationUser User { get; set; }
+        //public int? GroupId { get; set; }
+        //public Group Group { get; set; }
+        //public string UserId { get; set; }//чья страница на которой мем
+        //public ApplicationUser User { get; set; }
 
         //public string MessageId { get; set; }
         //public Message Message { get; set; }
 
+        
+        public int? RecordId { get; set; }
+        [NotMapped]
+        public Record Record_NM { get; set; }
+
 
         public ICollection<Image> Images { get; set; }
-        public ICollection<ApplicationUser> UsersLikes { get; set; }
-        public ICollection<ApplicationUser> UsersRipostes { get; set; }
-        public ICollection<ApplicationUser> UsersNews { get; set; }
+        //public ICollection<ApplicationUser> UsersLikes { get; set; }
+        //public ICollection<ApplicationUser> UsersRipostes { get; set; }
+        //public ICollection<ApplicationUser> UsersNews { get; set; }
         public ICollection<Message> Messages { get; set; }//мем отправляется в сообщении
-        public ICollection<Comment> Comments { get; set; }
+        //public ICollection<Comment> Comments { get; set; }
 
 
 
@@ -46,11 +51,13 @@ namespace server_info_web_desk.Models.SocialNetwork
             Description = null;
                 СreatorId= null;
             Сreator = null;
-            GroupId = null;
-            Group = null;
-            UserId = null;
-            User = null;
+            Record_NM = null;
+            //GroupId = null;
+            //Group = null;
+            //UserId = null;
+            //User = null;
             Images = new List<Image>();
+            Messages= new List<Message>();
             Birthday = DateTime.Now;
         }
     }
