@@ -23,9 +23,15 @@ input,
 	textarea {
 		width:100%;
 		height: 100%;
+        
 		-webkit-box-sizing: border-box;
 		        box-sizing: border-box;
 	}
+textarea {
+    max-width:100%;
+        min-width:100%;
+        min-height:20px;
+}
 	.link_standart_for_div {
 		display: block; /* Ссылка как блочный элемент */
 		text-align: center; /* Выравнивание по центру */
@@ -47,7 +53,13 @@ input,
 		padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
 	}
 
-	
+	a{
+        color:black;
+        text-decoration:none;
+	}
+    a:hover{
+         text-decoration:none;
+    }
 
    
 
@@ -80,6 +92,11 @@ ul {
 div.div_inline_block {
     display: inline-block;
     vertical-align: top;
+}
+
+
+div.div_paddin_top_10_px{
+    padding-top:10px;
 }
 
 
@@ -146,16 +163,41 @@ div.div_inline_block {
         background-color:white;
     }
 
+    div.block_circle{
+          border-radius:50%;
+          height:100%;
+          width:100%;
+      }
 
      /*-----------------------------------------------------------------------------*/
 
      div.LeftMenuPersonalMain{
-        height:200px;
+        /*height:200px;*/
         width:200px;
         border:2px solid black;
         position:absolute;
         
     }
+
+     li.LeftMenuPersonal_one_line{
+         white-space: nowrap;
+         color: #285473;
+             border-radius: 2px;
+     }
+     li.LeftMenuPersonal_one_line:hover{
+         background: #e1e5eb;
+     }
+
+     div.LeftMenuPersonal_one_line_div{
+         margin-left:0;
+         text-align:left;
+         height:30px;
+         font-size:13pt;
+     }
+     ul.LeftMenuPersonalMain_main_ul{
+         margin-left:5px;
+         margin-top:5px;
+     }
       /*-----------------------------------------------------------------------------*/
 
       div.small_img_circle_size_1{
@@ -168,13 +210,10 @@ div.div_inline_block {
           width:90px;
           border:1px solid black;
       }
-      div.small_block_img_circle{
-          border-radius:50%;
-          height:100%;
-          width:100%;
-      }
+      
 
       div.one_album_short_block{
+          padding-top:5px;
           width:200px;
           height:150px;
           margin-left:15px;
@@ -182,7 +221,7 @@ div.div_inline_block {
       }
 
       div.one_album_short_name{
-          margin-top:-15px;
+          margin-top:-20px;
       }
 
        div.one_image_small_block{
@@ -190,9 +229,25 @@ div.div_inline_block {
            height:120px;
     }
 
+       div.div_img_creator_meme{
+           width:70px;
+           height:70px;
+       }
 
 
-      /*-----------------NEED--NEW-FILE----------------------------------------------------------*/
+       div.div_like_button{
+
+       }
+       div.div_comment_button{
+
+       }
+       div.div_ripost_button{
+
+       }
+
+
+
+      /*--------PERSON---------NEED--NEW-FILE----------------------------------------------------------*/
      div.PersonalRecord_left{
          width:230px;
          border:1px solid black;
@@ -214,6 +269,23 @@ div.div_inline_block {
          height:100%;
      }
 
-     div.PersonalRecord_main_img_all{
+    
 
+
+     /*-------GROUP----------NEED--NEW-FILE----------------------------------------------------------*/
+     div.GroupRecord_left{
+          width:510px;
+         border:1px solid black;
+         
+     }
+     div.GroupRecord_right{
+          width:230px;
+         border:1px solid black;
+         margin-left:5px;
+     }
+     div.GroupRecord_main_img_div{
+ width:100%;
+         height:300px;
+         border:1px solid black;
+         padding:10px;
      }

@@ -29,8 +29,8 @@ namespace server_info_web_desk.Models
         public string Street { get; set; }
         public bool Online { get; set; }
         public string Description { get; set; }
-
-
+        public bool? WallOpenWrite { get; set; }//кто может писать на стену false только владелец страницы true-все null-друзья
+        public bool PrivatePage { get; set; }//кто может просмотреть всю страницу false только владелец страницы true-все null-друзья
         public int New_message_count { get; set; }
 
 
@@ -70,7 +70,7 @@ namespace server_info_web_desk.Models
         //TODO
         public List<ApplicationUser> Friends { get; set; }//друзья пользователя
         public List<ApplicationUser> FriendUser { get; set; }//тоже друзья(для связи), сюда не обращаться
-        public List<ApplicationUser> Followers { get; set; }//фолловера пользователя
+        public List<ApplicationUser> Followers { get; set; }//фолловеры пользователя
         public List<ApplicationUser> FollowUser { get; set; }//на кого зафоловлен
 
         public ApplicationUser() : base()
@@ -89,10 +89,13 @@ namespace server_info_web_desk.Models
             New_message_count = 0;
             //о себе 
             Description = null;
-
+            WallOpenWrite = true;
             Open_data_info = false;
+            PrivatePage = false;
 
-            Sections=new List<Section>();
+
+
+            Sections =new List<Section>();
             Articles = new List<Article>();
             ImagesInfo = new List<ImageInfo>();
             MemeCreated = new List<Meme>();

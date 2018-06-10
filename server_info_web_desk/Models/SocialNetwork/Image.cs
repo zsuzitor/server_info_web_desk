@@ -29,7 +29,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public int? MessageId { get; set; }
         public Message Message { get; set; }//если картинка в сообщении
 
-        public int? RecordId { get; set; }
+        public int? RecordId { get; set; }//если картинка самостоятельная и должна быть обернута в запись
         [NotMapped]
         public Record Record_NM { get; set; }
 

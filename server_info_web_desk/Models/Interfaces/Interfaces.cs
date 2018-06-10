@@ -14,7 +14,7 @@ namespace server_info_web_desk.Models.Interfaces
         public DateTime Birthday { get; set; }
         public byte[] Data { get; set; }
 
-        public string UserId { get; set; }
+        public string UserId { get; set; }//тот кто загрузил??
         public ApplicationUser User { get; set; }
 
         public AImage()

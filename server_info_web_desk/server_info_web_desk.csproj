@@ -227,6 +227,7 @@
     <Compile Include="Models\SocialNetwork\Message.cs" />
     <Compile Include="Models\SocialNetwork\Record.cs" />
     <Compile Include="Models\ViewModel\GroupRecordView.cs" />
+    <Compile Include="Models\ViewModel\GroupsListView.cs" />
     <Compile Include="Models\ViewModel\IndexInfoView.cs" />
     <Compile Include="Models\ViewModel\PersonalRecordView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -306,6 +307,8 @@
     <Content Include="Views\SocialNetwork\PersonalRecord.cshtml" />
     <Content Include="Views\SocialNetwork\LeftMenuPersonal.cshtml" />
     <Content Include="Views\SocialNetwork\Index.cshtml" />
+    <Content Include="Views\SocialNetwork\GroupRecord.cshtml" />
+    <Content Include="Views\SocialNetwork\Groups.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

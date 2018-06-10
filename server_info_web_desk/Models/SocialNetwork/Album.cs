@@ -4,6 +4,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static server_info_web_desk.Models.DataBase.DataBase;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
@@ -46,6 +47,27 @@ namespace server_info_web_desk.Models.SocialNetwork
             Images = new List<Record>();
 
 
+        }
+        public static List<Image> GetLastImageAlbum(Album a, int count)
+        {
+            List<Image> res = new List<Image>();
+            if (!db.Entry(a).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(a).Collection(x1 => x1.Images).Load();
+            res.AddRange(a.Images.Skip(a.Images.Count-count>0? a.Images.Count - count:0).Select(x1=> x1.Image));
+
+                return res;
+        }
+        public static List<AlbumShort> GetAlbumShortForView(List<Album> a,int count)
+        {
+            List<AlbumShort> res = new List<AlbumShort>();
+            for (var i=0;i<count;++i)
+            {
+                if (!db.Entry(a[i]).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(a[i]).Collection(x1 => x1.Images).Load();
+                res.Add(new AlbumShort(a[i]));
+            }
+
+            return res;
         }
     }
 

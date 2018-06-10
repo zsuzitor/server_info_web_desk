@@ -23,12 +23,18 @@ namespace server_info_web_desk.Models.ViewModel
         public bool OpenGroup { get; set; }
         public bool AddMemesPrivate { get; set; }
 
+        public bool? CanFollow { get; set; }//true-можно подать заявку false-можно убрать из групп null-можно отписаться
+        public bool CanAddMeme { get; set; }
+
+        public Image MainImage { get; set; }
+
+        public List<Image> Image { get; set; }
 
         public List<ApplicationUserShort> Users { get; set; }
         public List<ApplicationUserShort> Admins { get; set; }
 
         public List<Album> Albums { get; set; }
-        public List<Record> WallRecord { get; set; }
+        public List<Record> WallMeme { get; set; }
 
         public GroupRecordView()
         {
@@ -37,13 +43,16 @@ namespace server_info_web_desk.Models.ViewModel
             IdUser = null;
             Name = null;
             Status = null;
+            MainImage = null;
             Birthday = DateTime.Now;
             OpenGroup = false;
             AddMemesPrivate = true;
+            CanAddMeme = false;
             Users = new List<ApplicationUserShort>();
             Admins = new List<ApplicationUserShort>(); 
-            Albums = new List<Album>(); 
-            WallRecord = new List<Record>(); 
+            Albums = new List<Album>();
+            WallMeme = new List<Record>();
+            Image = new List<SocialNetwork.Image>();
 
         }
         public GroupRecordView(Group a)
@@ -55,11 +64,14 @@ namespace server_info_web_desk.Models.ViewModel
             Birthday = a.Birthday;
             OpenGroup = a.OpenGroup;
             AddMemesPrivate = a.AddMemesPrivate;
+            MainImage = null;
+            CanAddMeme = false;
 
             Users = new List<ApplicationUserShort>();
             Admins = new List<ApplicationUserShort>();
             Albums = new List<Album>();
-            WallRecord = new List<Record>();
+            WallMeme = new List<Record>();
+            Image = new List<SocialNetwork.Image>();
 
         }
 

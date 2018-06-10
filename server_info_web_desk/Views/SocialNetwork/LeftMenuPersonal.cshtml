@@ -3,10 +3,53 @@
 {
 
     <div class="LeftMenuPersonalMain" >
-        <p>@Html.ActionLink("Моя страница", "PersonalRecord", "SocialNetwork")</p>
+        @*<div class="LeftMenuPersonal_one_line">
+            
+        </div>*@
+        <ul class="LeftMenuPersonalMain_main_ul">
+            <li class="LeftMenuPersonal_one_line">
+                <a class="link_standart_for_div" href="@Url.Action("PersonalRecord","SocialNetwork")">
+                    <div class="LeftMenuPersonal_one_line_div">
+                        <span>&#9998;</span>
+                        <span>Моя страница</span>
+                         
+                    </div>
+                </a>
+            </li>
+            <li class="LeftMenuPersonal_one_line">
+                <a class="link_standart_for_div" href="@Url.Action("Messages","SocialNetwork")">
+                    <div class="LeftMenuPersonal_one_line_div">
+                        <span>&#9884;</span>
+                        <span>Messages</span>
+
+                    </div>
+                </a>
+            </li>
+            <li class="LeftMenuPersonal_one_line">
+                <a class="link_standart_for_div" href="@Url.Action("Friends","SocialNetwork")">
+                    <div class="LeftMenuPersonal_one_line_div">
+                        <span>&#9937;</span>
+                        <span>Friends</span>
+
+                    </div>
+
+                </a>
+            </li>
+            <li class="LeftMenuPersonal_one_line">
+                <a class="link_standart_for_div" href="@Url.Action("Groups","SocialNetwork")">
+                    <div class="LeftMenuPersonal_one_line_div">
+                        <span>&#10053;</span>
+                        <span>Groups</span>
+                    </div>
+
+                </a>
+            </li>
+        </ul>
+        
+        @*<p>@Html.ActionLink("Моя страница", "PersonalRecord", "SocialNetwork")</p>
         <p>@Html.ActionLink("Messages", "Messages", "SocialNetwork")</p>
         <p>@Html.ActionLink("Friends", "Friends", "SocialNetwork")</p>
-        <p>@Html.ActionLink("Groups", "Groups", "SocialNetwork")</p>
+        <p>@Html.ActionLink("Groups", "Groups", "SocialNetwork")</p>*@
         
        
         
