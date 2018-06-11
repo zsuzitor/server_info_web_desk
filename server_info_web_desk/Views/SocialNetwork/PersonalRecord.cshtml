@@ -12,14 +12,12 @@
             <div class="PersonalRecord_main_img_div">
                 
                     @Healpers.ImageLink(Model?.MainImage)
-                    
-               
-
+                  
             </div>
-            <div>
+            <div class="div_paddin_left_10_px">
                 @if (Model.IdPage == Model.IdUser)
                 {
-                    @Html.ActionLink("Редактировать страницу", "EditPersonalRecord", "SocialNetwork")
+                    @Html.ActionLink("Редактировать страницу", "EditPersonalRecord", "SocialNetwork", new { }, new { })
                 }
                 
                 <div id="PersonalRecord_block_add_friend">
@@ -34,15 +32,15 @@
                         };
                         if (Model.CanAddFriend == true)
                         {
-                            @Ajax.ActionLink("Добавить в друзья", "AddFriend", "SocialNetwork", ajax_options_add_frieds, new {id=Model.IdPage })
+                            @Ajax.ActionLink("Добавить в друзья", "AddFriend", "SocialNetwork", new { id = Model.IdPage }, ajax_options_add_frieds)
                         }
                         if (Model.CanAddFriend == false)
                         {
-                            @Ajax.ActionLink("Удалить из друзей", "AddFriend", "SocialNetwork", ajax_options_add_frieds, new { id = Model.IdPage })
+                            @Ajax.ActionLink("Удалить из друзей", "AddFriend", "SocialNetwork", new { id = Model.IdPage }, ajax_options_add_frieds)
                         }
                         if (Model.CanAddFriend == null)
                         {
-                            @Ajax.ActionLink("Отписаться", "AddFriend", "SocialNetwork", ajax_options_add_frieds, new { id = Model.IdPage })
+                            @Ajax.ActionLink("Отписаться", "AddFriend", "SocialNetwork", new { id = Model.IdPage }, ajax_options_add_frieds)
                         }
                     }
                 </div>
@@ -55,28 +53,32 @@
         </div>
 
         @*блок с друзьями*@
-        <div class="div_paddin_top_10_px">
-            <div class="div_color_white">
-                @Html.ActionLink("Друзья", "Friends", "SocialNetwork", new { id = Model.IdPage })
+        <div class="div_padding_top_10_px">
+            <div class="div_paddin_left_10_px div_color_white">
+                @Html.ActionLink("Друзья", "Friends", "SocialNetwork", new { id = Model.IdPage }, new { })
                 <div>
                     @foreach (var i in Model.Friends)
                     {
-                        @Healpers.UserShort(i, 1)
+                        
+                            @Healpers.UserShort(i,1)
+                        
                     }
 
-                </div>
+                        </div>
 
             </div>
         </div>
         @*блок с группами*@
-        <div class="div_paddin_top_10_px">
-            <div class="div_color_white">
-               @Html.ActionLink("Группы", "Groups", "SocialNetwork", new { id = Model.IdPage })
+        <div class="div_padding_top_10_px">
+            <div class="div_paddin_left_10_px div_color_white">
+               @Html.ActionLink("Группы", "Groups", "SocialNetwork", new { id = Model.IdPage },new { })
                 <div>
-                    @foreach (var i in Model.Friends)
-                    {
-                        @Healpers.UserShort(i, 1)
-                    }
+    @foreach (var i in Model.Friends)
+    {
+       
+            @Healpers.UserShort(i,1)
+        
+    }
 
                 </div>
 
@@ -84,9 +86,9 @@
         </div>
 
             @*блок с альбомами*@
-        <div class="div_paddin_top_10_px">
-            <div class="div_color_white">
-                @Html.ActionLink("Альбомы", "AlbumsPerson", "SocialNetwork", new { id = Model.IdPage })
+        <div class="div_padding_top_10_px">
+            <div class="div_paddin_left_10_px div_color_white">
+                @Html.ActionLink("Альбомы", "AlbumsPerson", "SocialNetwork", new { id = Model.IdPage }, new { })
                 <div>
                     @foreach (var i in Model.Albums)
                     {
@@ -119,9 +121,9 @@
                 </div>
             </div>
         </div>
-        <div class="div_paddin_top_10_px">
+        <div class="div_padding_top_10_px">
             <div class="div_color_white">
-                @Html.ActionLink("Фотографии", "", "SocialNetwork")
+                @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
                 @foreach (var i in Model.Image)
             {
                     <div class="one_image_small_block">
@@ -132,15 +134,21 @@
         </div>
 
 
-        <div class="div_color_white">
-           
+        <div class="">
+            <div class="div_paddin_left_10_px div_color_white">
                 <p>Стена</p>
                 @if (Model.CanAddMeme == true)
                 {
 
-                <div>
-                    
-                    @using (Ajax.BeginForm("AddMemePerson", "SocialNetwork", new AjaxOptions {
+                    <div>
+                        @using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.Hidden("id_user", Model.IdPage)
+                            @Html.TextArea("text")
+                            <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                            <input type="submit" value="Добавить" />
+                        }
+                        @*@using (Ajax.BeginForm("AddMemePerson", "SocialNetwork", new { enctype = "multipart/form-data" }, new AjaxOptions {
                         UpdateTargetId = "PersonalRecord_wall_meme_block",
                         LoadingElementId="Main_preloader_id",
                         LoadingElementDuration=200,
@@ -148,17 +156,18 @@
                         OnComplete = "OnComplete"
                     }))
                     {
-                        @Html.Display( "id_user", Model.IdPage)
+                        @Html.Hidden( "id_user", Model.IdPage)
                         @Html.TextArea("text")
-                        <input type="file" name="uploadImage" multiple />
+                        <input type="file" name="uploadImage[0]" multiple="multiple" accept="image/*" />
                         <input type="submit" value="Добавить" />
-                    }
-                </div>
+                    }*@
+                    </div>
                 }
-                <div id="PersonalRecord_wall_meme_block">
+            </div>
+                <div class="div_padding_top_10_px" id="PersonalRecord_wall_meme_block">
                     @foreach (var i in Model.WallMeme)
                     {
-                        @Healpers.MemeRecord(i)
+                        @Healpers.MemeRecord(i, Model.IdUser)
                         }
                 </div>
            

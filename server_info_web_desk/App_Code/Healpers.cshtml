@@ -9,47 +9,55 @@
 
 @helper ImageLink(Image a)
 {
-if (a?.Id != null)
-{
+    @*<a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">*@
+        if (a?.Id != null)
+        {
         <a class="link_standart_for_div" href="/SocialNetwork/Image/@(a?.Id)">
-           @Healpers.Image(a)
+            @Healpers.Image(a, true)
         </a>
-}
-if (a?.Id == null)
-{
-        @Healpers.Image(a)
-}
-
-}
-
-@helper Image(Image a)
-{
-        if (a?.Data != null)
-        {
-            <div class="" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(a.Data) ) no-repeat;background-size: cover;">
-            </div>
         }
-        if (a?.Data == null)
+        if (a?.Id == null)
         {
+        @Healpers.Image(a, true)
+        }
+
+        }
+
+
+
+        @helper Image(Image a, bool show_empty_img)
+        {
+if (a?.Data != null)
+{
+        //TODO сейчас  не полностью картинки влезают
+        <div class="div_image_standart" style="background:url( data:image/jpeg;base64,@Convert.ToBase64String(a.Data)) no-repeat;background-size: cover;">
+        </div>
+}
+if (show_empty_img)
+{
+
+
+    if (a?.Data == null)
+    {
             <img src="~/Content/images/camera_200.png" />
-        }
-
+    }
+}
 }
 
 
 
-        @helper UserShort(ApplicationUserShort a, int size)
+        @helper UserShort(ApplicationUserShort a,int size)
         {
-        <div class="small_block_circle_size_@size" title="@a.Name @a.Surname">
+        <div class="small_block_short_size_@size" title="@a.Name @a.Surname">@**@
             <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.PageId">
+                <div class="small_block_img_short_size_@size">
+                    <div class="block_circle">
+                        @Healpers.Image(a?.Image, true)
 
-                <div class="block_circle">
-                    @Healpers.Image(a?.Image)
-
-                </div>
-
-                <div>@Html.Label(a.Name + " " + a.Surname)</div>
-            </a>
+                    </div>
+                    </div>
+                    <div>@(a.Name )</div>@*+ " " + a.Surname*@
+</a>
         </div>
 }
 
@@ -57,26 +65,27 @@ if (a?.Id == null)
 
         @helper GroupShort(GroupShort a, int size)
         {
-        <div class="small_block_circle_size_@size" title="@a.Name">
-            <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Id">
+        <div class="small_block_short_size_@size" title="@a.Name">
+            <a class="link_standart_for_div" href="/SocialNetwork/GroupRecord/@a.Id">
+                <div class="small_block_img_short_size_@size">
+                    <div class="block_circle">
+                        @Healpers.Image(a?.Image, true)
 
-                <div class="block_circle">
-                    @Healpers.Image(a?.Image)
-
+                    </div>
                 </div>
-
-                <div>@Html.Label(a.Name)</div>
-            </a>
+                    <div>@Html.Label(a.Name)</div>
+</a>
         </div>
 }
 
 
         @helper Album(AlbumShort a)
         {
+    <div class="div_padding_top_10_px">
         <div class="one_album_short_block">
             <a class="link_standart_for_div" href="/SocialNetwork/Album/@a.Id">
 
-                @Healpers.Image(a?.Image)
+                @Healpers.Image(a?.Image, true)
 
 
                 <div class="one_album_short_name">
@@ -86,45 +95,86 @@ if (a?.Id == null)
             </a>
 
         </div>
+    </div>
+}
+
+        @helper ActionRecord(Record a, string user_id)
+        {
+        <div class="div_padding_top_10_px">
+            <div class="Record_likes_block div_inline_block">
+
+                <div class="div_inline_block Record_like_block_img">
+                    @{
+                        var check_user = a.UsersLikes.FirstOrDefault(x1 => x1.Id == user_id);
+                    }
+                    @if (check_user == null)
+                    {
+                        <div class="Record_like_block_img_not_active"></div>
+                    }
+                    @if (check_user != null)
+                    {
+                        <div class="Record_like_block_img_active"></div>
+                    }
+
+                </div>
+                <div class="div_inline_block">@a.UsersLikes.Count</div>
+            </div>
+            <div class="Record_comment_block div_inline_block">
+                <div class="div_inline_block Record_comment_block_img"></div>
+                <div class="div_inline_block">@a.Comments.Count</div>
+            </div>
+            <div class="Record_ripost_block div_inline_block">
+                <div class="div_inline_block Record_ripost_block_img"></div>
+                <div class="div_inline_block">@a.RecordRiposters.Count</div>
+            </div>
+        </div>
+}
+
+        @helper ImageRecord(Record a, string user_id)
+        {
+        <div>
+            <div class="ImageRecord_left_block">
+                @Healpers.Image(a.Image, true)
+            </div>
+            <div class="ImageRecord_right_block">
+                @Healpers.ActionRecord(a, user_id)
+            </div>
+        </div>
 
 }
 
 
-
-        @helper MemeRecord(Record a)
+        @helper MemeRecord(Record a,string  user_id)
         {
-        <div class="">
+        <div class="div_padding_top_10_px">
+            <div class="div_paddin_left_10_px div_color_white">
+                <div class="div_padding_top_10_px">
+                    @if (a.Image == null)
+                    {
+                        //запись мем
+                        <div>
+                            @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
+                            <div></div>
+                            @Healpers.Meme(a?.Meme)
 
-            @if (a.Image == null)
-            {
-                //запись мем
-                <div>
-                    @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
-                    <div></div>
-                    @Healpers.Meme(a?.Meme_NM)
-                    @*див для кнопок*@
-                    <div>
-                        <div class="div_like_button div_inline_block"></div>
-                        <div class="div_comment_button div_inline_block"></div>
-                        <div class="div_ripost_button div_inline_block"></div>
-                    </div>
-                    @*див для отрисовки комментов по клику*@
-                    <div>
+                            @*див для отрисовки комментов по клику*@
+                            <div>
 
-                    </div>
+                            </div>
+                        </div>
+
+                    }
+                    @if (a.Image != null)
+                    {
+                        //запись картинка
+
+                        @Healpers.ImageLink(a?.Image)
+
+                    }
+                    @*отрисовка кнопок для записи*@
+                    @Healpers.ActionRecord(a, user_id)
                 </div>
-
-
-
-            }
-            @if (a.Image != null)
-            {
-                //запись картинка
-            }
-            <a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">
-                @Healpers.Meme(a?.Meme_NM)
-
-            </a>
+                </div>
         </div>
 
 }
@@ -136,67 +186,64 @@ if (a?.Id == null)
             <div>
                 <div class="div_inline_block div_img_creator_meme block_circle">
 
-                    @if (a?.Record_NM?.Group == null)
+                    @if (a?.Record?.Group == null)
                     {
-                        <a href="/SocialNetwork/PersonalRecord/@a.Id">
-                            @Healpers.Image(a?.Record_NM?.User?.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image)
+                        <a href="/SocialNetwork/PersonalRecord/@(a.Record.UserId)" class="link_standart_for_div">
+                            @Healpers.Image(a?.Record?.User?.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
                         </a>
                     }
-                    @if (a?.Record_NM?.Group != null)
+                    @if (a?.Record?.Group != null)
                     {
-                        <a href="/SocialNetwork/GroupRecord/@a.Id">
-                            @Healpers.Image(a?.Record_NM?.Group?.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image)
+                        <a href="/SocialNetwork/GroupRecord/@(a.Record.GroupId)" class="link_standart_for_div">
+                            @Healpers.Image(a?.Record?.Group?.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
                         </a>
                     }
 
-
-                    @*@if (a?.Record_NM != null)
-                        {
-                            if (a?.Record_NM.Group != null)
-                            {
-                                @Healpers.Image()
-                            }
-                        }
-                        @if (a?.Record_NM == null && a?.RecordId != null)
-                        {
-                        }*@
                 </div>
-                <div class="div_inline_block">
-                    @if (a?.Record_NM?.Group == null)
+                <div class="div_inline_block div_meme_name_date">
+                    @if (a?.Record?.Group == null)
                     {
-                        <a href="/SocialNetwork/PersonalRecord/@a.Id">
-                            @Html.Label(a?.Record_NM?.User?.Name)
+                        <a href="/SocialNetwork/PersonalRecord/@(a.Record.UserId)">
+                            @(a.Record.User.Name.ToString())
+                           
                         </a>
 
                     }
-                    @if (a?.Record_NM?.Group != null)
+                    @if (a?.Record?.Group != null)
                     {
-                        <a href="/SocialNetwork/GroupRecord/@a.Id">
-                            @Html.Label(a?.Record_NM?.Group?.Name)
+                        <a href="/SocialNetwork/GroupRecord/@(a.Record.GroupId)">
+                            @(a?.Record?.Group?.Name.ToString())
+                            
                         </a>
                     }
-                    <a href="/@a.Id">
+                    <a href="/">
                         <p>
-                            @Html.Label((a?.Birthday).ToString())
+                           @*TODO открывать ajax окно большое с отображением этого мема*@
+                            @(a?.Birthday.ToString())
+                           
                         </p>
                     </a>
                 </div>
             </div>
-            <a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">
-                <div>
+            <div>
+                @if (a?.Description != null)
+                {
                     <p>@a.Description</p>
+                }
+                
+
                     <div>
                         @foreach (var i in a.Images)
                         {
-                            @Healpers.Image(i)
-
+                            <div class="meme_one_image">
+                                @Healpers.ImageLink(i)
+                            </div>
                         }
 
                     </div>
 
-                </div>
-
-            </a>
+               
+            </div>
         </div>
 
 }

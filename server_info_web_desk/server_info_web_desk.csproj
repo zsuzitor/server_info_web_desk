@@ -309,6 +309,7 @@
     <Content Include="Views\SocialNetwork\Index.cshtml" />
     <Content Include="Views\SocialNetwork\GroupRecord.cshtml" />
     <Content Include="Views\SocialNetwork\Groups.cshtml" />
+    <Content Include="Views\SocialNetwork\MemeRecordPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

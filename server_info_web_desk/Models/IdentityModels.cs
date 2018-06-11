@@ -11,18 +11,22 @@ using System;
 using server_info_web_desk.Models.Interfaces;
 using static server_info_web_desk.Models.DataBase.DataBase;
 using System.Linq;
+using System.Web.Mvc;
+using System.ComponentModel.DataAnnotations;
 
 namespace server_info_web_desk.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
     public class ApplicationUser : IdentityUser, Iuser
     {
-        
+        [Required(ErrorMessage="Обязательный параметр")]
         public string Name { get; set; }
         public string Status { get; set; }
+        [Required(ErrorMessage = "Обязательный параметр")]
         public DateTime? Birthday { get; set; }
         public bool Sex { get; set; }
         public int? Age { get; set; }
+        [Required(ErrorMessage = "Обязательный параметр")]
         public string Surname { get; set; }
         public string Country { get; set; }
         public string Town { get; set; }

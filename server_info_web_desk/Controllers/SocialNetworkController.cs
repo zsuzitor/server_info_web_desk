@@ -23,7 +23,7 @@ namespace server_info_web_desk.Controllers
         // GET: SocialNetwork
         public ActionResult Index()
         {
-            Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
+           // Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
             return View();
         }
 
@@ -90,8 +90,32 @@ namespace server_info_web_desk.Controllers
             //TODO сейчас плохо будет работать
             res.GroupCount = user.Group.Count;
             res.Group.AddRange(user.Group.Take(7).Select(x1=>new GroupShort(x1)));
-            res.WallMeme.AddRange(user.WallRecord.Skip(user.WallRecord .Count- 10));
-           
+            if(!db.Entry(user).Collection(x1 => x1.WallRecord).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.WallRecord).Load();
+            res.WallMeme.AddRange(user.WallRecord.Skip(user.WallRecord.Count-10>0?user.WallRecord.Count-10:0));
+           foreach(var i in res.WallMeme)
+            {
+                if (i.ImageId != null && !db.Entry(i).Reference(x1 => x1.Image).IsLoaded)
+                    db.Entry(i).Reference(x1 => x1.Image).Load();
+                //можно загружать усеченную версию
+                if (!db.Entry(i).Collection(x1 => x1.UsersLikes).IsLoaded)
+                    db.Entry(i).Collection(x1 => x1.UsersLikes).Load();
+
+                //колличество нужно +5 записей последних
+                if (!db.Entry(i).Collection(x1 => x1.Comments).IsLoaded)
+                    db.Entry(i).Collection(x1 => x1.Comments).Load();
+                //колличество нужно +5 записей последних
+                if (!db.Entry(i).Collection(x1 => x1.RecordRiposters).IsLoaded)
+                    db.Entry(i).Collection(x1 => x1.RecordRiposters).Load();
+                if (!db.Entry(i).Reference(x1 => x1.Meme).IsLoaded)
+                    db.Entry(i).Reference(x1 => x1.Meme).Load();
+
+                if (!db.Entry(i.Meme).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(i.Meme).Collection(x1 => x1.Images).Load();
+                //i.Meme_NM.Record_NM=
+
+
+            }
             if(!db.Entry(user).Collection(x1=>x1.Friends).IsLoaded)
             {
                 db.Entry(user).Collection(x1 => x1.Friends).Load();
@@ -152,6 +176,8 @@ namespace server_info_web_desk.Controllers
 
             if(!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
                 db.Entry(group).Collection(x1 => x1.Users).Load();
+            if (!db.Entry(group).Collection(x1 => x1.Admins).IsLoaded)
+                db.Entry(group).Collection(x1 => x1.Admins).Load();
 
             res.Users.AddRange(group.Users.Skip(group.Users.Count-6).Select(x1=> 
                  new Models.ApplicationUserShort(x1)));
@@ -266,9 +292,36 @@ namespace server_info_web_desk.Controllers
 
         [AllowAnonymous]
         //TODO
-        public ActionResult Groups(int id)
+        public ActionResult Groups(string id)
         {
-            return View();
+            if(id==null)
+                return new HttpStatusCodeResult(404);
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            var user = db.Users.FirstOrDefault(x1=>x1.Id==id);
+            if(user==null)
+                return new HttpStatusCodeResult(404);
+            GroupsListView res = new GroupsListView();
+
+            if (!db.Entry(user).Collection(x1 => x1.Group).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Group).Load();
+
+            //res.Groups.AddRange(user.Group.Select(x1=>
+            //{
+            //    var rs = new GroupShort(x1);
+            //    if (!db.Entry(x1).Collection(x2 => x2.Albums).IsLoaded)
+            //        db.Entry(x1).Collection(x2 => x2.Albums).Load();
+            //    if (!db.Entry(x1.Albums.First()).Collection(x2 => x2.Images).IsLoaded)
+            //        db.Entry(x1.Albums.First()).Collection(x2 => x2.Images).Load();
+            //    if (!db.Entry(x1.Albums.First().Images.Last()).Reference(x2 => x2.Image).IsLoaded)
+            //        db.Entry(x1.Albums.First().Images.Last()).Reference(x2 => x2.Image).Load();
+            //    return rs;
+            //}));
+
+
+
+
+
+            return View(res);
         }
 
 
@@ -295,6 +348,37 @@ namespace server_info_web_desk.Controllers
 
         //---------------------------------------------------ACTION---------------------------------
         [Authorize]
+        public ActionResult GroupCreate([Bind(Include="Name")]GroupShort a)
+        {
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            if(string.IsNullOrWhiteSpace(a.Name))
+                return new HttpStatusCodeResult(404);
+            Group res = new Group() { Name=a.Name, MainAdminId=check_id };
+            db.Groups.Add(res);
+            db.SaveChanges();
+
+            db.Albums.Add(new Album()
+            {
+                Name = "Main",
+                Description = "Сюда добавляются главные фотографии с вашей страницы",
+                //User = admin
+                GroupId = res.Id
+            });
+            db.Albums.Add(new Album()
+            {
+                Name = "NotMain",
+                Description = "Сюда добавляются фотографии с вашей страницы",
+                GroupId = res.Id
+            });
+            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+            res.Admins.Add(user);
+            res.Users.Add(user);
+            db.SaveChanges();
+            
+            return RedirectToAction("GroupRecord", "SocialNetwork",new {id=res.Id });
+        }
+
+        [Authorize]
         public ActionResult AddFriend(string id)
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
@@ -314,7 +398,10 @@ namespace server_info_web_desk.Controllers
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             //TODO проверять есть ли доступ к добавлению мемов на чужую стену
+            //int gg = Request.Files.Count;
+
             bool access = false;
+            id_user = id_user ?? check_id;
             var user = db.Users.FirstOrDefault(x1 => x1.Id == id_user);
 
             if (id_user == check_id)
@@ -336,32 +423,37 @@ namespace server_info_web_desk.Controllers
             if (!access)
                 return PartialView(null);
             var list_img_byte = Get_photo_post(uploadImage);
-            Meme mem = new Meme() { Description=text, СreatorId=check_id };
+
+            Record record = new Record() { UserId = id_user };
+            db.Record.Add(record);
+            db.SaveChanges();
+
+            Meme mem = new Meme() {Id=record.Id, Description=text, СreatorId=check_id };
             db.Memes.Add(mem);
             db.SaveChanges();
             var list_img = list_img_byte.Select(x1 => new Image() { MemeId=mem.Id, Data=x1, UserId=check_id });
             db.ImagesSocial.AddRange(list_img);
             db.SaveChanges();
-            Record record = new Record() { MemeId=mem.Id, UserId= id_user };
-            db.Record.Add(record);
-            db.SaveChanges();
+            
             if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
                 db.Entry(user).Collection(x1 => x1.Friends).Load();
             if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
                 db.Entry(user).Collection(x1 => x1.Followers).Load();
+            //user.WallRecord.Add(record);
             user.Friends.Where(x1 =>
             {
-                x1.WallRecord.Add(record);
+                x1.News.Add(record);
                 return true;
             });
             user.Followers.Where(x1 =>
             {
-                x1.WallRecord.Add(record);
+                x1.News.Add(record);
                 return true;
             });
             db.SaveChanges();
 
-            return PartialView(record);
+            return RedirectToAction("PersonalRecord", "SocialNetwork",new {id= id_user });
+           // return PartialView(record);
         }
         [Authorize]
         public ActionResult AddMemeGroup(int id_group, HttpPostedFileBase[] uploadImage, string text)
@@ -370,6 +462,21 @@ namespace server_info_web_desk.Controllers
 
 
             return PartialView();
+        }
+
+        //------------------------------------------------------------
+        [ChildActionOnly]
+        [AllowAnonymous]
+            public ActionResult MemeRecordPartial(int id_record, Record a)
+        {
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            if (a == null)
+            {
+                //загрузить
+            }
+            //загрузить все ужные данные для отображения
+            ViewBag.check_id = check_id;
+            return PartialView(a);
         }
     }
 }

@@ -49,7 +49,7 @@
             <div id="PersonalRecord_wall_meme_block">
                 @foreach (var i in Model.WallMeme)
                 {
-                    @Healpers.MemeRecord(i)
+                    @Healpers.MemeRecord(i,Model.IdUser)
                 }
             </div>
 
@@ -73,7 +73,9 @@
         <div>
             @foreach (var i in Model.Users)
             {
-                @Healpers.UserShort(i, 1)
+               
+                    @Healpers.UserShort(i,1)
+                
             }
 
         </div>
@@ -85,10 +87,12 @@
             <div>
                 @foreach (var i in Model.Admins)
             {
-                    @Healpers.UserShort(i, 1)
+                    
+                        @Healpers.UserShort(i,1)
+                   
                 }
 
-            </div>
+                    </div>
 
         </div>
 

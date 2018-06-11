@@ -1,4 +1,9 @@
-﻿body {
+﻿*, *:before, *:after {
+    box-sizing: border-box;
+}
+
+
+body {
     /*padding-top: 50px;*/
     padding-bottom: 20px;
     background-color:#F8F8FF;
@@ -38,11 +43,19 @@ textarea {
 		height: 100%; /* Высота на весь слой */
 		color: black; /* Цвет ссылки */
 	}
+    
 	img {
 		width: 100%;
 		height: 100%;
 	}
-
+    div.div_image_standart{
+width: 100%;
+		height: 100%;
+        /*background-size:100%;*/
+        /*background-size: cover;
+    background-repeat: no-repeat;
+    background: no-repeat;*/
+    }
 	li {
 		list-style-type: none; /* Убираем маркеры */
 	}
@@ -94,10 +107,21 @@ div.div_inline_block {
     vertical-align: top;
 }
 
-
-div.div_paddin_top_10_px{
+div.div_paddin_5_px{
+    padding:5px;
+}
+div.div_padding_top_10_px{
     padding-top:10px;
 }
+div.div_paddin_left_10_px{
+    padding-left:10px;
+}
+
+
+
+
+
+
 
 
     /*-----------------------------------------------------------------------------*/
@@ -167,10 +191,19 @@ div.div_paddin_top_10_px{
           border-radius:50%;
           height:100%;
           width:100%;
+          overflow:hidden;
       }
-
+     div.small_block_short_size_1{
+         width:50px;
+    height:70px;
+     }
+     div.small_block_img_short_size_1{
+         width:50px;
+    height:50px;
+     }
      /*-----------------------------------------------------------------------------*/
 
+    
      div.LeftMenuPersonalMain{
         /*height:200px;*/
         width:200px;
@@ -198,6 +231,32 @@ div.div_paddin_top_10_px{
          margin-left:5px;
          margin-top:5px;
      }
+
+     div.LeftMenuPersonal_my_page{
+         width:19px;
+         height:19px;
+         /*background-position: 0px -917px;*/
+         background: url(/Content/images/menu_icon.png ) no-repeat 0px 4px;
+         overflow:hidden;
+     }
+     div.LeftMenuPersonal_messages{
+         width:19px;
+         height:19px;
+         background: url(/Content/images/menu_icon.png ) no-repeat 0px -22px;
+         overflow:hidden;
+     }
+     div.LeftMenuPersonal_friends{
+         width:19px;
+         height:19px;
+         background: url(/Content/images/menu_icon.png ) no-repeat 0px -79px;
+         overflow:hidden;
+     }
+     div.LeftMenuPersonal_groups{
+         width:19px;
+         height:19px;
+         background: url(/Content/images/menu_icon.png ) no-repeat 0px -107px;
+         overflow:hidden;
+     }
       /*-----------------------------------------------------------------------------*/
 
       div.small_img_circle_size_1{
@@ -213,11 +272,12 @@ div.div_paddin_top_10_px{
       
 
       div.one_album_short_block{
-          padding-top:5px;
-          width:200px;
+          
+          width:208px;
           height:150px;
-          margin-left:15px;
+          
           border-radius:15px;
+          overflow:hidden;
       }
 
       div.one_album_short_name{
@@ -233,9 +293,18 @@ div.div_paddin_top_10_px{
            width:70px;
            height:70px;
        }
+       div.ImageRecord_left_block{
+           width:600px;
+           height:300px;
+           border:1px solid black;
+       }
+       div.ImageRecord_right_block{
+           width:360px;
+           height:300px;
+           border:1px solid black;
+       }
 
-
-       div.div_like_button{
+       /*div.div_like_button{
 
        }
        div.div_comment_button{
@@ -243,9 +312,64 @@ div.div_paddin_top_10_px{
        }
        div.div_ripost_button{
 
+       }*/
+       div.Record_likes_block:hover {
+           cursor:pointer;
+       }
+       div.Record_comment_block{
+           cursor:pointer;
+           margin-left:20px;
+       }
+       div.Record_ripost_block{
+           cursor:pointer;
+           margin-left:20px;
        }
 
+       div.Record_like_block_img_not_active{
+           width:25px;
+           height:25px;
+            background-image: url(/Content/images/Heart.svg);
+       }
+       div.Record_like_block_img_active{
+           width:25px;
+           height:25px;
+            background-image: url(/Content/images/HeartRed.svg);
+       }
+       div.Record_like_block_img{
+          
+           opacity:0.7;
+       }
+div.Record_like_block_img:hover {
+    opacity:1;
+}
+div.Record_comment_block_img{
+    width:25px;
+           height:25px;
+ background-image: url(/Content/images/comments.svg);
+           opacity:0.7;
+}
+div.Record_comment_block_img:hover {
+    opacity:1;
+}
+div.Record_ripost_block_img{
+    width:25px;
+           height:25px;
+ background-image: url(/Content/images/ripost.svg);
+           opacity:0.7;
+}
+div.Record_ripost_block_img:hover {
+    opacity:1;
+}
 
+div.div_meme_name_date{
+    max-width:400px;
+}
+
+
+div.meme_one_image{
+    height:300px;
+    width:488px;
+}
 
       /*--------PERSON---------NEED--NEW-FILE----------------------------------------------------------*/
      div.PersonalRecord_left{

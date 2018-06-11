@@ -4,5 +4,17 @@
     ViewBag.Title = "Groups";
 }
 
+<div>
+    <div>
 
+    </div>
+    <div>
+        @using (Html.BeginForm("GroupCreate", "SocialNetwork"))
+        {
+            @Html.Editor("Name")
+            <input type="submit" value="Создать группу"/>
+        }
+    </div>
+
+</div>
 

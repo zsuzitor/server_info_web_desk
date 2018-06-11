@@ -26,7 +26,7 @@ namespace server_info_web_desk.Models.DataBase
 
             // создаем пользователей
            
-            var admin = new ApplicationUser { Email = "admin@mail.ru", UserName = "admin@mail.ru" };
+            var admin = new ApplicationUser { Email = "admin@mail.ru", UserName = "admin@mail.ru", Name="zsuz",Surname="zsuzSUR",Birthday=DateTime.Now };
             string password = "Admin1!";
             var result = userManager.Create(admin, password);
 

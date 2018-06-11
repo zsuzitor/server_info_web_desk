@@ -11,6 +11,7 @@ namespace server_info_web_desk.Models.SocialNetwork
     public class Meme
     {
         [Key]
+        [ForeignKey("Record")]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
         [UIHint("MultilineText")]
@@ -31,9 +32,9 @@ namespace server_info_web_desk.Models.SocialNetwork
         //public Message Message { get; set; }
 
         
-        public int? RecordId { get; set; }
-        [NotMapped]
-        public Record Record_NM { get; set; }
+        //public int? RecordId { get; set; }
+        //[NotMapped]
+        public Record Record { get; set; }
 
 
         public ICollection<Image> Images { get; set; }
@@ -51,7 +52,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Description = null;
                 СreatorId= null;
             Сreator = null;
-            Record_NM = null;
+            Record = null;
             //GroupId = null;
             //Group = null;
             //UserId = null;

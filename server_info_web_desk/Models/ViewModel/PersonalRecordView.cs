@@ -53,6 +53,7 @@ namespace server_info_web_desk.Models.ViewModel
 
             Online = false;
             Surname = null;
+            Name = null;
             Country = null;
             Town = null;
             Street = null;
@@ -85,6 +86,7 @@ namespace server_info_web_desk.Models.ViewModel
             IdPage = a.Id;
             Online = a.Online;
             Surname = a.Surname;
+            Name = a.Name;
             Country = a.Country;
             Town = a.Town;
             Street = a.Street;

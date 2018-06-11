@@ -17,9 +17,9 @@ namespace server_info_web_desk.Models.SocialNetwork
         public int Id { get; set; }
 
         
-        public int? MemeId { get; set; }
-        [NotMapped]
-        public Meme Meme_NM { get; set; }//мем который в запись
+        //public int? MemeId { get; set; }
+        //[NotMapped]
+        public Meme Meme { get; set; }//мем который в запись
 
         public int? ImageId { get; set; }
         public Image Image { get; set; }//запись==картинка 
@@ -50,7 +50,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             Id = 0;
                // MemeId = null;
-            Meme_NM = null;
+            Meme = null;
             ImageId = null;
             Image = null;
             //AlbumId = null;
