@@ -310,6 +310,8 @@
     <Content Include="Views\SocialNetwork\GroupRecord.cshtml" />
     <Content Include="Views\SocialNetwork\Groups.cshtml" />
     <Content Include="Views\SocialNetwork\MemeRecordPartial.cshtml" />
+    <Content Include="Views\SocialNetwork\FollowGroupPartial.cshtml" />
+    <Content Include="Views\SocialNetwork\FollowUserPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

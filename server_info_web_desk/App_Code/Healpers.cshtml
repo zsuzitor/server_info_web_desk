@@ -65,7 +65,7 @@ if (show_empty_img)
 
         @helper GroupShort(GroupShort a, int size)
         {
-        <div class="small_block_short_size_@size" title="@a.Name">
+        <div class="div_inline_block small_block_short_size_@size" title="@a.Name">
             <a class="link_standart_for_div" href="/SocialNetwork/GroupRecord/@a.Id">
                 <div class="small_block_img_short_size_@size">
                     <div class="block_circle">
@@ -73,8 +73,14 @@ if (show_empty_img)
 
                     </div>
                 </div>
-                    <div>@Html.Label(a.Name)</div>
+                    
 </a>
+        </div>
+        <div class="div_inline_block">
+            <a class="link_standart_for_div" href="/SocialNetwork/GroupRecord/@a.Id">@a.Name</a>
+            @if (a.Status != null)
+            {
+                <div>@a.Status</div>}
         </div>
 }
 
@@ -103,7 +109,7 @@ if (show_empty_img)
         <div class="div_padding_top_10_px">
             <div class="Record_likes_block div_inline_block">
 
-                <div class="div_inline_block Record_like_block_img">
+                <div id="Record_like_block_img_id_@a.Id" class="div_inline_block Record_like_block_img" onclick="LikeRecordClick(@a.Id)">
                     @{
                         var check_user = a.UsersLikes.FirstOrDefault(x1 => x1.Id == user_id);
                     }
@@ -117,7 +123,7 @@ if (show_empty_img)
                     }
 
                 </div>
-                <div class="div_inline_block">@a.UsersLikes.Count</div>
+                <div id="Record_like_block_count_id_@a.Id" class="div_inline_block">@a.UsersLikes.Count</div>
             </div>
             <div class="Record_comment_block div_inline_block">
                 <div class="div_inline_block Record_comment_block_img"></div>
@@ -171,6 +177,7 @@ if (show_empty_img)
                         @Healpers.ImageLink(a?.Image)
 
                     }
+                    <hr />
                     @*отрисовка кнопок для записи*@
                     @Healpers.ActionRecord(a, user_id)
                 </div>

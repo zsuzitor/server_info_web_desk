@@ -1,0 +1,24 @@
+﻿
+
+
+@{ 
+    var ajax_options_add_frieds = new AjaxOptions
+    {
+        UpdateTargetId = "GroupRecord_block_follow",
+        OnComplete = "OnComplete_follow_group",
+        LoadingElementId = "Main_preloader_id",
+        LoadingElementDuration = 200
+    };
+    if (ViewBag.CanFollow == true)
+    {
+        @Ajax.ActionLink("Подписаться", "FollowGroup", "SocialNetwork", new { id = ViewBag.IdGroup }, ajax_options_add_frieds)
+    }
+    if (ViewBag.CanFollow == false)
+    {
+        @Ajax.ActionLink("Отписаться", "FollowGroup", "SocialNetwork", new { id = ViewBag.IdGroup }, ajax_options_add_frieds)
+    }
+    if (ViewBag.CanFollow == null)
+    {
+        @Ajax.ActionLink("Заявка обрабатывается", "FollowGroup", "SocialNetwork", new { id = ViewBag.IdGroup }, ajax_options_add_frieds)
+    }
+}

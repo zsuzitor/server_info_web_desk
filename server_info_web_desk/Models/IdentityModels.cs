@@ -126,6 +126,80 @@ namespace server_info_web_desk.Models
             // Add custom user claims here
             return userIdentity;
         }
+
+
+        //---------------------------------METHODS------------------------------------------------------------------
+        //если указан старт то count должен быть>0
+        public static List<ApplicationUserShort> UserListToShort(List<ApplicationUser> a,int? start, int count)
+        {
+            List<ApplicationUserShort> res = new List<ApplicationUserShort>();
+            if (start == null)
+            {
+
+           
+            if (count > 0)
+                res.AddRange(a.Take((count <= a.Count ? count : a.Count)).Select(x1 =>
+                       new Models.ApplicationUserShort(x1)));
+            else
+                res.AddRange(a.Skip((a.Count - Math.Abs(count) > 0 ? a.Count - Math.Abs(count) : 0)).Select(x1 =>
+                         new Models.ApplicationUserShort(x1)));
+            }
+            else
+                res.AddRange(a.Skip(((int)start > 1 ? (int)start -1 : (int)start)).Take(count).Select(x1 =>
+                             new Models.ApplicationUserShort(x1)));
+            
+            return res;
+        }
+        public  List<GroupShort> UserGroupToShort( int? start, int count)
+        {
+            List<GroupShort> res = new List<GroupShort>();
+            if (!db.Entry(this).Collection(x1 => x1.Group).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Group).Load();
+
+            res.AddRange(this.Group.Select(x1 => SocialNetwork.Group.GetGroupShort(x1)));
+            
+            return res;
+        }
+
+        public  List<Record> GetWallRecords(int start, int count)
+        {
+            if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.WallRecord).Load();
+            this.WallRecord.Reverse();
+            List<Record> res = new List<Record>();//System.Collections.Generic.
+            res.AddRange(this.WallRecord.Skip(start > 0 ? start - 1 : 0).Take(count));
+            foreach (var i in res)
+            {
+                i.RecordLoadForView();
+                
+            }
+            
+            return res;
+        }
+
+        public bool? CanFollow(string user_id)
+        {
+            bool? res = true;
+            if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Friends).Load();
+            var ch_can_foll = this.Friends.FirstOrDefault(x1 => x1.Id == user_id);
+            if (ch_can_foll != null)
+                res = false;
+            if (res==true)
+            {
+                if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Followers).Load();
+                ch_can_foll = this.Followers.FirstOrDefault(x1 => x1.Id == user_id);
+                if (ch_can_foll != null)
+                    res = null;
+            }
+            
+            //TODO тут еще искать по списку не одобренных заявок и если найдено то отправлять null
+
+
+            return res;
+        }
+
     }
 
     public class ApplicationUserShort

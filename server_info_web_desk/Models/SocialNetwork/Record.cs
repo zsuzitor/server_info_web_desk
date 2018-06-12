@@ -5,6 +5,8 @@ using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using static server_info_web_desk.Models.DataBase.DataBase;
+
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
@@ -68,5 +70,34 @@ namespace server_info_web_desk.Models.SocialNetwork
             GroupWall = new List<Group>();
             Comments = new List<Comment>();
         }
+
+        public  void RecordLoadForView()
+        {
+            if (this.ImageId != null && !db.Entry(this).Reference(x1 => x1.Image).IsLoaded)
+                db.Entry(this).Reference(x1 => x1.Image).Load();
+
+            ////TODO тут может быть ошибка тк запись == картинка
+            //if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
+            //    db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+
+            //можно загружать усеченную версию
+            if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
+
+            //колличество нужно +5 записей последних
+            //if (!db.Entry(i).Collection(x1 => x1.Comments).IsLoaded)
+            //    db.Entry(i).Collection(x1 => x1.Comments).Load();
+            //колличество нужно +5 записей последних
+            if (!db.Entry(this).Collection(x1 => x1.RecordRiposters).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.RecordRiposters).Load();
+            if (!db.Entry(this).Reference(x1 => x1.Meme).IsLoaded)
+                db.Entry(this).Reference(x1 => x1.Meme).Load();
+
+            if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+
+            //i.Meme_NM.Record_NM=
+        }
+
     }
 }

@@ -21,27 +21,9 @@
                 }
                 
                 <div id="PersonalRecord_block_add_friend">
-                    @if (Model.IdUser != null&& Model.IdUser!=Model.IdPage)
+                    @if (Model.IdUser != null && Model.IdUser != Model.IdPage)
                     {
-                        var ajax_options_add_frieds = new AjaxOptions
-                        {
-                            UpdateTargetId = "PersonalRecord_block_add_friend",
-                            OnComplete = "OnComplete_add_friend",
-                            LoadingElementId = "Main_preloader_id",
-                            LoadingElementDuration = 200
-                        };
-                        if (Model.CanAddFriend == true)
-                        {
-                            @Ajax.ActionLink("Добавить в друзья", "AddFriend", "SocialNetwork", new { id = Model.IdPage }, ajax_options_add_frieds)
-                        }
-                        if (Model.CanAddFriend == false)
-                        {
-                            @Ajax.ActionLink("Удалить из друзей", "AddFriend", "SocialNetwork", new { id = Model.IdPage }, ajax_options_add_frieds)
-                        }
-                        if (Model.CanAddFriend == null)
-                        {
-                            @Ajax.ActionLink("Отписаться", "AddFriend", "SocialNetwork", new { id = Model.IdPage }, ajax_options_add_frieds)
-                        }
+                        @Html.Action("FollowUserPartial", "SocialNetwork", new { Iduser = Model.IdPage, CanAddFriend = Model.CanAddFriend })
                     }
                 </div>
                @if (Model.IdUser != null)
@@ -71,12 +53,13 @@
         @*блок с группами*@
         <div class="div_padding_top_10_px">
             <div class="div_paddin_left_10_px div_color_white">
-               @Html.ActionLink("Группы", "Groups", "SocialNetwork", new { id = Model.IdPage },new { })
+               @Html.ActionLink("Группы ", "Groups", "SocialNetwork", new { id = Model.IdPage },new { })
+                @Model.GroupCount
                 <div>
-    @foreach (var i in Model.Friends)
+    @foreach (var i in Model.Group)
     {
        
-            @Healpers.UserShort(i,1)
+            @Healpers.GroupShort(i,1)
         
     }
 

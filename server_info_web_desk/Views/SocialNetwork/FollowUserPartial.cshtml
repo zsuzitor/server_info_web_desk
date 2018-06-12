@@ -1,0 +1,23 @@
+﻿@{
+
+    var ajax_options_add_frieds = new AjaxOptions
+    {
+        UpdateTargetId = "PersonalRecord_block_add_friend",
+        OnComplete = "OnComplete_add_friend",
+        LoadingElementId = "Main_preloader_id",
+        LoadingElementDuration = 200
+    };
+    if (ViewBag.CanAddFriend == true)
+    {
+        @Ajax.ActionLink("Добавить в друзья", "AddFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+    }
+    if (ViewBag.CanAddFriend == false)
+    {
+        @Ajax.ActionLink("Удалить из друзей", "AddFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+    }
+    if (ViewBag.CanAddFriend == null)
+    {
+        @Ajax.ActionLink("Отписаться", "AddFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+    }
+
+}

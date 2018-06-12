@@ -10,6 +10,9 @@ namespace server_info_web_desk.Models.ViewModel
     {
         public List<GroupShort> Groups { get; set; }
 
-
+        public GroupsListView()
+        {
+            Groups = new List<GroupShort>();
+        }
     }
 }

@@ -57,19 +57,29 @@ namespace server_info_web_desk.Models.SocialNetwork
 
                 return res;
         }
-        public static List<AlbumShort> GetAlbumShortForView(List<Album> a,int count)
+        public static List<AlbumShort> GetAlbumShortListForView(List<Album> a,int count)
         {
             List<AlbumShort> res = new List<AlbumShort>();
             for (var i=0;i<count;++i)
             {
-                if (!db.Entry(a[i]).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(a[i]).Collection(x1 => x1.Images).Load();
-                res.Add(new AlbumShort(a[i]));
+                res.Add(GetAlbumShortForView(a[i]));
             }
 
             return res;
         }
-    }
+
+        public static AlbumShort GetAlbumShortForView(Album a)
+        {
+            if (!db.Entry(a).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(a).Collection(x1 => x1.Images).Load();
+            var check = a.Images.LastOrDefault();
+            if (check != null)
+                if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
+                    db.Entry(check).Reference(x1 => x1.Image).Load();
+            return new AlbumShort(a);
+
+        }
+        }
 
     public class AlbumShort
     {

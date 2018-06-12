@@ -30,16 +30,17 @@
             @if (Model.CanAddMeme == true)
             {
                 <div>
-                    @using (Ajax.BeginForm("AddMemeGroup", "SocialNetwork", new AjaxOptions
+                    @*@using (Ajax.BeginForm("AddMemeGroup", "SocialNetwork", new AjaxOptions
                     {
                         UpdateTargetId = "PersonalRecord_wall_meme_block",
                         LoadingElementId = "Main_preloader_id",
                         LoadingElementDuration = 200,
                         InsertionMode = InsertionMode.InsertBefore,
                         OnComplete = "OnComplete"
-                    }))
+                    }))*@
+                    @using (Html.BeginForm("AddMemeGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
-                        @Html.Display("id_group", Model.IdGroup)
+                        @Html.Hidden("id_group", Model.IdGroup)
                         @Html.TextArea("text")
                         <input type="file" name="uploadImage" multiple />
                             <input type="submit" value="Добавить" />
@@ -60,44 +61,54 @@
     </div>
     <div class="GroupRecord_right div_inline_block">
 
-       
-            <div class="GroupRecord_main_img_div div_color_white">
+        <div class="div_color_white">
+            <div class="GroupRecord_main_img_div">
                 <div class="PersonalRecord_main_img_d">
 
                     @Healpers.ImageLink(Model?.MainImage)
                 </div>
             </div>
+@if (Model.IdUser != null)
+{
+            <div id="GroupRecord_block_follow">
+                @Html.Action("FollowGroupPartial", "SocialNetwork", new { IdGroup=Model.IdGroup, CanFollow=Model.CanFollow })
+            </div>
+}
+        </div>
+        <div class="div_padding_top_10_px">
+            <div class="div_color_white">
+                @Html.ActionLink("Подписчики", "GroupUsers", "SocialNetwork", new { id = Model.IdGroup })
+                <div>
+                    @foreach (var i in Model.Users)
+                    {
 
-        <div class="div_color_white">
-           @Html.ActionLink("Подписчики", "GroupUsers", "SocialNetwork", new { id = Model.IdGroup })
-        <div>
-            @foreach (var i in Model.Users)
-            {
-               
-                    @Healpers.UserShort(i,1)
-                
-            }
+                        @Healpers.UserShort(i, 1)
 
+                    }
+
+                </div>
+
+            </div>
+        </div>
+        <div class="div_padding_top_10_px">
+            <div class="div_color_white">
+                @Html.ActionLink("Администраторы", "GroupAdmins", "SocialNetwork", new { id = Model.IdGroup })
+                <div>
+                    @foreach (var i in Model.Admins)
+                    {
+
+                        @Healpers.UserShort(i, 1)
+
+                    }
+
+                </div>
+
+            </div>
         </div>
 
         </div>
 
-        <div class="div_color_white">
-            @Html.ActionLink("Администраторы", "GroupAdmins", "SocialNetwork", new { id = Model.IdGroup })
-            <div>
-                @foreach (var i in Model.Admins)
-            {
-                    
-                        @Healpers.UserShort(i,1)
-                   
-                }
 
-                    </div>
-
-        </div>
-
-
-        </div>
     
 </div>
 
