@@ -28,6 +28,10 @@ namespace server_info_web_desk.Models.ViewModel
 
         public Image MainImage { get; set; }
 
+        public int IdMainAlbum { get; set; }
+        public int IdNotMainAlbum { get; set; }//мб не нужно
+        public bool Admin { get; set; }
+
         public List<Image> Image { get; set; }
 
         public List<ApplicationUserShort> Users { get; set; }
@@ -49,6 +53,9 @@ namespace server_info_web_desk.Models.ViewModel
             AddMemesPrivate = true;
             CanAddMeme = false;
             CanFollow = true;
+            IdMainAlbum = 0;
+            IdNotMainAlbum = 0;
+            Admin = false;
             Users = new List<ApplicationUserShort>();
             Admins = new List<ApplicationUserShort>(); 
             Albums = new List<Album>();
@@ -68,6 +75,9 @@ namespace server_info_web_desk.Models.ViewModel
             MainImage = null;
             CanAddMeme = false;
             CanFollow = true;
+            IdMainAlbum = 0;
+            IdNotMainAlbum = 0;
+            Admin = false;
             Users = new List<ApplicationUserShort>();
             Admins = new List<ApplicationUserShort>();
             Albums = new List<Album>();

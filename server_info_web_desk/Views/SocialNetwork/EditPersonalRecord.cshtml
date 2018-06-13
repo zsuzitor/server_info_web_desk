@@ -1,0 +1,60 @@
+﻿@model server_info_web_desk.Models.ApplicationUser
+
+@{
+    ViewBag.Title = "EditPersonalRecord";
+}
+
+<div>
+    <div class="div_content_main_size_2 div_inline_block">
+
+        <div>
+            @using (Html.BeginForm("SaveChangesPersonalRecord", "SocialNetwork"))
+            {
+                @Html.LabelFor(x1 => x1.Name)
+                @Html.EditorFor(x1=>x1.Name)
+                @Html.LabelFor(x1 => x1.Status)
+                @Html.EditorFor(x1 => x1.Status)
+                @Html.LabelFor(x1 => x1.Birthday)
+                @Html.EditorFor(x1 => x1.Birthday)
+                @Html.LabelFor(x1 => x1.Sex)
+                @Html.EditorFor(x1 => x1.Sex)
+                @Html.LabelFor(x1 => x1.Surname)
+                @Html.EditorFor(x1 => x1.Surname)
+                @Html.LabelFor(x1 => x1.Country)
+                @Html.EditorFor(x1 => x1.Country)
+                @Html.LabelFor(x1 => x1.Town)
+                @Html.EditorFor(x1 => x1.Town)
+                @Html.LabelFor(x1 => x1.Street)
+                @Html.EditorFor(x1 => x1.Street)
+                @Html.LabelFor(x1 => x1.Description)
+                @Html.EditorFor(x1 => x1.Description)
+                @Html.LabelFor(x1 => x1.WallOpenWrite)
+                @Html.EditorFor(x1 => x1.WallOpenWrite)
+                @Html.LabelFor(x1 => x1.PrivatePage)
+                @Html.EditorFor(x1 => x1.PrivatePage)
+                @Html.LabelFor(x1 => x1.Open_data_info)
+                @Html.EditorFor(x1 => x1.Open_data_info)
+                
+                <input type="submit" value="Сохранить все"/>
+            }
+
+
+        </div>
+        <div>
+            
+
+
+        </div>
+        <div>
+
+
+
+        </div>
+
+
+
+    </div>
+    <div class="EditPersonalRecord_div_right div_content_main_size_1 div_inline_block"></div>
+</div>
+
+

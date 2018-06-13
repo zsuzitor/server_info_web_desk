@@ -7,7 +7,7 @@
 
 
 <div>
-    <div class="PersonalRecord_left div_inline_block">
+    <div class="PersonalRecord_left div_content_main_size_1 div_inline_block">
         <div class="div_color_white">
             <div class="PersonalRecord_main_img_div">
                 
@@ -18,6 +18,16 @@
                 @if (Model.IdPage == Model.IdUser)
                 {
                     @Html.ActionLink("Редактировать страницу", "EditPersonalRecord", "SocialNetwork", new { }, new { })
+
+
+                    using (Html.BeginForm("AddImagePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                    {
+                        @Html.Hidden("id_user", Model.IdPage)
+                        @Html.Hidden("album_id", Model.IdMainAlbum)
+                        @Html.TextArea("text")
+                        <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                            <input type="submit" value="Добавить" />
+                    }
                 }
                 
                 <div id="PersonalRecord_block_add_friend">
@@ -83,11 +93,11 @@
             </div>
         </div>
         </div>
-    <div class="PersonalRecord_right div_inline_block">
+    <div class="PersonalRecord_right div_content_main_size_2 div_inline_block">
         <div class="div_color_white">
-            <div>
+            <h2>
                 @Model.Name @Model.Surname
-            </div>
+            </h2>
             <div>
                 @Model.Status
             </div>
@@ -96,12 +106,18 @@
             @*блок с информацией*@
             <div>
                 @Model.Town
-                @Model.Street
-                @Model.Birthday
+               
                 @*доп инфа которая будет по клику открываться*@
-                <div>
-
+                <div style="display:none;" id="PersonalRecord_div_more_imfo">
+                    @Model.Street
+                    @Html.DisplayFor(x1 => x1.Birthday)
                 </div>
+                <div class="PersonalRecord_button_more_imfo" id="PersonalRecord_button_more_imfo" onclick="PersonalRecord_show_more_imfo()">
+                    
+                        Показать полную информацию
+                  
+                </div>
+                
             </div>
         </div>
         <div class="div_padding_top_10_px">
@@ -117,7 +133,7 @@
         </div>
 
 
-        <div class="">
+        <div class="div_padding_top_10_px">
             <div class="div_paddin_left_10_px div_color_white">
                 <p>Стена</p>
                 @if (Model.CanAddMeme == true)
@@ -148,10 +164,8 @@
                 }
             </div>
                 <div class="div_padding_top_10_px" id="PersonalRecord_wall_meme_block">
-                    @foreach (var i in Model.WallMeme)
-                    {
-                        @Healpers.MemeRecord(i, Model.IdUser)
-                        }
+                    @Html.Action("MemeRecordListPartial", "SocialNetwork",new { id=Model.IdPage, type=1, start=0, count=10 })
+                   
                 </div>
            
         </div>

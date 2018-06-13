@@ -7,6 +7,8 @@ body {
     /*padding-top: 50px;*/
     padding-bottom: 20px;
     background-color:#F8F8FF;
+    /*color:rgb(102, 111, 160);*/
+    color:rgb(67, 75, 119);
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -67,7 +69,8 @@ width: 100%;
 	}
 
 	a{
-        color:black;
+        /*color:black;*/
+        color:rgb(67, 75, 119);
         text-decoration:none;
 	}
     a:hover{
@@ -96,6 +99,10 @@ ul {
     padding-left: 0; /* Отступ слева в браузере Firefox, Safari, Chrome */
 }
 
+
+h2{
+    margin:0;
+}
 .text-box {
     line-height: 30px;
     height: 30px;
@@ -118,8 +125,14 @@ div.div_paddin_left_10_px{
 }
 
 
-
-
+div.div_content_main_size_1{
+    width:230px;
+         border:1px solid black;
+     }
+div.div_content_main_size_2{
+    width:510px;
+         border:1px solid black;
+     }
 
 
 
@@ -142,6 +155,9 @@ div.div_paddin_left_10_px{
         background-color:#4d7198;
         border:2px solid black;
         height:55px;
+        position:fixed;
+        width:100%;
+        z-index:5;
     }
 
 
@@ -167,7 +183,7 @@ div.div_paddin_left_10_px{
    
     div.main_div_body_all{
         position:relative;
-        
+        top:50px;
         min-width:960px;
         width:100%;
         
@@ -303,7 +319,9 @@ div.div_paddin_left_10_px{
            height:300px;
            border:1px solid black;
        }
-
+       div.MemeRecord_mem{
+       color:black;
+   }
        /*div.div_like_button{
 
        }
@@ -370,15 +388,17 @@ div.meme_one_image{
     height:300px;
     width:488px;
 }
+div.record_image_one_image{
+    height:300px;
+    width:488px;
+}
 
       /*--------PERSON---------NEED--NEW-FILE----------------------------------------------------------*/
-     div.PersonalRecord_left{
-         width:230px;
-         border:1px solid black;
-     }
+     /*div.PersonalRecord_left{
+         
+     }*/
      div.PersonalRecord_right{
-         width:510px;
-         border:1px solid black;
+         
          margin-left:5px;
      }
 
@@ -393,18 +413,24 @@ div.meme_one_image{
          height:100%;
      }
 
-    
-
+    div.PersonalRecord_button_more_imfo{
+        text-align:center;
+        height:35px;
+        font-size:15pt;
+        cursor:pointer;
+        border-radius:10px;
+    }
+    div.PersonalRecord_button_more_imfo:hover{
+ background: #e1e5eb;
+    }
 
      /*-------GROUP----------NEED--NEW-FILE----------------------------------------------------------*/
      div.GroupRecord_left{
-          width:510px;
-         border:1px solid black;
+          
          
      }
      div.GroupRecord_right{
-          width:230px;
-         border:1px solid black;
+          
          margin-left:5px;
      }
      div.GroupRecord_main_img_div{
@@ -412,4 +438,25 @@ div.meme_one_image{
          height:300px;
          border:1px solid black;
          padding:10px;
+     }
+
+
+
+     /*-------------------------------------------------------------NEWS---------------------------------------*/
+     /*div.News_left_div_all{
+
+     }*/
+     div.News_div_right_block {
+          margin-left:5px;
+          min-height:300px;
+     }
+
+
+
+
+
+     /*---------------------------------------------EDIT PERSONAL RECORD------------------------------------------*/
+     div.EditPersonalRecord_div_right{
+          margin-left:5px;
+          min-height:300px;
      }

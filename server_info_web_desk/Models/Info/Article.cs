@@ -30,7 +30,7 @@ namespace server_info_web_desk.Models.Info
 
         public List<ImageInfo> Images { get; set; }
 
-        [JsonProperty("Section_parrentId")]
+        //[JsonProperty("Section_parrentId")]
         public int SectionParrentId { get; set; }
         public Section SectionParrent { get; set; }
         public Article()

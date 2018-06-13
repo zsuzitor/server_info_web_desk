@@ -1,0 +1,6 @@
+﻿@model IEnumerable<server_info_web_desk.Models.SocialNetwork.Record>
+
+@foreach (var i in Model)
+{
+    @Healpers.MemeRecord(i, (string)ViewBag.check_id)
+}

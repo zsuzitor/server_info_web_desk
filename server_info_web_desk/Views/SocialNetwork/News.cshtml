@@ -1,0 +1,24 @@
+﻿
+@{
+    ViewBag.Title = "News";
+}
+
+
+
+<div class="div_content_main_size_2 div_inline_block">
+    @*для добавления поста, просто форма с страницы пользователя*@
+    <div>
+        @using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            
+            @Html.TextArea("text")
+            <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                            <input type="submit" value="Добавить" />
+        }
+
+    </div>
+    <div>
+        @Html.Action("MemeRecordListPartial", "SocialNetwork", new {  type = 3, start = 0, count = 10 })
+    </div>
+</div>
+<div class="div_content_main_size_1 News_div_right_block div_inline_block"></div>

@@ -38,6 +38,8 @@ namespace server_info_web_desk.Models.ViewModel
         public int ImageCount { get; set; }
         public int WallMemeCount { get; set; }
         public int GroupCount { get; set; }
+        public int IdMainAlbum { get; set; }
+        public int IdNotMainAlbum { get; set; }//мб не нужно
 
         public List<ApplicationUserShort> Friends { get; set; }
 
@@ -73,6 +75,9 @@ namespace server_info_web_desk.Models.ViewModel
             WallMemeCount = 0;
             GroupCount = 0;
 
+            IdNotMainAlbum = 0;
+            IdMainAlbum = 0;
+
             Friends = new List<ApplicationUserShort>();
             WallMeme = new List<Record>();
             Albums = new List<AlbumShort>();
@@ -100,6 +105,8 @@ namespace server_info_web_desk.Models.ViewModel
             //о себе 
             Description = null;
             CanAddMeme = false;
+            IdNotMainAlbum = 0;
+            IdMainAlbum = 0;
             Friends = new List<ApplicationUserShort>();
             WallMeme = new List<Record>();
             Albums = new List<AlbumShort>();

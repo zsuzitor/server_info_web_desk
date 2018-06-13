@@ -12,7 +12,7 @@
     @*<a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">*@
         if (a?.Id != null)
         {
-        <a class="link_standart_for_div" href="/SocialNetwork/Image/@(a?.Id)">
+        <a class="link_standart_for_div" href="/SocialNetwork/Image/@(a.Id)">
             @Healpers.Image(a, true)
         </a>
         }
@@ -108,31 +108,52 @@ if (show_empty_img)
         {
         <div class="div_padding_top_10_px">
             <div class="Record_likes_block div_inline_block">
+                @if (user_id != null)
+                {
+                    <div id="Record_like_block_img_id_@a.Id" class="div_inline_block Record_like_block_img" onclick="LikeRecordClick(@a.Id)">
+                        @{
+                            var check_user = a.UsersLikes.FirstOrDefault(x1 => x1.Id == user_id);
+                        }
+                        @if (check_user == null)
+                        {
+                            <div class="Record_like_block_img_not_active"></div>
+                        }
+                        @if (check_user != null)
+                        {
+                            <div class="Record_like_block_img_active"></div>
+                        }
 
-                <div id="Record_like_block_img_id_@a.Id" class="div_inline_block Record_like_block_img" onclick="LikeRecordClick(@a.Id)">
-                    @{
-                        var check_user = a.UsersLikes.FirstOrDefault(x1 => x1.Id == user_id);
-                    }
-                    @if (check_user == null)
-                    {
-                        <div class="Record_like_block_img_not_active"></div>
-                    }
-                    @if (check_user != null)
-                    {
-                        <div class="Record_like_block_img_active"></div>
-                    }
+                    </div>
+                            }
+@if (user_id == null)
+{
+    <div id="Record_like_block_img_id_@a.Id" class="div_inline_block Record_like_block_img">
+        
+            <div class="Record_like_block_img_not_active"></div>
+        
+    </div>
+            }
 
-                </div>
                 <div id="Record_like_block_count_id_@a.Id" class="div_inline_block">@a.UsersLikes.Count</div>
             </div>
             <div class="Record_comment_block div_inline_block">
                 <div class="div_inline_block Record_comment_block_img"></div>
                 <div class="div_inline_block">@a.Comments.Count</div>
             </div>
+@if (user_id != null)
+{
             <div class="Record_ripost_block div_inline_block">
                 <div class="div_inline_block Record_ripost_block_img"></div>
                 <div class="div_inline_block">@a.RecordRiposters.Count</div>
             </div>
+}
+@if (user_id == null)
+{
+    <div class="Record_ripost_block div_inline_block">
+        <div class="div_inline_block Record_ripost_block_img"></div>
+        <div class="div_inline_block">@a.RecordRiposters.Count</div>
+    </div>
+}
         </div>
 }
 
@@ -154,7 +175,7 @@ if (show_empty_img)
         {
         <div class="div_padding_top_10_px">
             <div class="div_paddin_left_10_px div_color_white">
-                <div class="div_padding_top_10_px">
+                <div class="MemeRecord_mem div_padding_top_10_px">
                     @if (a.Image == null)
                     {
                         //запись мем
@@ -173,9 +194,9 @@ if (show_empty_img)
                     @if (a.Image != null)
                     {
                         //запись картинка
-
-                        @Healpers.ImageLink(a?.Image)
-
+                        <div class="record_image_one_image">
+                            @Healpers.ImageLink(a?.Image)
+                        </div>
                     }
                     <hr />
                     @*отрисовка кнопок для записи*@

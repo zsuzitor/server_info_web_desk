@@ -133,7 +133,7 @@ function load_one_section_data(id) {
 
     var mass_with_id = [];
     for (var i = 0; i < mass_section.length; ++i) {
-        if (mass_section[i].Section_parrentId == id)
+        if (mass_section[i].SectionParrentId == id)
             mass_with_id.push(mass_section[i].Id);
     }
 
@@ -144,7 +144,7 @@ function load_one_section_data(id) {
     res += "</div><div class='div_inside_articles' id='div_inside_articles_" + id + "'>";
 
     for (var i = 0; i < mass_article.length; ++i) {
-        if (mass_article[i].Section_parrentId == id) {//
+        if (mass_article[i].SectionParrentId == id) {//
             res += "<div class='div_one_article_name' id='div_one_article_name_" + mass_article[i].Id + "' onclick='load_article(" + mass_article[i].Id + ")'>" + mass_article[i].Head + "</div>";//convert_string(mass_article[i].Head)
         }
     }
@@ -185,14 +185,14 @@ function click_name_section(a) {//,open
     var int_id = a.id.split("_")[4];
     var need_load = true;
     for (var i = 0; i < mass_section.length; ++i) {
-        if (mass_section[i].Section_parrentId == int_id) {
+        if (mass_section[i].SectionParrentId == int_id) {
             need_load = false;
             break;
         }
     }
     if (need_load)
     for (var i = 0; i < mass_article.length; ++i) {
-        if (mass_article[i].Section_parrentId == int_id) {
+        if (mass_article[i].SectionParrentId == int_id) {
             need_load = false;
             break;
         }
@@ -272,11 +272,11 @@ function OnComplete_load_inside_section(data) {
     }
        
     for (var i = 0; i < data.Sections.length; ++i) {
-        var obg_tmp = { Id: data.Sections[i].Id, Head: data.Sections[i].Head, Section_parrentId: data.Sections[i].Section_parrentId };
+        var obg_tmp = { Id: data.Sections[i].Id, Head: data.Sections[i].Head, SectionParrentId: data.Sections[i].SectionParrentId };
         mass_section.push(obg_tmp)
     }
     for (var i = 0; i < data.Articles.length; ++i) {
-        var obg_tmp = { Id: data.Articles[i].Id, Head: data.Articles[i].Head, Body: null, Section_parrentId: data.Articles[i].Section_parrentId };
+        var obg_tmp = { Id: data.Articles[i].Id, Head: data.Articles[i].Head, Body: null, SectionParrentId: data.Articles[i].SectionParrentId };
         mass_article.push(obg_tmp)
     }
 
@@ -307,12 +307,12 @@ function OnComplete_Add_section(data) {
         alert("OnComplete_Add_section return false");
         return;
     }
-    var obj = { Id: data.Id, Head: data.Head, Section_parrentId: data.Section_parrentId };
+    var obj = { Id: data.Id, Head: data.Head, SectionParrentId: data.SectionParrentId };
     mass_section.push(obj);
 
     document.getElementById("main_block_right_id").innerHTML = "";
 
-    var inside_sect = document.getElementById("div_inside_sections_" + obj.Section_parrentId);
+    var inside_sect = document.getElementById("div_inside_sections_" + obj.SectionParrentId);
     var str= str_add_name_section(obj.Id) + load_one_section(obj.Id);
     inside_sect.innerHTML += str;
         
@@ -323,12 +323,12 @@ function OnComplete_Add_article(data) {
         alert("OnComplete_Add_article return false");
         return;
     }
-    var obj = { Id: data.Id, Head: data.Head, Body: null, Section_parrentId: data.Section_parrentId };
+    var obj = { Id: data.Id, Head: data.Head, Body: null, SectionParrentId: data.SectionParrentId };
     mass_article.push(obj)
     document.getElementById("main_block_right_id").innerHTML = "";
     var tmp = "";
     tmp += "<div class='div_one_article_name' id='div_one_article_name_" + obj.Id + "' onclick='load_article(" + obj.Id + ")'>" + obj.Head + "</div>";
-    var inside_sect = document.getElementById("div_inside_articles_" + obj.Section_parrentId);
+    var inside_sect = document.getElementById("div_inside_articles_" + obj.SectionParrentId);
     inside_sect.innerHTML += tmp;
 }
 
@@ -455,14 +455,14 @@ function OnComplete_delete_section(data) {
     }
     if (data.parrent_id_main == null)
         for (var i2 = 0; i2 < mass_article.length; ++i2)
-            if (mass_article[i2].Section_parrentId == data.main_id)
+            if (mass_article[i2].SectionParrentId == data.main_id)
                 mass_article.splice(i2--, 1);
             
         
 
     for (var i = 0; i < data.sec_list.length; ++i) {
         for (var i2 = 0; i2 < mass_article.length; ++i2) {
-            if (mass_article[i2].Section_parrentId == data.sec_list[i]) {
+            if (mass_article[i2].SectionParrentId == data.sec_list[i]) {
                 mass_article.splice(i2--,1);
             }
         }
@@ -716,7 +716,7 @@ function click_sect_id() {
     if (last_click_name.indexOf('div_one_section_name_') == 0)
         return last_click_name.split('_')[4];
     else {
-        return find_in_mass(last_click_name.split('_')[4], 2).Section_parrentId;
+        return find_in_mass(last_click_name.split('_')[4], 2).SectionParrentId;
     }
 }
 //-------------------------------------------------------------
@@ -834,18 +834,18 @@ function load_left_block() {
         //var res = [];
         for (var i = 0; i < mass_section.length; ++i) 
             if (mass_section[i].Id == id) {
-                if (mass_section[i].Section_parrentId != null) {
+                if (mass_section[i].SectionParrentId != null) {
                     var break_=false;
                     for (var i2 = 0; i2 < mass; ++i2) {
                         // ТУТ не надо добавлять в массив + и родителей тоже если уже есть в последовательности
-                        if (mass[i2] == mass_section[i].Section_parrentId) {
+                        if (mass[i2] == mass_section[i].SectionParrentId) {
                             break_ = true;
                         }
 
                     }
                     if (!break_) {
-                        mass.push(mass_section[i].Section_parrentId);
-                        get_all_parrent(mass_section[i].Section_parrentId, mass);
+                        mass.push(mass_section[i].SectionParrentId);
+                        get_all_parrent(mass_section[i].SectionParrentId, mass);
                     }
                    
                 }
@@ -857,7 +857,7 @@ function load_left_block() {
     function load_sec(id, mass) {
 
         for (var i = 0; i < mass_section.length; ++i) {
-            if (mass_section[i].Section_parrentId == id) {
+            if (mass_section[i].SectionParrentId == id) {
                 for (var i2 = 0; i2 < mass.length; ++i2) {
                     if (mass[i2] == mass_section[i].Id) {
                         mass.splice(i2, 1);

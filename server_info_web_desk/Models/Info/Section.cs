@@ -28,7 +28,7 @@ namespace server_info_web_desk.Models.Info
         public string UserId { get; set; }
         public ApplicationUser User { get; set; }
 
-        [JsonProperty("Section_parrentId")]
+        //[JsonProperty("Section_parrentId")]
         public int? SectionParrentId { get; set; }//для главной секции будет у всех пользователей null
         public Section SectionParrent { get; set; }
 

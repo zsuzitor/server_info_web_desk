@@ -90,11 +90,15 @@ namespace server_info_web_desk.Models.SocialNetwork
             //колличество нужно +5 записей последних
             if (!db.Entry(this).Collection(x1 => x1.RecordRiposters).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.RecordRiposters).Load();
+            
             if (!db.Entry(this).Reference(x1 => x1.Meme).IsLoaded)
                 db.Entry(this).Reference(x1 => x1.Meme).Load();
-
-            if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
-                db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+            if (this.Meme != null)
+                if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+            if(this.ImageId!=null)
+                if (!db.Entry(this).Reference(x1 => x1.Image).IsLoaded)
+                    db.Entry(this).Reference(x1 => x1.Image).Load();
 
             //i.Meme_NM.Record_NM=
         }

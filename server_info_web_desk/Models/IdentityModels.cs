@@ -20,24 +20,37 @@ namespace server_info_web_desk.Models
     public class ApplicationUser : IdentityUser, Iuser
     {
         [Required(ErrorMessage="Обязательный параметр")]
+        [Display(Name = "Имя")]
         public string Name { get; set; }
+        [Display(Name = "Статус")]
         public string Status { get; set; }
         [Required(ErrorMessage = "Обязательный параметр")]
+        [Display(Name = "День Рождения")]
+        [DataType(DataType.Date)]
         public DateTime? Birthday { get; set; }
+        [Display(Name = "Пол")]
         public bool Sex { get; set; }
         public int? Age { get; set; }
         [Required(ErrorMessage = "Обязательный параметр")]
+        [Display(Name = "Фамилия")]
         public string Surname { get; set; }
+        [Display(Name = "Страна")]
         public string Country { get; set; }
+        [Display(Name = "Город")]
         public string Town { get; set; }
+        [Display(Name = "Улица")]
         public string Street { get; set; }
         public bool Online { get; set; }
+        [Display(Name = "О себе")]
+        [DataType(DataType.MultilineText)]
         public string Description { get; set; }
+        [Display(Name = "Открытая стена")]
         public bool? WallOpenWrite { get; set; }//кто может писать на стену false только владелец страницы true-все null-друзья
+        [Display(Name = "Открытая страница")]
         public bool PrivatePage { get; set; }//кто может просмотреть всю страницу false только владелец страницы true-все null-друзья
         public int New_message_count { get; set; }
 
-
+        [Display(Name = "Открытые секции и статьи")]
         public bool Open_data_info { get; set; }
 
 
@@ -150,24 +163,73 @@ namespace server_info_web_desk.Models
             
             return res;
         }
+
+        //добавить запись на стену пользователя
+        public void AddRecordMemeWall(Record record)
+        {
+            if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Friends).Load();
+            if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Followers).Load();
+            if (!db.Entry(this).Collection(x1 => x1.News).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.News).Load();
+            this.News.Add(record);
+            //user.WallRecord.Add(record);
+
+
+            ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Friends);
+            ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Followers);
+
+
+            //foreach (var i in this.Friends)
+            //{
+            //    i.AddRecordMemeNews(record);
+            //}
+            //this.Friends.Where(x1 =>
+            //{
+
+            //    return true;
+            //});
+
+            //foreach (var i in this.Followers)
+            //{
+            //    i.AddRecordMemeNews(record);
+            //}
+            //this.Followers.Where(x1 =>
+            //{
+            //    x1.News.Add(record);
+            //    return true;
+            //});
+            db.SaveChanges();
+        }
+
+        //добавить запись в новости пользователя
+        public void AddRecordMemeNews( Record record)
+        {
+            this.News.Add(record);
+            db.SaveChanges();
+        }
+
+        //вернуть список усеченных гурупп пользователя
         public  List<GroupShort> UserGroupToShort( int? start, int count)
         {
             List<GroupShort> res = new List<GroupShort>();
             if (!db.Entry(this).Collection(x1 => x1.Group).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Group).Load();
 
-            res.AddRange(this.Group.Select(x1 => SocialNetwork.Group.GetGroupShort(x1)));
+            res.AddRange(this.Group.Select(x1 => x1.GetGroupShort()));
             
             return res;
         }
-
-        public  List<Record> GetWallRecords(int start, int count)
+        //получить список записей на стене
+        public List<Record> GetWallRecords(int start, int count)
         {
             if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.WallRecord).Load();
-            this.WallRecord.Reverse();
+           
             List<Record> res = new List<Record>();//System.Collections.Generic.
-            res.AddRange(this.WallRecord.Skip(start > 0 ? start - 1 : 0).Take(count));
+            //this.WallRecord.Reverse();
+            res.AddRange(((ICollection<Record>)this.WallRecord).Reverse().Skip(start > 0 ? start - 1 : 0).Take(count));
             foreach (var i in res)
             {
                 i.RecordLoadForView();
@@ -177,6 +239,25 @@ namespace server_info_web_desk.Models
             return res;
         }
 
+        //получить список записей в новостях
+        public List<Record> GetNewsRecords(int start, int count)
+        {
+            if (!db.Entry(this).Collection(x1 => x1.News).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.News).Load();
+           
+            List<Record> res = new List<Record>();//System.Collections.Generic.
+            //this.News.Reverse();
+            res.AddRange(((ICollection<Record>)this.News).Reverse().Skip(start > 0 ? start - 1 : 0).Take(count));
+            foreach (var i in res)
+            {
+                i.RecordLoadForView();
+
+            }
+
+            return res;
+        }
+
+        //проверка на то что отобразить (добавить отписаться удалить)
         public bool? CanFollow(string user_id)
         {
             bool? res = true;

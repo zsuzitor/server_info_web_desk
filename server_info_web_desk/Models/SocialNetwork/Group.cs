@@ -23,7 +23,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public DateTime Birthday { get; set; }
         //public byte[] Image { get; set; }
         public bool OpenGroup { get; set; }
-        public bool AddMemesPrivate { get; set; }
+        public bool AddMemesPrivate { get; set; }// отвечает за добавление записей и фотографий
 
         //public ICollection<SocialNetwork.Image> MainImages { get; set; }
 
@@ -59,29 +59,29 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
 
-        public static void GetUserShortList(Group group, List<ApplicationUserShort> a,int count)
+        public  void GetUserShortList( List<ApplicationUserShort> a,int count)
         {
-            if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Users).Load();
-            a.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)group.Users,null,count));
+            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Users).Load();
+            a.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users,null,count));
             return;
         }
-        public static void GetAdminShortList(Group group, List<ApplicationUserShort> a, int count)
+        public  void GetAdminShortList( List<ApplicationUserShort> a, int count)
         {
-            if (!db.Entry(group).Collection(x1 => x1.Admins).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Admins).Load();
-            a.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)group.Admins, null, count));
+            if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Admins).Load();
+            a.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, null, count));
             return;
         }
 
-        public static GroupShort GetGroupShort(Group group)
+        public  GroupShort GetGroupShort()
         {
             //картинка
-            if (!db.Entry(group).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Albums).Load();
-            if (!db.Entry(group.Albums.First()).Collection(x1 => x1.Images).IsLoaded)
-                db.Entry(group.Albums.First()).Collection(x1 => x1.Images).Load();
-            var check = group.Albums.First().Images.LastOrDefault();
+            if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Albums).Load();
+            if (!db.Entry(this.Albums.First()).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(this.Albums.First()).Collection(x1 => x1.Images).Load();
+            var check = this.Albums.First().Images.LastOrDefault();
             if (check != null)
             {
                 if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
@@ -90,13 +90,29 @@ namespace server_info_web_desk.Models.SocialNetwork
             
 
             //подписчики
-            if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Users).Load();
+            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Users).Load();
 
-            GroupShort res = new GroupShort(group);
+            GroupShort res = new GroupShort(this);
 
             return res;
         }
+
+
+        public void AddRecordMemeWall(Record record)
+        {
+            this.WallRecord.Add(record);
+            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Users).Load();
+            ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Users);
+            //foreach(var i in group.Users)
+            //{
+            //    i.News.Add(record);
+            //}
+            db.SaveChanges();
+        }
+
+
 
         public List<Record> GetWallRecords(int start, int count)
         {
@@ -104,6 +120,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                 db.Entry(this).Collection(x1 => x1.WallRecord).Load();
             
             List<Record> res = new List<Record>();//System.Collections.Generic.
+           
             res.AddRange(this.WallRecord.Reverse().Skip(start > 0 ? start - 1 : 0).Take(count));
             foreach (var i in res)
             {
@@ -119,7 +136,18 @@ namespace server_info_web_desk.Models.SocialNetwork
 
             if (!this.AddMemesPrivate)
             {
-                res = true;
+                if (!this.OpenGroup)
+                {
+                    if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                        db.Entry(this).Collection(x1 => x1.Users).Load();
+                    var u = this.Users.FirstOrDefault(x1 => x1.Id == user_id);
+                    if (u == null)
+                        res = false;
+                }
+                else
+                    res = true;
+
+
             }
             else
             {

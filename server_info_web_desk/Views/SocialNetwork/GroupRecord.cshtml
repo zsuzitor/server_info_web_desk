@@ -5,7 +5,7 @@
 
 <div>
 
-    <div class="GroupRecord_left div_inline_block">
+    <div class="GroupRecord_left div_content_main_size_2 div_inline_block">
         <div class="div_color_white">
             <h1>@Model.Name</h1>
             <p>@Model.Status</p>
@@ -48,10 +48,7 @@
                 </div>
             }
             <div id="PersonalRecord_wall_meme_block">
-                @foreach (var i in Model.WallMeme)
-                {
-                    @Healpers.MemeRecord(i,Model.IdUser)
-                }
+                @Html.Action("MemeRecordListPartial", "SocialNetwork", new { id = Model.IdGroup, type = 2, start = 0, count = 10 })
             </div>
 
         </div>
@@ -59,7 +56,7 @@
 
 
     </div>
-    <div class="GroupRecord_right div_inline_block">
+    <div class="GroupRecord_right div_content_main_size_1 div_inline_block">
 
         <div class="div_color_white">
             <div class="GroupRecord_main_img_div">
@@ -68,6 +65,26 @@
                     @Healpers.ImageLink(Model?.MainImage)
                 </div>
             </div>
+
+            @if (Model.Admin)
+            {
+                @Html.ActionLink("Редактировать страницу", "EditGroupRecord", "SocialNetwork", new { }, new { })
+
+
+                using (Html.BeginForm("AddImageGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
+                    @Html.Hidden("id_group", Model.IdGroup)
+                    @Html.Hidden("album_id", Model.IdMainAlbum)
+                    @Html.TextArea("text")
+                    <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                        <input type="submit" value="Добавить" />
+                }
+            }
+
+
+
+
+
 @if (Model.IdUser != null)
 {
             <div id="GroupRecord_block_follow">
