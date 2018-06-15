@@ -10,18 +10,20 @@
 @helper ImageLink(Image a)
 {
     @*<a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">*@
-        if (a?.Id != null)
-        {
-        <a class="link_standart_for_div" href="/SocialNetwork/Image/@(a.Id)">
-            @Healpers.Image(a, true)
-        </a>
-        }
-        if (a?.Id == null)
-        {
+if (a?.Id != null)
+{
+    <div id="LinkImageForLoad_id_@a.Id" class="div_image_standart div_load_open_img" onclick="ShowImageRecordAJAX(this)">
+        @*<a class="link_standart_for_div" href="/SocialNetwork/Image/@(a.Id)">*@
         @Healpers.Image(a, true)
-        }
+        @*</a>*@
+    </div>
+}
+if (a?.Id == null)
+{
+        @Healpers.Image(a, true)
+    }
 
-        }
+}
 
 
 
@@ -89,7 +91,7 @@ if (show_empty_img)
         {
     <div class="div_padding_top_10_px">
         <div class="one_album_short_block">
-            <a class="link_standart_for_div" href="/SocialNetwork/Album/@a.Id">
+            @*<a class="link_standart_for_div" href="/SocialNetwork/Album/@a.Id">*@
 
                 @Healpers.Image(a?.Image, true)
 
@@ -98,7 +100,7 @@ if (show_empty_img)
                     <p>@a.Name</p>
                 </div>
 
-            </a>
+            @*</a>*@
 
         </div>
     </div>
@@ -165,22 +167,40 @@ if (show_empty_img)
             </div>
             <div class="ImageRecord_right_block">
                 @Healpers.ActionRecord(a, user_id)
+                <hr />
+                <div id="div_for_comments_record_@a.Id"></div>
             </div>
         </div>
 
 }
 
+@*@helper ImageForRecord(Image a, string user_id)
+        {
+    <div>
+        
+        
+    </div>
 
-        @helper MemeRecord(Record a,string  user_id)
+}*@
+
+
+        @helper RecordView(Record a,string  user_id)
         {
         <div class="div_padding_top_10_px">
-            <div class="div_paddin_left_10_px div_color_white">
-                <div class="MemeRecord_mem div_padding_top_10_px">
+            <div class="div_padding_side_10_px div_color_white">
+                
+                <div class="RecordView_mem div_padding_top_10_px">
+                    
                     @if (a.Image == null)
                     {
                         //запись мем
                         <div>
+                            @Healpers.Author(a?.User, a?.Group, a.Meme.Birthday)
                             @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
+                            @if (a.Description != null)
+                            {
+                                <p>@a.Description</p>
+                            }
                             <div></div>
                             @Healpers.Meme(a?.Meme)
 
@@ -194,6 +214,13 @@ if (show_empty_img)
                     @if (a.Image != null)
                     {
                         //запись картинка
+                        @Healpers.Author(a?.User, a?.Group, a.Image.Birthday)
+                        <div>
+                            @if (a.Description != null)
+                            {
+                                <p>@a.Description</p>
+                            }
+                        </div>
                         <div class="record_image_one_image">
                             @Healpers.ImageLink(a?.Image)
                         </div>
@@ -201,6 +228,7 @@ if (show_empty_img)
                     <hr />
                     @*отрисовка кнопок для записи*@
                     @Healpers.ActionRecord(a, user_id)
+                    <div id="div_for_comments_record_@a.Id"></div>
                 </div>
                 </div>
         </div>
@@ -208,51 +236,67 @@ if (show_empty_img)
 }
 
 
+
+@helper Author(ApplicationUser user,Group group,DateTime date)
+        {
+    <div>
+        <div class="div_inline_block div_img_creator_meme block_circle">
+
+            @if (group == null)
+            {
+                <a href="/SocialNetwork/PersonalRecord/@(user.Id)" class="link_standart_for_div">
+                    @Healpers.Image(user.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
+                </a>
+            }
+            @if (group != null)
+            {
+                <a href="/SocialNetwork/GroupRecord/@(group.Id)" class="link_standart_for_div">
+                    @Healpers.Image(group.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
+                </a>
+            }
+
+        </div>
+        <div class="div_inline_block div_meme_name_date">
+            @if (group == null)
+            {
+                <a href="/SocialNetwork/PersonalRecord/@(user.Id)">
+                    @(user.Name.ToString())
+
+                </a>
+
+            }
+            @if (group != null)
+            {
+                <a href="/SocialNetwork/GroupRecord/@(group.Id)">
+                    @(group.Name.ToString())
+
+                </a>
+            }
+            <a href="/">
+                <p>
+                    @*TODO открывать ajax окно большое с отображением этого мема*@
+                    @(date.ToString())
+
+                </p>
+            </a>
+        </div>
+    </div>
+
+}
+
+
+@*@helper Image(ApplicationUser user, Group group, DateTime date)
+{
+
+
+}*@
+
+
+
         @helper Meme(Meme a)
         {
         <div class="">
-            <div>
-                <div class="div_inline_block div_img_creator_meme block_circle">
-
-                    @if (a?.Record?.Group == null)
-                    {
-                        <a href="/SocialNetwork/PersonalRecord/@(a.Record.UserId)" class="link_standart_for_div">
-                            @Healpers.Image(a?.Record?.User?.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
-                        </a>
-                    }
-                    @if (a?.Record?.Group != null)
-                    {
-                        <a href="/SocialNetwork/GroupRecord/@(a.Record.GroupId)" class="link_standart_for_div">
-                            @Healpers.Image(a?.Record?.Group?.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
-                        </a>
-                    }
-
-                </div>
-                <div class="div_inline_block div_meme_name_date">
-                    @if (a?.Record?.Group == null)
-                    {
-                        <a href="/SocialNetwork/PersonalRecord/@(a.Record.UserId)">
-                            @(a.Record.User.Name.ToString())
-                           
-                        </a>
-
-                    }
-                    @if (a?.Record?.Group != null)
-                    {
-                        <a href="/SocialNetwork/GroupRecord/@(a.Record.GroupId)">
-                            @(a?.Record?.Group?.Name.ToString())
-                            
-                        </a>
-                    }
-                    <a href="/">
-                        <p>
-                           @*TODO открывать ajax окно большое с отображением этого мема*@
-                            @(a?.Birthday.ToString())
-                           
-                        </p>
-                    </a>
-                </div>
-            </div>
+           
             <div>
                 @if (a?.Description != null)
                 {

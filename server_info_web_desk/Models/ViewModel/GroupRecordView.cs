@@ -37,7 +37,7 @@ namespace server_info_web_desk.Models.ViewModel
         public List<ApplicationUserShort> Users { get; set; }
         public List<ApplicationUserShort> Admins { get; set; }
 
-        public List<Album> Albums { get; set; }
+        public List<AlbumShort> Albums { get; set; }
         public List<Record> WallMeme { get; set; }
 
         public GroupRecordView()
@@ -58,7 +58,7 @@ namespace server_info_web_desk.Models.ViewModel
             Admin = false;
             Users = new List<ApplicationUserShort>();
             Admins = new List<ApplicationUserShort>(); 
-            Albums = new List<Album>();
+            Albums = new List<AlbumShort>();
             WallMeme = new List<Record>();
             Image = new List<SocialNetwork.Image>();
 
@@ -80,7 +80,7 @@ namespace server_info_web_desk.Models.ViewModel
             Admin = false;
             Users = new List<ApplicationUserShort>();
             Admins = new List<ApplicationUserShort>();
-            Albums = new List<Album>();
+            Albums = new List<AlbumShort>();
             WallMeme = new List<Record>();
             Image = new List<SocialNetwork.Image>();
 

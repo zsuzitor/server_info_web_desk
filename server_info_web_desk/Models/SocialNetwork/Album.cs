@@ -79,7 +79,22 @@ namespace server_info_web_desk.Models.SocialNetwork
             return new AlbumShort(a);
 
         }
+
+        public  void GetAlbumImages( int start, int count)
+        {
+            if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Images).Load();
+            foreach(var i in this.Images)
+            {
+                if (!db.Entry(i).Reference(x1 => x1.Image).IsLoaded)
+                    db.Entry(i).Reference(x1 => x1.Image).Load();
+            }
+
+
+            return;
+
         }
+    }
 
     public class AlbumShort
     {

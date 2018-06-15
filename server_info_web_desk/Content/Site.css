@@ -39,17 +39,7 @@ textarea {
         min-width:100%;
         min-height:20px;
 }
-	.link_standart_for_div {
-		display: block; /* Ссылка как блочный элемент */
-		text-align: center; /* Выравнивание по центру */
-		height: 100%; /* Высота на весь слой */
-		color: black; /* Цвет ссылки */
-	}
-    
-	img {
-		width: 100%;
-		height: 100%;
-	}
+
     div.div_image_standart{
 width: 100%;
 		height: 100%;
@@ -120,10 +110,13 @@ div.div_paddin_5_px{
 div.div_padding_top_10_px{
     padding-top:10px;
 }
-div.div_paddin_left_10_px{
+div.div_padding_left_10_px{/*div_paddin_left_10_px*/
     padding-left:10px;
 }
-
+div.div_padding_side_10_px{/*div_paddin_side_10_px*/
+    padding-left:10px;
+    padding-right:10px;
+}
 
 div.div_content_main_size_1{
     width:230px;
@@ -134,8 +127,22 @@ div.div_content_main_size_2{
          border:1px solid black;
      }
 
+/*----------------------------------------------------------------------------------
 
-
+*/
+div.div_for_replace_ajax{
+    position:fixed;
+    left:-20px;
+    top:-20px;
+    display:none;
+    background: #000;
+    opacity: 0.8;
+}
+div.div_for_replace_ajax_2{
+     position:fixed;
+    left:-20px;
+    top:-20px;
+}
 
     /*-----------------------------------------------------------------------------*/
     div.Main_preloader{
@@ -273,7 +280,11 @@ div.div_content_main_size_2{
          background: url(/Content/images/menu_icon.png ) no-repeat 0px -107px;
          overflow:hidden;
      }
-      /*-----------------------------------------------------------------------------*/
+
+
+
+
+      /*---------------------------------HEALPERS--------------------------------------------*/
 
       div.small_img_circle_size_1{
           height:85px;
@@ -288,7 +299,7 @@ div.div_content_main_size_2{
       
 
       div.one_album_short_block{
-          
+          text-align:center;
           width:208px;
           height:150px;
           
@@ -311,15 +322,15 @@ div.div_content_main_size_2{
        }
        div.ImageRecord_left_block{
            width:600px;
-           height:300px;
+           height:600px;
            border:1px solid black;
        }
        div.ImageRecord_right_block{
            width:360px;
-           height:300px;
+           height:600px;
            border:1px solid black;
        }
-       div.MemeRecord_mem{
+       div.RecordView_mem{
        color:black;
    }
        /*div.div_like_button{
@@ -384,14 +395,22 @@ div.div_meme_name_date{
 }
 
 
+div.div_load_open_img{
+    cursor:pointer;
+}
+
 div.meme_one_image{
     height:300px;
     width:488px;
 }
 div.record_image_one_image{
     height:300px;
-    width:488px;
+    width:100%;
 }
+/*div.RecordView_mem_block{
+    height:300px;
+   width:488px;
+}*/
 
       /*--------PERSON---------NEED--NEW-FILE----------------------------------------------------------*/
      /*div.PersonalRecord_left{
@@ -459,4 +478,14 @@ div.record_image_one_image{
      div.EditPersonalRecord_div_right{
           margin-left:5px;
           min-height:300px;
+     }
+
+
+     /*------------------------------------------------ALBUMS-----------------------------------------------------*/
+     div.Albums_one_album_block_img{
+         cursor:pointer;
+     }
+     div.album_one_image_img{
+         width:218px;
+         height:160px;
      }

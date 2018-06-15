@@ -229,6 +229,7 @@
     <Compile Include="Models\ViewModel\GroupRecordView.cs" />
     <Compile Include="Models\ViewModel\GroupsListView.cs" />
     <Compile Include="Models\ViewModel\IndexInfoView.cs" />
+    <Compile Include="Models\ViewModel\ListAlbumsShortView.cs" />
     <Compile Include="Models\ViewModel\PersonalRecordView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Startup.cs" />
@@ -314,6 +315,9 @@
     <Content Include="Views\SocialNetwork\MemeRecordListPartial.cshtml" />
     <Content Include="Views\SocialNetwork\News.cshtml" />
     <Content Include="Views\SocialNetwork\EditPersonalRecord.cshtml" />
+    <Content Include="Views\SocialNetwork\Albums.cshtml" />
+    <Content Include="Views\SocialNetwork\LoadImagesAlbum.cshtml" />
+    <Content Include="Views\SocialNetwork\LoadShowImageRecord.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

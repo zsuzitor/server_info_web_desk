@@ -49,7 +49,7 @@ namespace server_info_web_desk.Models
         [Display(Name = "Открытая страница")]
         public bool PrivatePage { get; set; }//кто может просмотреть всю страницу false только владелец страницы true-все null-друзья
         public int New_message_count { get; set; }
-
+        public DateTime DateRegistration { get; set; }
         [Display(Name = "Открытые секции и статьи")]
         public bool Open_data_info { get; set; }
 
@@ -109,7 +109,7 @@ namespace server_info_web_desk.Models
             WallOpenWrite = true;
             Open_data_info = false;
             PrivatePage = false;
-
+            DateRegistration = DateTime.Now;
 
 
             Sections =new List<Section>();
@@ -326,7 +326,7 @@ namespace server_info_web_desk.Models
     }
 
 
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>//,IDisposable
     {
         public ApplicationDbContext()
             : base("DefaultConnection", throwIfV1Schema: false)

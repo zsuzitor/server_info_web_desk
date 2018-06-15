@@ -1,0 +1,15 @@
+﻿@model List<server_info_web_desk.Models.SocialNetwork.Image>
+
+
+
+<div>
+    @foreach (var i in Model)
+    {
+
+        <div class="div_padding_left_10_px div_padding_top_10_px div_inline_block album_one_image_img">
+            @Healpers.ImageLink(i)
+        </div>
+    }
+
+
+</div>

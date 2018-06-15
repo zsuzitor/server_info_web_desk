@@ -14,7 +14,7 @@
                     @Healpers.ImageLink(Model?.MainImage)
                   
             </div>
-            <div class="div_paddin_left_10_px">
+            <div class="div_padding_left_10_px">
                 @if (Model.IdPage == Model.IdUser)
                 {
                     @Html.ActionLink("Редактировать страницу", "EditPersonalRecord", "SocialNetwork", new { }, new { })
@@ -22,7 +22,7 @@
 
                     using (Html.BeginForm("AddImagePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
                     {
-                        @Html.Hidden("id_user", Model.IdPage)
+                        @*@Html.Hidden("id_user", Model.IdPage)*@
                         @Html.Hidden("album_id", Model.IdMainAlbum)
                         @Html.TextArea("text")
                         <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
@@ -46,7 +46,7 @@
 
         @*блок с друзьями*@
         <div class="div_padding_top_10_px">
-            <div class="div_paddin_left_10_px div_color_white">
+            <div class="div_padding_left_10_px div_color_white">
                 @Html.ActionLink("Друзья", "Friends", "SocialNetwork", new { id = Model.IdPage }, new { })
                 <div>
                     @foreach (var i in Model.Friends)
@@ -62,7 +62,7 @@
         </div>
         @*блок с группами*@
         <div class="div_padding_top_10_px">
-            <div class="div_paddin_left_10_px div_color_white">
+            <div class="div_padding_left_10_px div_color_white">
                @Html.ActionLink("Группы ", "Groups", "SocialNetwork", new { id = Model.IdPage },new { })
                 @Model.GroupCount
                 <div>
@@ -80,12 +80,14 @@
 
             @*блок с альбомами*@
         <div class="div_padding_top_10_px">
-            <div class="div_paddin_left_10_px div_color_white">
+            <div class="div_padding_left_10_px div_color_white">
                 @Html.ActionLink("Альбомы", "AlbumsPerson", "SocialNetwork", new { id = Model.IdPage }, new { })
                 <div>
                     @foreach (var i in Model.Albums)
                     {
-                        @Healpers.Album(i)
+                        <a href="@Url.Action("AlbumsPerson","SocialNetwork",new {id=Model.IdPage,select_id=i.Id })">
+                            @Healpers.Album(i)
+                        </a>
                     }
 
                 </div>
@@ -122,19 +124,21 @@
         </div>
         <div class="div_padding_top_10_px">
             <div class="div_color_white">
-                @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
-                @foreach (var i in Model.Image)
+                <div class="div_padding_top_10_px">
+                    @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
+                    @foreach (var i in Model.Image)
             {
-                    <div class="one_image_small_block">
-                        @Healpers.ImageLink(i)
-                    </div>
-                }
+                        <div class="div_padding_left_10_px one_image_small_block">
+                            @Healpers.ImageLink(i)
+                        </div>
+                    }
+                </div>
                     </div>
         </div>
 
 
         <div class="div_padding_top_10_px">
-            <div class="div_paddin_left_10_px div_color_white">
+            <div class="div_padding_left_10_px div_color_white">
                 <p>Стена</p>
                 @if (Model.CanAddMeme == true)
                 {

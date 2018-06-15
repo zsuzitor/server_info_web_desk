@@ -1,0 +1,58 @@
+﻿@model server_info_web_desk.Models.ViewModel.ListAlbumsShortView
+
+@{
+    ViewBag.Title = "Albums";
+}
+
+<div>
+    @foreach(var i in Model.AlbumList)
+    {
+        <div class="div_padding_left_10_px div_inline_block Albums_one_album_block_img" id="Album_one_block_id_@i.Id" onclick="Album_one_block_click_al(this)">
+            @Healpers.Album(i)
+        </div>
+       
+
+    }
+    <div>
+        @if (Model.PageUserId != null)
+        {
+            using (Html.BeginForm("AddImagePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @*@Html.Hidden("id_user", Model.PageUserId)*@
+                @Html.Hidden("album_id", Model.SelectAlbum)
+                @Html.TextArea("text")
+                <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                <input type="submit" value="Добавить" />
+            }
+        }
+        @if (Model.PageUserId == null)
+        {
+            using (Html.BeginForm("AddImageGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.Hidden("id_group", Model.PageGroupId)
+                @Html.Hidden("album_id", Model.SelectAlbum)
+                @Html.TextArea("text")
+                <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                    <input type="submit" value="Добавить" />
+            }
+        }
+
+    </div>
+    <div id="Albums_block_for_img">
+        @if (Model.SelectAlbum != null)
+        {
+        @Html.Action("LoadImagesAlbum", "SocialNetwork", new {id=Model.SelectAlbum, start=0, count=10 })
+        }
+    </div>
+
+
+    <div>
+        <button onclick="load_more_img_album()" >Загрузить больше</button>
+    </div>
+</div>
+
+
+@section scripts{
+    
+    }
+

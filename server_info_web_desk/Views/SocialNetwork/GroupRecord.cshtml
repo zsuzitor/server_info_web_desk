@@ -13,14 +13,16 @@
         </div>
 
         <div class="div_color_white">
-            @foreach (var i in Model.Image)
+            <div class="div_padding_top_10_px">
+                @foreach (var i in Model.Image)
             {
-                <div class="one_image_small_block">
-                    @Healpers.ImageLink(i)
-                </div>
+                    <div class="div_padding_left_10_px one_image_small_block">
+                        @Healpers.ImageLink(i)
+                    </div>
 
 
-            }
+                }
+            </div>
         </div>
 
 
@@ -107,6 +109,24 @@
 
             </div>
         </div>
+        @*блок с альбомами*@
+        <div class="div_padding_top_10_px">
+            <div class="div_padding_left_10_px div_color_white">
+                @Html.ActionLink("Альбомы", "AlbumsGroup", "SocialNetwork", new { id = Model.IdGroup }, new { })
+                <div>
+                    @foreach (var i in Model.Albums)
+                    {
+                        <a href="@Url.Action("AlbumsGroup","SocialNetwork",new {id=Model.IdGroup,select_id=i.Id })">
+                            @Healpers.Album(i)
+                        </a>
+                    }
+
+                </div>
+
+            </div>
+        </div>
+
+
         <div class="div_padding_top_10_px">
             <div class="div_color_white">
                 @Html.ActionLink("Администраторы", "GroupAdmins", "SocialNetwork", new { id = Model.IdGroup })

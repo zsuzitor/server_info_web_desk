@@ -64,4 +64,19 @@ namespace server_info_web_desk.Models.SocialNetwork
         //    }
         //}
     }
+
+    public class ImageShort
+    {
+        public int Id { get; set; }
+        public byte[] Data { get; set; }
+        public int? PreviewId { get; set; }//id image
+        public int? NextId { get; set; }//id image
+        public ImageShort()
+        {
+            Id = 0;
+            Data = null;
+            PreviewId = null;
+            NextId = null;
+        }
+    }
 }

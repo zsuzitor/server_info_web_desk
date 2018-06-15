@@ -38,12 +38,12 @@ namespace server_info_web_desk.Controllers
             //id = id ?? check_id;
             if (id == null&&check_id==null)
             {
-                return RedirectToAction("Index", "SocialNetworkController",new { });
+                return RedirectToAction("Index", "SocialNetwork",new { });
             }
             if(id==null)
                 return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = check_id });
 
-            var user = db.Users.First(x1=>x1.Id==id);
+             var user =  db.Users.First(x1=>x1.Id==id);
             
             PersonalRecordView res = new PersonalRecordView(user);
             res.IdUser = check_id;
@@ -172,9 +172,10 @@ namespace server_info_web_desk.Controllers
             res.IdNotMainAlbum = group.Albums.ElementAt(1).Id;
 
 
+            res.Albums = Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)group.Albums, 2);
             res.MainImage= Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.First(), 1).FirstOrDefault();
 
-            res.Image = Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.First(), 4);
+            res.Image = Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.ElementAt(1), 4);
 
 
            
@@ -212,23 +213,44 @@ namespace server_info_web_desk.Controllers
         }
         [AllowAnonymous]
         //TODO вместе с AlbumsGroup редиректить на 1 метод в котором все будет происходить????
-        public ActionResult AlbumsPerson(string id)
+        public ActionResult AlbumsPerson(string id,int? select_id)
         {
-            return View();
+            //TODO проверять есть ли доступ
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            ListAlbumsShortView res = new ListAlbumsShortView() {UserId= check_id,PageUserId=id, SelectAlbum=select_id };
+            var userPage = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            if (!db.Entry(userPage).Collection(x1 => x1.Albums).IsLoaded)
+                db.Entry(userPage).Collection(x1 => x1.Albums).Load();
+            
+          
+
+             res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
+
+
+            return View("Albums",  res);//"SocialNetwork",
         }
         [AllowAnonymous]
         //TODOвместе с AlbumsPerson редиректить на 1 метод в котором все будет происходить????
-        public ActionResult AlbumsGroup(int id)
+        public ActionResult AlbumsGroup(int id, int? select_id)
         {
-            return View();
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            ListAlbumsShortView res = new ListAlbumsShortView() { UserId = check_id, PageGroupId = id, SelectAlbum = select_id };
+            var GroupPage = db.Groups.FirstOrDefault(x1 => x1.Id == id);
+            if (!db.Entry(GroupPage).Collection(x1 => x1.Albums).IsLoaded)
+                db.Entry(GroupPage).Collection(x1 => x1.Albums).Load();
+
+
+
+            res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)GroupPage.Albums, GroupPage.Albums.Count));
+            return View("Albums",  res);//"SocialNetwork",
         }
 
-        [AllowAnonymous]
-        //TODO 
-        public ActionResult Album(int id)
-        {
-            return View();
-        }
+        //[AllowAnonymous]
+        ////TODO 
+        //public ActionResult Album(int id)
+        //{
+        //    return View();
+        //}
 
         [AllowAnonymous]
         //TODO 
@@ -547,8 +569,10 @@ namespace server_info_web_desk.Controllers
         }
 
         [Authorize]
-        public ActionResult AddImagePerson(string text, HttpPostedFileBase[] uploadImage, int album_id)
+        public ActionResult AddImagePerson(string text, HttpPostedFileBase[] uploadImage, int? album_id)
         {
+            if(uploadImage.Count()<1|| album_id==null)
+                return new HttpStatusCodeResult(404);
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             var user = db.Users.FirstOrDefault(x1=>x1.Id==check_id);
             if (!db.Entry(user).Collection(x1 => x1.Albums).IsLoaded)
@@ -561,19 +585,24 @@ namespace server_info_web_desk.Controllers
             db.ImagesSocial.Add(img);
             db.SaveChanges();
             
-            var record = new Record() {  AlbumId= album.Id, UserId=check_id };
+            var record = new Record() {  AlbumId= album.Id, UserId=check_id, Description = text };
 
             db.SaveChanges();
             img.RecordId= record.Id;
             record.ImageId=img.Id;
+            
             db.SaveChanges();
             user.AddRecordMemeWall(record);
 
             return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = check_id});
         }
         [Authorize]
-        public ActionResult AddImageGroup(string text, HttpPostedFileBase[] uploadImage, int album_id,int id_group)
+        public ActionResult AddImageGroup(string text, HttpPostedFileBase[] uploadImage, int? album_id,int? id_group)
         {
+            if (uploadImage.Count() < 1 || album_id == null|| id_group==null)
+                return new HttpStatusCodeResult(404);
+
+
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
             var group = db.Groups.FirstOrDefault(x1 => x1.Id == id_group);
@@ -624,14 +653,14 @@ namespace server_info_web_desk.Controllers
             db.ImagesSocial.Add(img);
             db.SaveChanges();
 
-            var record = new Record() { AlbumId = album.Id, GroupId = group.Id };
+            var record = new Record() { AlbumId = album.Id, GroupId = group.Id, Description = text };
 
             db.SaveChanges();
             img.RecordId = record.Id;
             record.ImageId = img.Id;
             db.SaveChanges();
             group.AddRecordMemeWall(record);
-            return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = check_id });
+            return RedirectToAction("GroupRecord", "SocialNetwork", new { id = id_group });
         }
 
 
@@ -684,6 +713,19 @@ namespace server_info_web_desk.Controllers
         //    ViewBag.check_id = check_id;
         //    return PartialView(a);
         //}
+
+
+        [AllowAnonymous]
+        public ActionResult LoadImagesAlbum(int id, int start, int count)
+        {
+            List<Image> res = new List<Models.SocialNetwork.Image>();
+            var album = db.Albums.FirstOrDefault(x1=>x1.Id== id);
+            album.GetAlbumImages(start, count);
+            res.AddRange(album.Images.Select(x1=>x1.Image));//.Select(x1=>new ImageShort() {Id=(int)x1.ImageId,Data=x1.Image.Data }
+
+            return PartialView(res);
+            
+        }
 
         [AllowAnonymous]
         public ActionResult MemeRecordListPartial(string id,int type,int start,int count)
@@ -752,5 +794,28 @@ namespace server_info_web_desk.Controllers
             ViewBag.CanAddFriend = CanAddFriend;
             return PartialView();
         }
-    }
+
+
+        [AllowAnonymous]
+        public ActionResult LoadShowImageRecord(int? id)
+        {
+            //TODO проверить доступ загрузить соседние id и тд
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            
+            if(id==null)
+                return new HttpStatusCodeResult(404);
+
+            ViewBag.check_id = check_id;
+
+            var img = db.ImagesSocial.FirstOrDefault(x1=>x1.Id==id);
+            img.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == img.RecordId);
+            img.Record_NM.Image = img;
+            if (!db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
+                db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+            //Image res = new Models.SocialNetwork.Image();
+
+
+            return PartialView(img.Record_NM);
+        }
+        }
 }

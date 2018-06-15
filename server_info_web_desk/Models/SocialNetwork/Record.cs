@@ -27,7 +27,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public Image Image { get; set; }//запись==картинка 
         public int? AlbumId { get; set; }
         public Album Album { get; set; }// запись==картинка и она в альбоме//для отображение картинок в альбоме тк там тоже есть лайки и тдтд
-
+        public string Description { get; set; }
 
         public int? GroupId { get; set; }
         public Group Group { get; set; }//группа в которой запись висит первоначально
@@ -63,6 +63,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             User = null;
             RecordRiposteId = null;
             RecordRiposte = null;
+            Description = null;
             RecordRiposters = new List<Record>();
             UsersLikes = new List<ApplicationUser>();
             UsersRipostes = new List<ApplicationUser>();
