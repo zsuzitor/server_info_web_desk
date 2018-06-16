@@ -80,3 +80,7 @@ E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\bin\Microsof
 E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\obj\Debug\server_info_web_desk.csprojResolveAssemblyReference.cache
 E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\obj\Debug\server_info_web_desk.dll
 E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\obj\Debug\server_info_web_desk.pdb
+E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\bin\Microsoft.AspNet.SignalR.Core.dll
+E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\bin\Microsoft.AspNet.SignalR.SystemWeb.dll
+E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\bin\Microsoft.AspNet.SignalR.Core.xml
+E:\csharp\server_info_mvc\server_info_web_desk\server_info_web_desk\bin\Microsoft.AspNet.SignalR.SystemWeb.xml

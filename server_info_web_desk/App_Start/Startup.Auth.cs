@@ -5,8 +5,11 @@ using Microsoft.Owin;
 using Microsoft.Owin.Security.Cookies;
 using Microsoft.Owin.Security.Google;
 using Owin;
+using System.Threading.Tasks;
 using server_info_web_desk.Models;
 
+
+///[assembly: OwinStartup(typeof(server_info_web_desk.Models.Startup))]
 namespace server_info_web_desk
 {
     public partial class Startup
@@ -63,6 +66,10 @@ namespace server_info_web_desk
             //    ClientId = "",
             //    ClientSecret = ""
             //});
+
+
+
+            app.MapSignalR();
         }
     }
 }

@@ -20,7 +20,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         public string СreatorId { get; set; }
-        public ApplicationUser Сreator { get; set; }//создатель
+        public ApplicationUser Creator { get; set; }//создатель
 
         public int? MemeId { get; set; }
         public Meme Meme { get; set; }
@@ -31,7 +31,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public ICollection<Image> Images { get; set; }
         //public ICollection<ApplicationUser> Users { get; set; }
 
-        
+        public ICollection<ApplicationUser> UserNeedRead { get; set; }
 
         public Message()
         {
@@ -39,13 +39,13 @@ namespace server_info_web_desk.Models.SocialNetwork
             Birthday = DateTime.Now;
             Text = null;
             СreatorId = null;
-            Сreator = null;
+            Creator = null;
             MemeId = null;
             Meme = null;
             Chat = null;
             ChatId = null;
             Images = new List<Image>();
-
+            UserNeedRead = new List<ApplicationUser>();
 
         }
     }

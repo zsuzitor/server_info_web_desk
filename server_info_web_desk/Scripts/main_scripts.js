@@ -55,9 +55,9 @@ function OnComplete_LikeRecordClick(data){
 //-------------------------------------------------NOT NEED NEW FILE
 
 function ShowImageRecordAJAX(a) {
-    var id = a.id.split('_')[1];
+    //var id = a.id.split('_')[1];
     var dt = {
-        'id': id
+        'id': a
     };
     $.ajax({
         url: "/SocialNetwork/LoadShowImageRecord",
@@ -79,21 +79,34 @@ function ShowImageRecordAJAX(a) {
 
 }
 
-function OnComplete_LoadShowImageRecord() {
+function OnComplete_LoadShowImageRecord(data) {
 
     var div = document.getElementById("div_for_replace_ajax_id_2");
     var div2 = document.getElementById("div_for_replace_ajax_id");
+    div2.style.width = '100%';//document.documentElement.clientWidth + 'px';
+    div2.style.height = '100%';//document.documentElement.clientHeight + 'px';
     div.innerHTML = data;
-    div.style.left = '100px';
+    div.style.left = '0px';
     div.style.top = '100px';
+    div2.style.left = '0px';
+    div2.style.top = '0px';
     div2.style.display = 'block';
 }
 
 
 function ShowImageRecordClose() {
+    var div = document.getElementById("div_for_replace_ajax_id_2");
     var div2 = document.getElementById("div_for_replace_ajax_id");
-    div2.innerHTML = '';
+
+    div.innerHTML = '';
+
+    div2.style.width =  '0px';
+    div2.style.height = '0px';
+   
+    div2.style.left = '-100px';
+    div2.style.top = '-100px';
     div2.style.display = 'none';
+    
 }
 
 //-------------------------------------PERSON------------------------------------------------

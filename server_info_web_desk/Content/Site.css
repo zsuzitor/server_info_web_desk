@@ -9,6 +9,7 @@ body {
     background-color:#F8F8FF;
     /*color:rgb(102, 111, 160);*/
     color:rgb(67, 75, 119);
+    z-index:1;
 }
 
 /* Set padding to keep content from hitting the edges */
@@ -135,13 +136,25 @@ div.div_for_replace_ajax{
     left:-20px;
     top:-20px;
     display:none;
-    background: #000;
-    opacity: 0.8;
+    background-color: rgba(0,0,0,0.8);
+    /*opacity: 0.8;*/
+    z-index:10;
+    overflow:hidden;
+    cursor:pointer;
+    
 }
 div.div_for_replace_ajax_2{
-     position:fixed;
-    left:-20px;
-    top:-20px;
+     position:absolute;
+    /*left:-20px;
+    top:-20px;*/
+    width:80%;
+    background-color: white;
+    opacity: 1;
+    margin-left:10%;
+    /*margin:auto;*/
+    min-width:960px;
+    cursor:default;
+     /*position:center;*/
 }
 
     /*-----------------------------------------------------------------------------*/
@@ -285,7 +298,11 @@ div.div_for_replace_ajax_2{
 
 
       /*---------------------------------HEALPERS--------------------------------------------*/
-
+      div.small_img_circle_size_0{
+          height:25px;
+          width:25px;
+          border:1px solid black;
+      }
       div.small_img_circle_size_1{
           height:85px;
           width:70px;
@@ -320,14 +337,25 @@ div.div_for_replace_ajax_2{
            width:70px;
            height:70px;
        }
+       div.ImageRecord_all_block{
+           /*width:80%;
+           margin-left:10%;
+           border:2px solid black;*/
+           padding-right:360px;
+       }
        div.ImageRecord_left_block{
-           width:600px;
+           width:100%;
+           /*padding-right:200px;*/
            height:600px;
            border:1px solid black;
        }
        div.ImageRecord_right_block{
+           position:absolute;
+           right:0;
+           top:0;
            width:360px;
            height:600px;
+           /*margin-left:-200px;*/
            border:1px solid black;
        }
        div.RecordView_mem{
@@ -412,6 +440,14 @@ div.record_image_one_image{
    width:488px;
 }*/
 
+
+div.LoadShowImageRecord_div_all_block{
+    /*z-index:10;*/
+    /*min-width:960px;*/
+}
+
+
+
       /*--------PERSON---------NEED--NEW-FILE----------------------------------------------------------*/
      /*div.PersonalRecord_left{
          
@@ -488,4 +524,14 @@ div.record_image_one_image{
      div.album_one_image_img{
          width:218px;
          height:160px;
+     }
+
+
+
+     /*----------------------------------------------------------------Messages----------------------------------------*/
+     div.Messages_div_right{
+         min-height:300px;
+     }
+     div.Messages_div_left{
+         min-height:300px;
      }

@@ -2,9 +2,15 @@
     ViewBag.Title = "Home Page";
 }
 
-<h3>Выберите файл для загрузки</h3>
+
+
+@Html.ActionLink("Личная страница","PersonalRecord", "SocialNetwork",new { },new { })
+@Html.ActionLink("Info data","index", "info", new { }, new { })
+
+
+@*<h3>Выберите файл для загрузки</h3>
 @using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
 {
     <input type="file" name="upload" /><br>
     <input type="submit" value="Загрузить" />
-}
+}*@

@@ -1,0 +1,18 @@
+﻿@model IEnumerable<server_info_web_desk.Models.SocialNetwork.ChatShort>
+
+@{
+    ViewBag.Title = "Messages";
+}
+
+
+<div>
+    <div class="Messages_div_left div_content_main_size_2 div_inline_block">
+
+        @foreach(var i in Model)
+        {
+        @Healpers.Chat(i)
+        }
+
+    </div>
+    <div class="div_content_main_size_1 Messages_div_right div_inline_block"></div>
+</div>

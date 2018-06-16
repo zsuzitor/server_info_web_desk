@@ -10,6 +10,12 @@
     @Scripts.Render("~/scripts/jquery-3.3.1.js")
     @Scripts.Render("~/scripts/jquery.unobtrusive-ajax.js")
     @Scripts.Render("~/scripts/main_scripts.js")
+
+
+    
+    
+
+
     @{
         string controller_name = ViewContext.RequestContext.RouteData.Values["controller"].ToString().ToLower();
         string action_name = ViewContext.RequestContext.RouteData.Values["action"].ToString().ToLower();
@@ -51,7 +57,7 @@
         <div class="">@Html.Partial("_LoginPartial")</div>
     }
     <div class="div_for_replace_ajax" id="div_for_replace_ajax_id" onclick="ShowImageRecordClose()">
-        <div id="div_for_replace_ajax_id_2" class="div_for_replace_ajax_2"></div>
+        <div id="div_for_replace_ajax_id_2" class="div_for_replace_ajax_2" onclick="event.stopPropagation()"></div>
     </div>
 
     <div class="main_div_body_all">
@@ -79,6 +85,9 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    @Scripts.Render("~/Scripts/jquery.signalR-2.2.3.min.js")
+    @Scripts.Render("~/signalr/hubs")
+    @Scripts.Render("~/Scripts/util.js")
     @RenderSection("scripts", required: false)
 </body>
 </html>

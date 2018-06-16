@@ -13,6 +13,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
         public DateTime Birthday { get; set; }
+        public string Name { get; set; }
+        public Image Image { get; set; }
 
         public string СreatorId { get; set; }
         public ApplicationUser Сreator { get; set; }//создатель
@@ -27,6 +29,8 @@ namespace server_info_web_desk.Models.SocialNetwork
             Birthday = DateTime.Now;
             СreatorId = null;
             Сreator = null;
+            Image = null;
+            Name = null;
             Messages = new List<Message>();
             Users = new List<ApplicationUser>(); 
 
@@ -34,4 +38,31 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         }
     }
-}
+
+
+    public class ChatShort
+    {
+        [HiddenInput(DisplayValue = false)]
+        public int Id { get; set; }
+        public DateTime LastMessageDate { get; set; }
+        public Image Image { get; set; }
+
+        //public Message Message { get; set; }
+        public ApplicationUserShort User { get; set; }
+        public string Text { get; set; }
+
+        public string Name { get; set; }
+        public int CountNewMessage { get; set; }
+
+        public ChatShort()
+        {
+            Id = 0;
+            LastMessageDate =DateTime.Now;
+            Image = null;
+            User = null;
+            Text = null;
+            Name = null;
+            CountNewMessage = 0;
+        }
+    }
+    }

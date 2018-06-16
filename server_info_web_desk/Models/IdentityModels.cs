@@ -84,6 +84,7 @@ namespace server_info_web_desk.Models
         public List<Group> GroupAdmin { get; set; }
 
 
+        public List<Message> MessageNeedRead { get; set; }
         //TODO
         public List<ApplicationUser> Friends { get; set; }//друзья пользователя
         public List<ApplicationUser> FriendUser { get; set; }//тоже друзья(для связи), сюда не обращаться
@@ -111,7 +112,7 @@ namespace server_info_web_desk.Models
             PrivatePage = false;
             DateRegistration = DateTime.Now;
 
-
+            MessageNeedRead = new List<Message>();
             Sections =new List<Section>();
             Articles = new List<Article>();
             ImagesInfo = new List<ImageInfo>();
@@ -132,6 +133,7 @@ namespace server_info_web_desk.Models
             Followers = new List<ApplicationUser>();
             FollowUser = new List<ApplicationUser>();
         }
+
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
         {
             // Note the authenticationType must match the one defined in CookieAuthenticationOptions.AuthenticationType
@@ -281,6 +283,15 @@ namespace server_info_web_desk.Models
             return res;
         }
 
+
+
+        public bool SendNewMessage(Message a)
+        {
+
+
+            return true;
+        }
+
     }
 
     public class ApplicationUserShort
@@ -417,6 +428,12 @@ namespace server_info_web_desk.Models
               .Map(t => t.MapLeftKey("ApplicationUserFriendsId")
               .MapRightKey("ApplicationUserFriendUserId")
               .ToTable("ApplicationUserFriends"));
+
+            modelBuilder.Entity<Message>().HasMany(c => c.UserNeedRead)
+              .WithMany(s => s.MessageNeedRead)
+              .Map(t => t.MapLeftKey("MessageId")
+              .MapRightKey("ApplicationUserId")
+              .ToTable("MessageApplicationUser"));
 
             base.OnModelCreating(modelBuilder);
         }

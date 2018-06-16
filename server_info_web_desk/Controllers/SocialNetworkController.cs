@@ -32,7 +32,9 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult PersonalRecord(string id)
         {
-            
+            //Session["NameAction"] = "WallMeme";
+            //Session["StartLoad"] = 0;
+            //Session["CountLoad"] = 10;
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             
             //id = id ?? check_id;
@@ -209,7 +211,38 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult Messages()
         {
-            return View();
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            var user = db.Users.First(x1 => x1.Id == check_id);
+            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Chats).Load();
+
+
+            List<ChatShort> res = new List<ChatShort>();
+            res.AddRange(user.Chats.Select(x1 => {
+                var us_s = new ChatShort() { Id=x1.Id,Image=x1.Image, Name=x1.Name };
+
+                if (!db.Entry(x1).Collection(x2 => x2.Messages).IsLoaded)
+                    db.Entry(x1).Collection(x2 => x2.Messages).Load();
+                var last_message = x1.Messages.LastOrDefault();
+                if (last_message == null)
+                {
+                    us_s.User = null;
+                    us_s.Text = null;
+                }
+                else
+                {
+                    us_s.User = new Models.ApplicationUserShort(last_message?.Creator);
+                    us_s.Text = last_message.Text;
+                }
+               
+                //us_s.CountNewMessage=;
+
+                return us_s;
+                }));
+
+
+
+            return View(res);
         }
         [AllowAnonymous]
         //TODO вместе с AlbumsGroup редиректить на 1 метод в котором все будет происходить????
@@ -263,9 +296,72 @@ namespace server_info_web_desk.Controllers
 
         [Authorize]
         //TODO
-        public ActionResult Dialog(int? id,string user_id=null)
+        public ActionResult Dialog(int? id = null, string user_id = null)//
         {
-            return View();
+
+            if(id==null&& user_id==null)
+                return new HttpStatusCodeResult(404);
+
+            //TODO УРОВЕНЬ ДОСТУПА
+
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+            Chat res = new Chat();
+
+            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Chats).Load();
+            if (id != null)
+            {
+                var dialog = user.Chats.FirstOrDefault(x1 => x1.Id == id);
+                if (dialog == null)
+                    return new HttpStatusCodeResult(404);
+                res = dialog;
+
+            }
+            else
+            if (user_id != null)
+            {
+                Chat chat = user.Chats.FirstOrDefault(x1 =>
+                {
+
+                    if (!db.Entry(x1).Collection(x2 => x2.Users).IsLoaded)
+                        db.Entry(x1).Collection(x2 => x2.Users).Load();
+                    if (x1.Users.FirstOrDefault(x2 => x2.Id == user_id) != null && x1.Users.Count == 2)
+                        return true;
+
+                    return false;
+                });
+                //Chat chat = null;
+                //foreach (var i in user.Chats)
+                //{
+                //    if (!db.Entry(i).Collection(x2 => i.Users).IsLoaded)
+                //        db.Entry(i).Collection(x2 => i.Users).Load();
+                //    if (i.Users.FirstOrDefault(x2 => x2.Id == user_id) != null && i.Users.Count == 2)
+                //        chat = i;
+                //    break;
+                //}
+
+
+
+                //СОЗДАТЬ НОВЫЙ ЧАТ
+                if (chat == null)
+                {
+                    var user2 = db.Users.FirstOrDefault(x1=>x1.Id== user_id);
+                    if(user2==null)
+                        return new HttpStatusCodeResult(404);
+                    chat = new Chat() { СreatorId=check_id };
+                    db.Chats.Add(chat);
+                    db.SaveChanges();
+                    chat.Users.Add(user);
+                    chat.Users.Add(user2);
+                    db.SaveChanges();
+                }
+                return RedirectToAction("Dialog", "SocialNetwork",new { id= chat.Id });
+            }
+            
+
+
+            return View(res);
         }
 
         [AllowAnonymous]
@@ -586,7 +682,7 @@ namespace server_info_web_desk.Controllers
             db.SaveChanges();
             
             var record = new Record() {  AlbumId= album.Id, UserId=check_id, Description = text };
-
+            db.Record.Add(record);
             db.SaveChanges();
             img.RecordId= record.Id;
             record.ImageId=img.Id;
@@ -727,6 +823,7 @@ namespace server_info_web_desk.Controllers
             
         }
 
+        
         [AllowAnonymous]
         public ActionResult MemeRecordListPartial(string id,int type,int start,int count)
         {
@@ -772,6 +869,49 @@ namespace server_info_web_desk.Controllers
             return PartialView(res);
         }
 
+        [Authorize]
+        public ActionResult SendNewMessageForm(int dialog, HttpPostedFileBase[] uploadImage, string text)
+        {
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            //TODO проверить доступ к диалогу
+            var user = db.Users.FirstOrDefault(x1=>x1.Id==check_id);
+            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Chats).Load();
+            var chat = user.Chats.FirstOrDefault(x1=>x1.Id==dialog);
+            if(chat==null)
+                return new HttpStatusCodeResult(404);
+            var list_img_byte = Get_photo_post(uploadImage);
+            
+            Message res = new Message() { Text=text, СreatorId=check_id, ChatId=dialog };
+
+            db.Messages.Add(res);
+            db.SaveChanges();
+
+            List<Image> image_list = new List<Models.SocialNetwork.Image>();
+            foreach (var i in list_img_byte)
+            {
+                //кратинки еще и в бд и тдтд
+
+                var img = new Image() { Data = i, UserId = check_id, MessageId = res.Id };
+                db.ImagesSocial.Add(img);
+                db.SaveChanges();
+                image_list.Add(img);
+
+            }
+            
+            if (!db.Entry(chat).Collection(x1 => x1.Users).IsLoaded)
+                db.Entry(chat).Collection(x1 => x1.Users).Load();
+            foreach (var i in chat.Users)
+                res.UserNeedRead.Add(i);
+            db.SaveChanges();
+
+            user.SendNewMessage(res);
+
+            return PartialView();
+        }
+
+       
+
 
         //[ChildActionOnly]
         [Authorize]
@@ -808,10 +948,21 @@ namespace server_info_web_desk.Controllers
             ViewBag.check_id = check_id;
 
             var img = db.ImagesSocial.FirstOrDefault(x1=>x1.Id==id);
-            img.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == img.RecordId);
-            img.Record_NM.Image = img;
-            if (!db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
-                db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+            if (img.RecordId != null)
+            {
+                img.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == img.RecordId);
+                img.Record_NM.Image = img;
+                if (!db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
+                    db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+            }
+            else
+            {
+                img.Record_NM = new Record();
+                img.Record_NM.Image = img;
+                if (!db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
+                    db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+            }
+            
             //Image res = new Models.SocialNetwork.Image();
 
 

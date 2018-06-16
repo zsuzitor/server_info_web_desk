@@ -1,0 +1,30 @@
+﻿@model server_info_web_desk.Models.SocialNetwork.Chat
+
+@{
+    ViewBag.Title = "Dialog";
+}
+
+<div>
+    <div class="div_inline_block div_content_main_size_2">
+
+        @foreach(var i in Model.Messages)
+        {
+            @Healpers.Message(i)
+
+        }
+
+@*@using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))*@
+        @using (Ajax.BeginForm("SendNewMessageForm", "SocialNetwork", new AjaxOptions { LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
+        {
+            @Html.Hidden("dialog", Model.Id)
+            @Html.TextArea("text")
+            @*<input type="file" name="uploadImage" multiple="multiple" accept="image/*" />*@
+            <input type="submit" value="Отправить" />
+        }
+
+
+
+    </div>
+    <div class="div_inline_block div_content_main_size_1"></div>
+</div>
+
