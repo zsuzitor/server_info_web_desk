@@ -20,8 +20,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         public DateTime Birthday { get; set; }
 
         
-        public string СreatorId { get; set; }
-        public ApplicationUser Сreator { get; set; }//создатель
+        public string CreatorId { get; set; }
+        public ApplicationUser Creator { get; set; }//создатель
 
         //public int? GroupId { get; set; }
         //public Group Group { get; set; }
@@ -50,8 +50,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             Id = 0;
             Description = null;
-                СreatorId= null;
-            Сreator = null;
+                CreatorId= null;
+            Creator = null;
             Record = null;
             //GroupId = null;
             //Group = null;

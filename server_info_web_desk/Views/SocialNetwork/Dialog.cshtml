@@ -5,26 +5,30 @@
 }
 
 <div>
-    <div class="div_inline_block div_content_main_size_2">
+    <div class="div_inline_block div_content_main_size_2" id="div_content_main_size_2_id">
+        <div class="div_padding_left_10_px div_padding_top_10_px">
+            <div id="Dialog_div_message_id">
+                @foreach (var i in Model.Messages)
+            {
+                    <div class="div_padding_top_10_px">
+                        @Healpers.Message(i)
+                    </div>
+                }
+            </div>
+            <div class="div_padding_top_10_px">
+                @*@using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))*@
+                @using (Ajax.BeginForm("SendNewMessageForm", "SocialNetwork", new AjaxOptions {
+                    LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200,OnComplete= "OnComplete_SendMessage" }))
+                {
+                    @Html.Hidden("dialog", Model.Id)
+                    @Html.TextArea("text")
+                    @*<input type="file" name="uploadImage" multiple="multiple" accept="image/*" />*@
+                    <input type="submit" value="Отправить" />
+                }
 
-        @foreach(var i in Model.Messages)
-        {
-            @Healpers.Message(i)
-
-        }
-
-@*@using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))*@
-        @using (Ajax.BeginForm("SendNewMessageForm", "SocialNetwork", new AjaxOptions { LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200 }))
-        {
-            @Html.Hidden("dialog", Model.Id)
-            @Html.TextArea("text")
-            @*<input type="file" name="uploadImage" multiple="multiple" accept="image/*" />*@
-            <input type="submit" value="Отправить" />
-        }
-
-
-
+            </div>
+        </div>
     </div>
-    <div class="div_inline_block div_content_main_size_1"></div>
+    <div class="div_inline_block div_content_main_size_1" id="div_content_main_size_1_id"></div>
 </div>
 

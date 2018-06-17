@@ -19,8 +19,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string Text { get; set; }
 
 
-        public string СreatorId { get; set; }
-        public ApplicationUser Сreator { get; set; }//создатель
+        public string CreatorId { get; set; }
+        public ApplicationUser Creator { get; set; }//создатель
 
         public int? AnswerCommentId { get; set; }
         public Comment AnswerComment { get; set; }//комментарийна который отвечают этим
@@ -41,8 +41,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             Id = 0;
             Birthday = DateTime.Now;
-            СreatorId = null;
-            Сreator= null;
+            CreatorId = null;
+            Creator = null;
             AnswerCommentId = null;
             AnswerComment = null;
             Record = null;

@@ -176,13 +176,16 @@ if (a != null)
             <div class="div_inline_block ImageRecord_left_block">
                 @Healpers.Image(a.Image, true)
             </div>
-            <div class="div_inline_block ImageRecord_right_block">
+            <div class="div_inline_block ImageRecord_right_block div_padding_top_10_px div_padding_left_10_px">
                 @if (a.Id == 0)
                 {
+                    @Healpers.Author(a?.Image.User, null, a.Image.Birthday)
                     @Healpers.ActionRecord(null, null)
                 }
+
 @if (a.Id != 0)
 {
+    @Healpers.Author(a?.User, a?.Group, a.Image.Birthday)
     @Healpers.ActionRecord(a, user_id)
 }
                
@@ -343,12 +346,12 @@ if (a != null)
 @helper Message(Message a)
         {
     <div>
-        <div class="div_inline_block small_img_circle_size_1">
-            <div class="block_circle">
+        <div class="div_inline_block small_img_circle_size_1 block_circle">
+            @*<div class="block_circle">*@
                 <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
                     @Healpers.Image(a.Creator.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
                 </a>
-                    </div>
+                    @*</div>*@
         </div>
         <div class="div_inline_block">
             <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
@@ -380,32 +383,35 @@ if (a != null)
         {
     <div>
         <a class="link_standart_for_div" href="/SocialNetwork/Dialog/@a.Id">
-            <div class="div_inline_block small_img_circle_size_1">
-                <div class="block_circle">
-                    @Healpers.Image(a.Image, true)
-            </div>
-        </div>
-            <div class="div_inline_block">
-                <div>@a.Name</div>
-                @if (a.User != null)
-                {
-                    <div>@a.LastMessageDate</div>
-                    <div>
-                        <div class="small_img_circle_size_0 div_inline_block">
-                            @Healpers.Image(a.User.Image, true)
+            <div class="div_padding_left_10_px div_padding_top_10_px oneDialogShortInside">
+                <div class="div_inline_block small_img_circle_size_1 block_circle">
+                    @*<div class="block_circle">*@
+                        @Healpers.Image(a.Image, true)
+                    @*</div>*@
+                </div>
+                <div class="div_inline_block">
+                    <div>@a.Name</div>
+                    @if (a.User != null)
+                    {
+                        <div>@a.LastMessageDate</div>
+                        <div>
+                            <div class="small_img_circle_size_0 block_circle div_inline_block">
+                                @Healpers.Image(a.User.Image, true)
+                            </div>
+                            <div class="div_inline_block">
+                                @a.Text
+                            </div>
                         </div>
-                        <div class="div_inline_block">
-                            @a.Text
-                        </div>
-                    </div>
-                }
-@if (a.User == null)
-{
-    <div>Сообщений на данный момент нет</div>
-}
+                    }
+                    @if (a.User == null)
+                    {
+                        <div>Сообщений на данный момент нет</div>
+                    }
 
+                </div>
             </div>
         </a>
+        <hr />
     </div>
 
 }

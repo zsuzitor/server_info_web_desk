@@ -76,6 +76,7 @@ width: 100%;
     text-align: center; /* Выравнивание по центру */
     height: 100%; /* Высота на весь слой */
     color: black; /* Цвет ссылки */
+    
 }
     img {
     width: 100%;
@@ -122,10 +123,13 @@ div.div_padding_side_10_px{/*div_paddin_side_10_px*/
 div.div_content_main_size_1{
     width:230px;
          border:1px solid black;
+         transition:1s;
+         /*min-height:10000px;*/
      }
 div.div_content_main_size_2{
     width:510px;
          border:1px solid black;
+         transition:1s;
      }
 
 /*----------------------------------------------------------------------------------
@@ -245,6 +249,7 @@ div.div_for_replace_ajax_2{
         width:200px;
         border:2px solid black;
         position:absolute;
+        transition:1s;
         
     }
 
@@ -304,12 +309,12 @@ div.div_for_replace_ajax_2{
           border:1px solid black;
       }
       div.small_img_circle_size_1{
-          height:85px;
+          height:70px;
           width:70px;
           border:1px solid black;
       }
       div.small_img_circle_size_2{
-          height:105px;
+          height:90px;
           width:90px;
           border:1px solid black;
       }
@@ -447,13 +452,17 @@ div.LoadShowImageRecord_div_all_block{
 }
 
 
+div.oneDialogShortInside{
+    text-align:left;
+}
+
 
       /*--------PERSON---------NEED--NEW-FILE----------------------------------------------------------*/
      /*div.PersonalRecord_left{
          
      }*/
      div.PersonalRecord_right{
-         
+             /*height: 1500px;*/
          margin-left:5px;
      }
 

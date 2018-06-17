@@ -19,7 +19,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string Text { get; set; }
 
 
-        public string СreatorId { get; set; }
+        public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
 
         public int? MemeId { get; set; }
@@ -38,7 +38,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Id = 0;
             Birthday = DateTime.Now;
             Text = null;
-            СreatorId = null;
+            CreatorId = null;
             Creator = null;
             MemeId = null;
             Meme = null;

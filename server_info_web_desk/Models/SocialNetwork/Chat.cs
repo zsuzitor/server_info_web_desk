@@ -16,8 +16,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string Name { get; set; }
         public Image Image { get; set; }
 
-        public string СreatorId { get; set; }
-        public ApplicationUser Сreator { get; set; }//создатель
+        public string CreatorId { get; set; }
+        public ApplicationUser Creator { get; set; }//создатель
 
         public ICollection<Message> Messages { get; set; }
         public ICollection<ApplicationUser> Users { get; set; }
@@ -27,8 +27,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             Id = 0;
             Birthday = DateTime.Now;
-            СreatorId = null;
-            Сreator = null;
+            CreatorId = null;
+            Creator = null;
             Image = null;
             Name = null;
             Messages = new List<Message>();

@@ -7,19 +7,47 @@
 
     // Объявление функции, которая хаб вызывает при получении сообщений
     chat.client.NeedDownloadChangesMessages = function (id_dialog) {
-        // Добавление сообщений на веб-страницу 
-        //$('#chatroom').append('<p><b>' + htmlEncode(name)
-        //+ '</b>: ' + htmlEncode(message) + '</p>');
+        //Dialog_div_message_id
+        if (isNaN(id_dialog) || id_dialog == undefined || id_dialog == null) {
+            alert("NeedDownloadChangesMessages error");
+            return;
+        }
+        var dt = {
+            'dialog': id_dialog
+        };
+        $.ajax({
+            url: "/SocialNetwork/LoadNewMessages",
+            data: dt,
+            success: OnComplete_Load_new_messages,
+            error: function () {
+                alert("ошибка загрузки");
+                document.getElementById('Main_preloader_id').style.display = 'none;';
+               
+            },
+            beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block';  },
+            complete: function () {
+                document.getElementById('Main_preloader_id').style.display = 'none';
+                
+
+            },
+            type: 'POST', dataType: 'html'//html
+        });
+
+
+
+
     };
 
-    
+    check_load_new_message_dialog = function (id_dialog) {
+        chat.server.Send(id_dialog);
+    };
 
   
 
     // Открываем соединение
     $.connection.hub.start().done(function () {
 
-
+        chat.server.JoinToHub();
 
 
         //устанавливаем событие отправки на кнопку

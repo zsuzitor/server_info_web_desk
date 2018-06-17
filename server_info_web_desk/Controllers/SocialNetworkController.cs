@@ -231,6 +231,8 @@ namespace server_info_web_desk.Controllers
                 }
                 else
                 {
+                    if (!db.Entry(last_message).Reference(x2 => x2.Creator).IsLoaded)
+                        db.Entry(last_message).Reference(x2 => x2.Creator).Load();
                     us_s.User = new Models.ApplicationUserShort(last_message?.Creator);
                     us_s.Text = last_message.Text;
                 }
@@ -349,7 +351,7 @@ namespace server_info_web_desk.Controllers
                     var user2 = db.Users.FirstOrDefault(x1=>x1.Id== user_id);
                     if(user2==null)
                         return new HttpStatusCodeResult(404);
-                    chat = new Chat() { СreatorId=check_id };
+                    chat = new Chat() { CreatorId=check_id };
                     db.Chats.Add(chat);
                     db.SaveChanges();
                     chat.Users.Add(user);
@@ -618,7 +620,7 @@ namespace server_info_web_desk.Controllers
             db.Record.Add(record);
             db.SaveChanges();
 
-            Meme mem = new Meme() {Id=record.Id, Description=text, СreatorId=check_id };
+            Meme mem = new Meme() {Id=record.Id, Description=text, CreatorId = check_id };
             db.Memes.Add(mem);
             db.SaveChanges();
             var list_img = list_img_byte.Select(x1 => new Image() { MemeId=mem.Id, Data=x1, UserId=check_id });
@@ -652,7 +654,7 @@ namespace server_info_web_desk.Controllers
             db.Record.Add(record);
             db.SaveChanges();
 
-            Meme mem = new Meme() { Id = record.Id, Description = text, СreatorId = check_id };
+            Meme mem = new Meme() { Id = record.Id, Description = text, CreatorId = check_id };
             db.Memes.Add(mem);
             db.SaveChanges();
             var list_img = list_img_byte.Select(x1 => new Image() { MemeId = mem.Id, Data = x1, UserId = check_id });
@@ -869,8 +871,34 @@ namespace server_info_web_desk.Controllers
             return PartialView(res);
         }
 
+
         [Authorize]
-        public ActionResult SendNewMessageForm(int dialog, HttpPostedFileBase[] uploadImage, string text)
+        public ActionResult LoadNewMessages(int dialog)
+        {
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            List<Message> res = new List<Message>();
+            var user = db.Users.First(x1=>x1.Id==check_id);
+            //if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+            //    db.Entry(user).Collection(x1 => x1.Chats).Load();
+            //var chat = user.Chats.FirstOrDefault(x1 => x1.Id == dialog);
+            //if(chat==null)
+            //    return new HttpStatusCodeResult(404);
+
+            if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
+            res.AddRange(user.MessageNeedRead.Where(x1 => {
+                if (!db.Entry(x1).Reference(x2 => x2.Chat).IsLoaded)
+                    db.Entry(x1).Reference(x2 => x2.Chat).Load();
+                if (x1.Chat.Id == dialog)
+                    return true;
+                return false;
+            }));
+
+            //вынести + написать представление которое должно стандартно отобразиться
+            return View(res);
+        }
+        [Authorize]
+        public JsonResult SendNewMessageForm(int dialog, HttpPostedFileBase[] uploadImage, string text)
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             //TODO проверить доступ к диалогу
@@ -879,10 +907,10 @@ namespace server_info_web_desk.Controllers
                 db.Entry(user).Collection(x1 => x1.Chats).Load();
             var chat = user.Chats.FirstOrDefault(x1=>x1.Id==dialog);
             if(chat==null)
-                return new HttpStatusCodeResult(404);
+                return null;
             var list_img_byte = Get_photo_post(uploadImage);
             
-            Message res = new Message() { Text=text, СreatorId=check_id, ChatId=dialog };
+            Message res = new Message() { Text=text, CreatorId = check_id, ChatId=dialog };
 
             db.Messages.Add(res);
             db.SaveChanges();
@@ -907,7 +935,7 @@ namespace server_info_web_desk.Controllers
 
             user.SendNewMessage(res);
 
-            return PartialView();
+            return Json(new { dialog= dialog });
         }
 
        

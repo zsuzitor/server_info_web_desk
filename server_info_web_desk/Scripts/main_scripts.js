@@ -12,6 +12,170 @@ function page_up_function() {
 
 
 
+
+//-----------------------------------------------------SOCIAL-----------------------------------------------------------------------
+
+
+
+function isVisible(tag) {
+    var t = $(tag);
+    var w = $(window);
+    var top_window = w.scrollTop();
+    var bot_window = top_window + document.documentElement.clientHeight;
+    var top_tag = t.offset().top;
+    var bot_tag = top_tag + t.height();
+
+    return ((bot_tag >= top_window && bot_tag <= bot_window) || (top_tag >= top_window && top_tag <= bot_window) || (bot_tag >= bot_window && top_tag <= top_window));
+}
+
+
+
+
+$(function () {
+    $(window).scroll(function () {
+        ////var gg = $(window).scrollTop();
+        //var left_menu = document.getElementById('LeftMenuPersonalMain_id');
+        //if (left_menu.getBoundingClientRect().bottom < 0) {
+        //    var height_left_menu = left_menu.offsetHeight;//left_menu.getBoundingClientRect().bottom - left_menu.getBoundingClientRect().top;
+        //    left_menu.style.top = $(window).scrollTop() - 20 - height_left_menu + 'px';
+        //}
+        //else {
+        //    var hhh = left_menu.getBoundingClientRect().top;
+        //    if (left_menu.getBoundingClientRect().top > 80)
+        //        left_menu.style.top = pageYOffset + 'px';
+        //}
+
+        
+        //left menu
+
+        var left_menu = document.getElementById("LeftMenuPersonalMain_id");
+        //b.style.top = parseInt(100) + 20 + 'px';
+        var left_menu_c = left_menu.getBoundingClientRect();
+        //alert(document.body.scrollTop);
+        if (left_menu_c.top > 80) {
+            var str = pageYOffset;
+            left_menu.style.top = str + 'px';
+           
+        }
+        else
+            if (left_menu_c.bottom < 0) {
+            //alert("выше");
+            //var g = document.body.scrollTop;
+
+            //alert(c.bottom);
+            var str = pageYOffset - left_menu.offsetHeight - 20;//- b.offsetHeight  offsetWidth
+            //alert(str);
+            left_menu.style.top = parseInt(str) + 'px';
+            //b.top = str;
+            //alert(b.style.top);
+            
+        }
+        
+       
+        //alert(document.documentElement.clientHeight)
+        var block_s_1 = document.getElementById("div_content_main_size_1_id");
+        var block_s_2 = document.getElementById("div_content_main_size_2_id");
+        var need_move_1 = null;
+        var need_move_2 = null;
+
+        var block_s_1_c = block_s_1.getBoundingClientRect();
+        
+        if (block_s_1_c.height < document.documentElement.clientHeight) {
+            var str = pageYOffset;
+            //block_s_1.style.marginTop = str + 'px';
+            need_move_1 = str;
+        }
+        else {
+
+
+            if (block_s_1_c.top > 80) {
+                var str = pageYOffset;
+                //block_s_1.style.marginTop = str + 'px';
+                need_move_1 = str;
+
+            }
+            else
+                if (block_s_1_c.bottom < (document.documentElement.clientHeight)) {//pageYOffset +
+
+                    var str = parseInt(pageYOffset + document.documentElement.clientHeight - block_s_1.offsetHeight);//- b.offsetHeight  offsetWidth
+                    if (str < 80)
+                        // block_s_1.style.marginTop = 80 + 'px';
+                        need_move_1 = 80;
+                    else
+                        //block_s_1.style.marginTop = str + 'px';
+                        need_move_1 = str;
+
+
+                }
+        }
+
+        var block_s_2_c = block_s_2.getBoundingClientRect();
+        if (block_s_2_c.height < document.documentElement.clientHeight) {
+            var str = pageYOffset;
+            //block_s_2.style.marginTop = str + 'px';
+            need_move_2 = str;
+        }
+        else {
+
+       
+        if (block_s_2_c.top > 80) {
+            var str = pageYOffset;
+            // block_s_2.style.marginTop = str + 'px';
+            need_move_2 = str;
+           
+        }
+        else
+            if (block_s_2_c.bottom < (document.documentElement.clientHeight)) {//pageYOffset +
+
+                var str =parseInt( pageYOffset + document.documentElement.clientHeight - block_s_2.offsetHeight);//- b.offsetHeight  offsetWidth
+                if (str < 80)
+                    //block_s_2.style.marginTop =  80 + 'px';
+                    need_move_2 = 80;
+                else
+                    //block_s_2.style.marginTop = str + 'px';
+                    need_move_2 = str;
+
+                
+            }
+        }
+        var hr_bot = document.getElementById('hr_bottom_footer_id');
+        if (!isVisible(hr_bot)) {
+            if (need_move_1 != null)
+                block_s_1.style.marginTop = need_move_1 + 'px';
+            if (need_move_2 != null)
+                block_s_2.style.marginTop = need_move_2 + 'px';
+        }
+        //if (need_move_1 != null || need_move_2 != null) {
+        //    var hr_bot=document.getElementById('hr_bottom_footer_id');
+        //    if (!isVisible(hr_bot)) {
+
+           
+        //    if (need_move_1 != null)
+        //        block_s_1.style.marginTop = need_move_1+'px';
+        //    else
+        //        block_s_2.style.marginTop = need_move_2 + 'px';
+        //}
+        //}
+    });
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 function LikeRecordClick(id) {
     
 
@@ -194,5 +358,31 @@ function Album_one_block_click_al(a) {
     document.getElementById("Albums_block_for_img").innerHTML="";
 
     load_more_img_album();
+
+}
+
+
+
+
+//---------------------------------------------------------------DIALOG--------------------------------------------------
+var check_load_new_message_dialog = null;
+function OnComplete_SendMessage(data){
+
+    if (data == null){
+        alert("OnComplete_SendMessage error");
+        return;
+    }
+        
+    var id = +data.dialog;
+    if (isNaN(id) || id == undefined || id == null) {
+        alert("OnComplete_SendMessage error");
+        return;
+    }
+    check_load_new_message_dialog(id);
+
+}
+
+
+function OnComplete_Load_new_messages(data) {
 
 }
