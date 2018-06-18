@@ -13,7 +13,8 @@
             return;
         }
         var dt = {
-            'dialog': id_dialog
+            'dialog': id_dialog//,
+            //'new_m':true
         };
         $.ajax({
             url: "/SocialNetwork/LoadNewMessages",
@@ -39,7 +40,7 @@
     };
 
     check_load_new_message_dialog = function (id_dialog) {
-        chat.server.Send(id_dialog);
+        chat.server.send(id_dialog);
     };
 
   
@@ -47,7 +48,7 @@
     // Открываем соединение
     $.connection.hub.start().done(function () {
 
-        chat.server.JoinToHub();
+        chat.server.joinToHub();
 
 
         //устанавливаем событие отправки на кнопку

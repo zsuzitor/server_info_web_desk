@@ -7,6 +7,9 @@ using server_info_web_desk.Models;
 using static server_info_web_desk.Models.DataBase.DataBase;
 using Microsoft.AspNet.Identity;
 
+
+
+
 namespace server_info_web_desk.Hubs
 {
     public class UserForHub

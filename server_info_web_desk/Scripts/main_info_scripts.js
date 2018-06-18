@@ -207,10 +207,10 @@ function click_name_section(a) {//,open
             success: OnComplete_load_inside_section,
             error: function () {
                 alert("ошибка загрузки");
-                document.getElementById('Main_preloader_id').style.display = 'none;';
+                PreloaderAction(false);
             },
-            beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-            complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+            beforeSend: function () { PreloaderAction(true); },
+            complete: function () { PreloaderAction(false); },
             type: 'POST', dataType: 'json'
         });
 
@@ -420,10 +420,10 @@ function delete_section_f(id) {
         success: OnComplete_delete_section,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () { PreloaderAction(false); },
         type: 'POST', dataType: 'json'
     });
 
@@ -439,10 +439,10 @@ function delete_article_f(id) {
         success: OnComplete_delete_article,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () { PreloaderAction(false); },
         type: 'POST', dataType: 'json'
     });
 
@@ -524,10 +524,10 @@ function send_form(type) {
                 success: OnComplete_Add_section,
                 error: function () {
                     alert("ошибка загрузки");
-                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                    PreloaderAction(false);
                 },
-                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                beforeSend: function () { PreloaderAction(true); },
+                complete: function () { PreloaderAction(false); },
                 type: 'POST', dataType: 'json'
             });
             break;
@@ -540,10 +540,10 @@ function send_form(type) {
                 success: OnComplete_edit_section,
                 error: function () {
                     alert("ошибка загрузки");
-                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                    PreloaderAction(false);
                 },
-                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                beforeSend: function () { PreloaderAction(true); },
+                complete: function () { PreloaderAction(false); },
                 type: 'POST', dataType: 'json'
             });
 
@@ -561,10 +561,10 @@ function send_form(type) {
                 success: OnComplete_Add_article,
                 error: function () {
                     alert("ошибка загрузки");
-                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                    PreloaderAction(false);
                 },
-                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                beforeSend: function () { PreloaderAction(true); },
+                complete: function () { PreloaderAction(false); },
                 type: 'POST', dataType: 'json'
             });
 
@@ -582,10 +582,10 @@ function send_form(type) {
                 success: OnComplete_edit_article,
                 error: function () {
                     alert("ошибка загрузки");
-                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                    PreloaderAction(false);
                 },
-                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                beforeSend: function () { PreloaderAction(true); },
+                complete: function () { PreloaderAction(false); },
                 type: 'POST', dataType: 'json'
             });
 
@@ -681,10 +681,10 @@ function load_article(id_ar) {
                 success: OnComplete_load_article_body,
                 error: function () {
                     alert("ошибка загрузки");
-                    document.getElementById('Main_preloader_id').style.display = 'none;';
+                    PreloaderAction(false);
                 },
-                beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-                complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+                beforeSend: function () { PreloaderAction(true); },
+                complete: function () { PreloaderAction(false); },
                 type: 'POST', dataType: 'json'
             });
 
@@ -753,10 +753,10 @@ function save_server_db() {
         success: OnComplete_load_all_data_for_save_file,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () { PreloaderAction(false); },
         type: 'POST', dataType: 'json'
     });
 }
@@ -937,10 +937,10 @@ function before_load_all_data_text() {
         success: OnComplete_load_all_data_for_save_server,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () { PreloaderAction(false); },
         type: 'POST', dataType: 'json'
     });
 
@@ -1065,10 +1065,10 @@ function start_search() {
         success: OnComplete_search,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () { PreloaderAction(false); },
         type: 'POST', dataType: 'json'
     });
 

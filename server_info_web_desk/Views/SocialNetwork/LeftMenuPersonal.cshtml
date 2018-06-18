@@ -30,7 +30,7 @@
                     <div class="LeftMenuPersonal_one_line_div">
                         <div class="div_inline_block LeftMenuPersonal_messages"></div>
                         <span>Messages</span>
-
+                        <div class="div_inline_block LeftMenuPersonal_count" id="num_CountNewMessage_id">@ViewBag.CountNewMessage</div>
                     </div>
                 </a>
             </li>
@@ -39,7 +39,11 @@
                     <div class="LeftMenuPersonal_one_line_div">
                         <div class="div_inline_block LeftMenuPersonal_friends"></div>
                         <span>Friends</span>
-
+                        @if (ViewBag.CountNewFriend != null)
+                        {
+                            <div class="div_inline_block LeftMenuPersonal_count" id=""></div>
+                        }
+                       
                     </div>
 
                 </a>

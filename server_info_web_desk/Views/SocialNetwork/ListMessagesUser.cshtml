@@ -1,0 +1,10 @@
+﻿@model server_info_web_desk.Models.SocialNetwork.Chat
+
+
+
+@foreach (var i in Model.Messages)
+            {
+    <div class="div_padding_top_10_px">
+        @Healpers.Message(i)
+    </div>
+}

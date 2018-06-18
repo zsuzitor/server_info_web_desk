@@ -243,6 +243,14 @@ div.div_for_replace_ajax_2{
      }
      /*-----------------------------------------------------------------------------*/
 
+     div.LeftMenuPersonal_count{
+         background-color:#d1d9e0;
+         /*height:100%;
+         padding-left:2px;
+         padding-right:2px;*/
+         padding:3px;
+         border-radius:2px;
+     }
     
      div.LeftMenuPersonalMain{
         /*height:200px;*/

@@ -24,7 +24,8 @@ namespace server_info_web_desk.Controllers
         // GET: SocialNetwork
         public ActionResult Index()
         {
-           // Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
+            // Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
+            Session["NewMessageType"] = "2";
             return View();
         }
 
@@ -111,7 +112,7 @@ namespace server_info_web_desk.Controllers
             
 
             res.Friends.AddRange(user.Friends.Skip(user.Friends.Count-6>0? (user.Friends.Count-6):0).Select(x1=>new Models.ApplicationUserShort(x1)));
-
+            Session["NewMessageType"] = "2";
             return View(res);
         }
         [Authorize]
@@ -124,7 +125,7 @@ namespace server_info_web_desk.Controllers
             var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
             if (user == null)
                 return new HttpStatusCodeResult(404);
-            
+            Session["NewMessageType"] = "2";
             return View(user);
         }
 
@@ -188,13 +189,14 @@ namespace server_info_web_desk.Controllers
 
             //Albums = new List<Album>();
             //WallRecord = new List<Record>();
-
+            Session["NewMessageType"] = "2";
             return View(res);
         }
         [Authorize]
         //TODO
         public ActionResult EditGroupRecord(int id)
         {
+            Session["NewMessageType"] = "2";
             return View();
         }
         [Authorize]
@@ -203,7 +205,7 @@ namespace server_info_web_desk.Controllers
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             ViewBag.check_id = check_id;
-
+            Session["NewMessageType"] = "2";
             return View();
         }
 
@@ -243,7 +245,7 @@ namespace server_info_web_desk.Controllers
                 }));
 
 
-
+            Session["NewMessageType"] = "3";
             return View(res);
         }
         [AllowAnonymous]
@@ -261,7 +263,7 @@ namespace server_info_web_desk.Controllers
 
              res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
 
-
+            Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
         }
         [AllowAnonymous]
@@ -277,6 +279,7 @@ namespace server_info_web_desk.Controllers
 
 
             res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)GroupPage.Albums, GroupPage.Albums.Count));
+            Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
         }
 
@@ -292,6 +295,7 @@ namespace server_info_web_desk.Controllers
         public ActionResult Image(int id)
         {
             //если прикреплено к записи то открывать запись
+            Session["NewMessageType"] = "2";
             return PartialView();
         }
 
@@ -360,8 +364,8 @@ namespace server_info_web_desk.Controllers
                 }
                 return RedirectToAction("Dialog", "SocialNetwork",new { id= chat.Id });
             }
-            
 
+            Session["NewMessageType"] = "1";
 
             return View(res);
         }
@@ -371,6 +375,7 @@ namespace server_info_web_desk.Controllers
         public ActionResult Friends(int id)
         {
             //GroupUsers
+            Session["NewMessageType"] = "2";
             return View();
         }
         [AllowAnonymous]
@@ -378,11 +383,13 @@ namespace server_info_web_desk.Controllers
         public ActionResult GroupUsers(int id)
         {
             //Friends
+            Session["NewMessageType"] = "2";
             return View();
         }
         public ActionResult GroupAdmins(int id)
         {
             //Friends
+            Session["NewMessageType"] = "2";
             return View();
         }
 
@@ -402,10 +409,19 @@ namespace server_info_web_desk.Controllers
 
             res.Groups.AddRange(user.UserGroupToShort(0,10));
 
-            
+            Session["NewMessageType"] = "2";
             return View(res);
         }
 
+
+
+
+
+
+
+
+
+        //-----------------------------------------------------------------------------------------------------------------------------------------------
 
         [AllowAnonymous]
         [ChildActionOnly]
@@ -421,7 +437,14 @@ namespace server_info_web_desk.Controllers
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             ViewBag.id = check_id;
-
+            if (check_id != null)
+            {
+                var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+                if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
+                    db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
+                ViewBag.CountNewMessage = user.MessageNeedRead.Count;
+            }
+           
             return PartialView();
         }
 
@@ -876,26 +899,51 @@ namespace server_info_web_desk.Controllers
         public ActionResult LoadNewMessages(int dialog)
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            List<Message> res = new List<Message>();
-            var user = db.Users.First(x1=>x1.Id==check_id);
-            //if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-            //    db.Entry(user).Collection(x1 => x1.Chats).Load();
-            //var chat = user.Chats.FirstOrDefault(x1 => x1.Id == dialog);
-            //if(chat==null)
-            //    return new HttpStatusCodeResult(404);
+            string type_message_need = (string)Session["NewMessageType"];
 
-            if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
-                db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
-            res.AddRange(user.MessageNeedRead.Where(x1 => {
-                if (!db.Entry(x1).Reference(x2 => x2.Chat).IsLoaded)
-                    db.Entry(x1).Reference(x2 => x2.Chat).Load();
-                if (x1.Chat.Id == dialog)
-                    return true;
-                return false;
-            }));
+            switch (type_message_need)
+            {
+                case "1":
+                    return Redirect(Url.Action("ListMessagesUser", "SocialNetwork", new { id = dialog, new_m = true }));//start = 0, int count = 10
+                    break;
+                case "2":
+                    //отправить колличество
+                    var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+                    if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
+                        db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
+                    return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork",new { str=user.MessageNeedRead.Count.ToString() }));
+                    break;
 
-            //вынести + написать представление которое должно стандартно отобразиться
-            return View(res);
+                case "3":
+                    //shortchat
+                    break;
+
+            }
+
+            return View();
+
+
+            //List<Message> res = new List<Message>();
+            //var user = db.Users.First(x1 => x1.Id == check_id);
+            ////if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+            ////    db.Entry(user).Collection(x1 => x1.Chats).Load();
+            ////var chat = user.Chats.FirstOrDefault(x1 => x1.Id == dialog);
+            ////if(chat==null)
+            ////    return new HttpStatusCodeResult(404);
+
+            //if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
+            //    db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
+            //res.AddRange(user.MessageNeedRead.Where(x1 =>
+            //{
+            //    if (!db.Entry(x1).Reference(x2 => x2.Chat).IsLoaded)
+            //        db.Entry(x1).Reference(x2 => x2.Chat).Load();
+            //    if (x1.Chat.Id == dialog)
+            //        return true;
+            //    return false;
+            //}));
+
+            ////вынести + написать представление которое должно стандартно отобразиться
+            //return PartialView("ListMessagesUser", new Chat() { Messages = res });//"SocialNetwork",
         }
         [Authorize]
         public JsonResult SendNewMessageForm(int dialog, HttpPostedFileBase[] uploadImage, string text)
@@ -964,6 +1012,58 @@ namespace server_info_web_desk.Controllers
         }
 
 
+        [Authorize]
+        public ActionResult ListMessagesUser(int? id,bool? new_m, int start=0, int count=10)
+        {
+            if (id == null)
+            {
+                return new HttpStatusCodeResult(404);
+            }
+                string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+            Chat res = new Chat();
+            List<Message> not_res = new List<Message>();
+            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Chats).Load();
+            
+                var dialog = user.Chats.FirstOrDefault(x1 => x1.Id == id);
+                if (dialog == null)
+                    return new HttpStatusCodeResult(404);
+                res = new Chat() {Id=dialog.Id };
+            if (!db.Entry(dialog).Collection(x1 => x1.Messages).IsLoaded)
+                db.Entry(dialog).Collection(x1 => x1.Messages).Load();
+
+            //dialog.Messages= dialog.Messages.Reverse().ToList();
+            start = start > 0 ? start - 1 : 0;
+            start = dialog.Messages.Count - start - count;
+            not_res.AddRange(dialog.Messages.Skip(start).Take(count));
+            //if (new_m == true)
+            //{
+            //    ((List<Message>)res.Messages).RemoveRange(res.Messages.Where());
+            //}
+            foreach(var i in not_res)
+            {
+                if (!db.Entry(i).Collection(x1 => x1.UserNeedRead).IsLoaded)
+                    db.Entry(i).Collection(x1 => x1.UserNeedRead).Load();
+                var us = i.UserNeedRead.FirstOrDefault(x1=>x1.Id==check_id);
+                if (us != null)
+                {
+                    i.UserNeedRead.Remove(us);
+                }
+                if (new_m == true)
+                {
+                    if (us != null)
+                    {
+                        res.Messages.Add(i);
+                    }
+                }
+                else
+                    res.Messages.Add(i);
+            }
+            db.SaveChanges();
+            return PartialView(res);
+        }
+
         [AllowAnonymous]
         public ActionResult LoadShowImageRecord(int? id)
         {
@@ -995,6 +1095,15 @@ namespace server_info_web_desk.Controllers
 
 
             return PartialView(img.Record_NM);
+        }
+
+
+        [AllowAnonymous]
+        public ActionResult ReturnStringPartial(string str)
+        {
+            ViewBag.str = str;
+            return View();
+
         }
         }
 }

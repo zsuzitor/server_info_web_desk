@@ -1,4 +1,8 @@
-﻿var time_for_page_up;
+﻿
+//------------------------------------------------------------------------------------ALL---------------------
+
+
+var time_for_page_up;
 
 
 function page_up_function() {
@@ -10,7 +14,12 @@ function page_up_function() {
     return false;
 }
 
-
+function PreloaderAction(show) {
+    if (show == true)
+        document.getElementById('Main_preloader_id').style.display = 'block';
+        else
+        document.getElementById('Main_preloader_id').style.display = 'none;';
+}
 
 
 //-----------------------------------------------------SOCIAL-----------------------------------------------------------------------
@@ -95,9 +104,9 @@ $(function () {
 
             }
             else
-                if (block_s_1_c.bottom < (document.documentElement.clientHeight)) {//pageYOffset +
+                if (block_s_1_c.bottom < (document.documentElement.clientHeight-100)) {//pageYOffset +
 
-                    var str = parseInt(pageYOffset + document.documentElement.clientHeight - block_s_1.offsetHeight);//- b.offsetHeight  offsetWidth
+                    var str = parseInt(pageYOffset + document.documentElement.clientHeight - block_s_1.offsetHeight-100);//- b.offsetHeight  offsetWidth
                     if (str < 80)
                         // block_s_1.style.marginTop = 80 + 'px';
                         need_move_1 = 80;
@@ -125,9 +134,9 @@ $(function () {
            
         }
         else
-            if (block_s_2_c.bottom < (document.documentElement.clientHeight)) {//pageYOffset +
+            if (block_s_2_c.bottom < (document.documentElement.clientHeight - 100)) {//pageYOffset +
 
-                var str =parseInt( pageYOffset + document.documentElement.clientHeight - block_s_2.offsetHeight);//- b.offsetHeight  offsetWidth
+                var str = parseInt(pageYOffset + document.documentElement.clientHeight - block_s_2.offsetHeight - 100);//- b.offsetHeight  offsetWidth
                 if (str < 80)
                     //block_s_2.style.marginTop =  80 + 'px';
                     need_move_2 = 80;
@@ -188,10 +197,10 @@ function LikeRecordClick(id) {
         success: OnComplete_LikeRecordClick,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
-        complete: function () { document.getElementById('Main_preloader_id').style.display = 'none'; },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () { PreloaderAction(false); },
         type: 'POST', dataType: 'json'//html
     });
 
@@ -229,12 +238,12 @@ function ShowImageRecordAJAX(a) {
         success: OnComplete_LoadShowImageRecord,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
             
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; },
+        beforeSend: function () { PreloaderAction(true); },
         complete: function () {
-            document.getElementById('Main_preloader_id').style.display = 'none';
+            PreloaderAction(false);
 
         },
         type: 'POST', dataType: 'html'//html
@@ -326,12 +335,12 @@ function load_more_img_album() {
         success: OnComplete_Load_images_album,
         error: function () {
             alert("ошибка загрузки");
-            document.getElementById('Main_preloader_id').style.display = 'none;';
+            PreloaderAction(false);
             Album_OBJECT.can_load = true;
         },
-        beforeSend: function () { document.getElementById('Main_preloader_id').style.display = 'block'; Album_OBJECT.can_load = false; },
+        beforeSend: function () { PreloaderAction(true); Album_OBJECT.can_load = false; },
         complete: function () {
-            document.getElementById('Main_preloader_id').style.display = 'none';
+            PreloaderAction(false);
             Album_OBJECT.start += Album_OBJECT.count;
             Album_OBJECT.can_load = true;
            
@@ -365,7 +374,44 @@ function Album_one_block_click_al(a) {
 
 
 //---------------------------------------------------------------DIALOG--------------------------------------------------
-var check_load_new_message_dialog = null;
+var check_load_new_message_dialog = null;//сюда сохраняется функция отправки к хабу
+
+
+
+function SendMessage() {
+    
+
+    var dt = {
+        'dialog': document.getElementById('dialog').value,
+        'text': document.getElementById('text').value
+    };
+
+    $.ajax({
+        url: "/SocialNetwork/SendNewMessageForm",
+        data: dt,
+        success: OnComplete_SendMessage,
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+           
+        },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () {
+            PreloaderAction(false);
+            //OnComplete_SendMessage();
+
+        },
+        type: 'POST', dataType: 'json'//html
+    });
+
+
+}
+
+
+
+
+
+
 function OnComplete_SendMessage(data){
 
     if (data == null){
@@ -384,5 +430,19 @@ function OnComplete_SendMessage(data){
 
 
 function OnComplete_Load_new_messages(data) {
-
+    var div = document.getElementById("Dialog_div_message_id");
+    if (div != undefined || div != null) {
+        div.innerHTML += data;
+    }
+    else {
+        //TODO тут надо порядок менять , сначала Dialog_div_message_id->страница диалогов->num_CountNewMessage_id
+        div = document.getElementById("num_CountNewMessage_id");
+        if (div != undefined || div != null) {
+            div.innerHTML += data;
+        }
+        else {
+            //TODO обновлять диалог на странице диалогов
+        }
+    }
+    
 }

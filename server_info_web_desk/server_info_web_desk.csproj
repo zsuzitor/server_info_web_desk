@@ -332,6 +332,8 @@
     <Content Include="Views\SocialNetwork\LoadShowImageRecord.cshtml" />
     <Content Include="Views\SocialNetwork\Messages.cshtml" />
     <Content Include="Views\SocialNetwork\Dialog.cshtml" />
+    <Content Include="Views\SocialNetwork\ListMessagesUser.cshtml" />
+    <Content Include="Views\SocialNetwork\ReturnStringPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
