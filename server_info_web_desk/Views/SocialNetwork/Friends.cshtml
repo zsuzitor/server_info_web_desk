@@ -1,0 +1,34 @@
+﻿
+@{
+    ViewBag.Title = "Friends";
+}
+
+
+<div>
+    <div class="div_content_main_size_2 div_inline_block" id="Friends_left_block_id"></div>
+    <div class="div_content_main_size_1 div_inline_block">
+        <div>
+            @Ajax.ActionLink("Друзья", "LoadFriends", "SocialNetwork", new { id = (string)ViewBag.id, start = 0, count = 10 }, new AjaxOptions
+   {
+       UpdateTargetId = "Friends_left_block_id",
+       LoadingElementDuration = 200,
+       LoadingElementId = "Main_preloader_id"
+   })
+        </div><div>
+    @Ajax.ActionLink("Фолловеры", "LoadFollowers", "SocialNetwork", new { id = (string)ViewBag.id, start = 0, count = 10 }, new AjaxOptions
+   {
+       UpdateTargetId = "Friends_left_block_id",
+       LoadingElementDuration = 200,
+       LoadingElementId = "Main_preloader_id"
+   })
+</div><div>
+    @Ajax.ActionLink("Зафоловлен", "LoadFollowUser", "SocialNetwork", new { id = (string)ViewBag.id, start = 0, count = 10 }, new AjaxOptions
+   {
+       UpdateTargetId = "Friends_left_block_id",
+       LoadingElementDuration = 200,
+       LoadingElementId = "Main_preloader_id"
+   })
+</div></div>
+
+</div>
+

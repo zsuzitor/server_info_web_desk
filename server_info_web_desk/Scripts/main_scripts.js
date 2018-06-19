@@ -21,6 +21,15 @@ function PreloaderAction(show) {
         document.getElementById('Main_preloader_id').style.display = 'none;';
 }
 
+function convert_string(str) {
+    var res = "";
+    res = str.replace(/</g, '&lt;');
+    res = res.replace(/>/g, '&gt;');
+    //res = res.replace(/@/g, '#');
+
+    return res;
+}
+
 
 //-----------------------------------------------------SOCIAL-----------------------------------------------------------------------
 
@@ -380,10 +389,11 @@ var check_load_new_message_dialog = null;//сюда сохраняется фу�
 
 function SendMessage() {
     
-
+    var str_text = convert_string(document.getElementById('text').value);
+    var str_dialog = convert_string(document.getElementById('dialog').value);
     var dt = {
-        'dialog': document.getElementById('dialog').value,
-        'text': document.getElementById('text').value
+        'dialog': str_dialog,
+        'text': str_text
     };
 
     $.ajax({
@@ -428,21 +438,44 @@ function OnComplete_SendMessage(data){
 
 }
 
-
+//<div id="OneMessageAllblock_div_id_
 function OnComplete_Load_new_messages(data) {
-    var div = document.getElementById("Dialog_div_message_id");
-    if (div != undefined || div != null) {
-        div.innerHTML += data;
-    }
-    else {
-        //TODO тут надо порядок менять , сначала Dialog_div_message_id->страница диалогов->num_CountNewMessage_id
-        div = document.getElementById("num_CountNewMessage_id");
+    
+    if (data.indexOf('<div id="OneMessageAllblock_div_id_') >= 0) {
+        //пришли сообщения для этого диалога и их надо вставить
+        var div = document.getElementById("Dialog_div_message_id");
         if (div != undefined || div != null) {
             div.innerHTML += data;
         }
+    }
+    else {
+        //<div id="OneChatAllblock_div_id_
+        if (data.indexOf('<div id="OneChatAllblock_div_id_') >= 0) {
+            //пришли сообщения для этого диалога и их надо вставить
+            var div = document.getElementById("Dialog_div_message_id");
+            if (div != undefined || div != null) {
+                div.innerHTML += data;
+            }
+        }
         else {
-            //TODO обновлять диалог на странице диалогов
+            div = document.getElementById("num_CountNewMessage_id");
+                if (div != undefined || div != null) {
+                    div.innerHTML += data;
+                }
         }
     }
+    //if (div != undefined || div != null) {
+    //    div.innerHTML += data;
+    //}
+    //else {
+    //    //TODO тут надо порядок менять , сначала Dialog_div_message_id->страница диалогов->num_CountNewMessage_id
+    //    div = document.getElementById("num_CountNewMessage_id");
+    //    if (div != undefined || div != null) {
+    //        div.innerHTML += data;
+    //    }
+    //    else {
+    //        //TODO обновлять диалог на странице диалогов
+    //    }
+    //}
     
 }

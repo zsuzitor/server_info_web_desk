@@ -345,7 +345,8 @@ if (a != null)
 
 @helper Message(Message a)
         {
-    <div>
+    @*<div id="OneMessageAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
+    <div id="OneMessageAllblock_div_id_@a.Id">
         <div class="div_inline_block small_img_circle_size_1 block_circle">
             @*<div class="block_circle">*@
                 <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
@@ -379,9 +380,52 @@ if (a != null)
 
 }
 
-@helper Chat(ChatShort a)
+
+
+
+
+@helper UserListItem(ApplicationUserShort a)
         {
     <div>
+        <div>
+            <div class="div_inline_block small_block_img_short_size_1" title="@a.Name @a.Surname">
+
+                <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.PageId">
+
+                    <div class="block_circle">
+                        @Healpers.Image(a?.Image, true)
+
+                    </div>
+
+                </a>
+            </div>
+            <div class="div_inline_block">
+                <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.PageId">
+                    @(a.Name + " " + a.Surname)
+                </a>
+            </div>
+        </div>
+        <div>
+            <a class="link_standart_for_div" href="/SocialNetwork/Dialog/@a.PageId">
+                Диалог
+            </a>
+            @*@Html.ActionLink("Диалог", "Dialog", "SocialNetwork", new { user_id = a.PageId }, new { })*@
+
+        </div>
+        <div>
+
+
+        </div>
+
+    </div>
+
+}
+
+@*ChatShort*@
+@helper Chat(ChatShort a)
+        {
+    @*<div id="OneChatAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
+    <div id="OneChatAllblock_div_id_@a.Id">
         <a class="link_standart_for_div" href="/SocialNetwork/Dialog/@a.Id">
             <div class="div_padding_left_10_px div_padding_top_10_px oneDialogShortInside">
                 <div class="div_inline_block small_img_circle_size_1 block_circle">

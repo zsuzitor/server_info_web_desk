@@ -169,14 +169,7 @@ function find_in_mass(id, type_mass) {//1--секция 2--артикл
     return null;
 }
 
-function convert_string(str) {
-    var res = "";
-    res = str.replace(/</g, '&lt;');
-    res = res.replace(/>/g, '&gt;');
-    //res = res.replace(/@/g, '#');
 
-    return res;
-}
 
 
 function click_name_section(a) {//,open

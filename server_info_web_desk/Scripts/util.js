@@ -65,7 +65,7 @@
     });
 });
 // Кодирование тегов
-function htmlEncode(value) {
-    var encodedValue = $('<div />').text(value).html();
-    return encodedValue;
-}
+//function htmlEncode(value) {
+//    var encodedValue = $('<div />').text(value).html();
+//    return encodedValue;
+//}

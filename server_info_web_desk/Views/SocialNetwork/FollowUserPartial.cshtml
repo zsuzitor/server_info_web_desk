@@ -9,15 +9,15 @@
     };
     if (ViewBag.CanAddFriend == true)
     {
-        @Ajax.ActionLink("Добавить в друзья", "AddFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+        @Ajax.ActionLink("Добавить в друзья", "FollowPerson", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
     }
     if (ViewBag.CanAddFriend == false)
     {
-        @Ajax.ActionLink("Удалить из друзей", "AddFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+        @Ajax.ActionLink("Удалить из друзей", "DeleteFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
     }
     if (ViewBag.CanAddFriend == null)
     {
-        @Ajax.ActionLink("Отписаться", "AddFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+        @Ajax.ActionLink("Отписаться", "DeleteFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
     }
 
 }

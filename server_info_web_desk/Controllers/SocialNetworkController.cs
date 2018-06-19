@@ -372,9 +372,15 @@ namespace server_info_web_desk.Controllers
 
         [AllowAnonymous]
         //TODO
-        public ActionResult Friends(int id)
+        public ActionResult Friends(string id)
         {
             //GroupUsers
+            //if (string.IsNullOrWhiteSpace(id))
+            //    return new HttpStatusCodeResult(404);
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            
+            ViewBag.id = id;
+            ViewBag.check_id = check_id;
             Session["NewMessageType"] = "2";
             return View();
         }
@@ -553,6 +559,39 @@ namespace server_info_web_desk.Controllers
         }
 
         [Authorize]
+        public ActionResult DeleteFriend(string id)
+        {
+
+            if(string.IsNullOrWhiteSpace(id))
+                return new HttpStatusCodeResult(404);
+            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            var user = db.Users.First(x1 => x1.Id == check_id);
+            if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Friends).Load();
+            var us = user.Friends.FirstOrDefault(x1=>x1.Id==id);
+            if (us != null)
+            {
+                user.Friends.Remove(us);
+                if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
+                    db.Entry(user).Collection(x1 => x1.Followers).Load();
+                user.Followers.Add(us);
+            }
+            else
+            {
+                if (!db.Entry(user).Collection(x1 => x1.FollowUser).IsLoaded)
+                    db.Entry(user).Collection(x1 => x1.FollowUser).Load();
+                 us = user.FollowUser.FirstOrDefault(x1 => x1.Id == id);
+                if (us != null)
+                {
+                    user.FollowUser.Remove(us);
+                }
+            }
+            db.SaveChanges();
+            return Redirect(Url.Action("FollowUserPartial", "SocialNetwork", new { Iduser = id, CanAddFriend = true }));
+        }
+
+
+        [Authorize]
         public ActionResult FollowPerson(string id)
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
@@ -566,22 +605,33 @@ namespace server_info_web_desk.Controllers
             var user_act = db.Users.First(x1 => x1.Id == check_id);
             if (res == true)
             {
-                user.Friends.Add(user_act);
+                user.Followers.Add(user_act);
                 res = false;
             }
-            else
-            if (res == false)
-            {
-                user.Friends.Remove(user_act);
-                res = true;
-            }
-            else
-            if (res == null)
+            //else
+            //if (res == false)
+            //{
+            //    //уже в друзьях
+            //    user.Friends.Remove(user_act);
+            //    res = true;
+            //}
+            //else
+            //if (res == null)
+            //{
+            //    //подписан на
+            //    user.Followers.Remove(user_act);
+            //    res = true;
+            //}
+
+            if (!db.Entry(user_act).Collection(x1 => x1.Followers).IsLoaded)
+                db.Entry(user_act).Collection(x1 => x1.Followers).Load();
+            if (user_act.Followers.FirstOrDefault(x1 => x1.Id == id) != null)
             {
                 user.Followers.Remove(user_act);
-                res = true;
+                user_act.Friends.Add(user);
             }
-            db.SaveChanges();
+
+                db.SaveChanges();
 
 
             //res = !res;
@@ -591,14 +641,26 @@ namespace server_info_web_desk.Controllers
 
 
 
-        [Authorize]
-        public ActionResult AddFriend(string id)
-        {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            
+        //[Authorize]
+        //public ActionResult AddFriend(string id)
+        //{
+        //    //string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+        //    //var user= db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+        //    //var user_act = db.Users.FirstOrDefault(x1=>x1.Id==id);
+        //    //if(user_act==null)
+        //    //    return new HttpStatusCodeResult(404);
+        //    //if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
+        //    //    db.Entry(user).Collection(x1 => x1.Friends).Load();
+        //    //if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
+        //    //    db.Entry(user).Collection(x1 => x1.Followers).Load();
+        //    //if (!user.Friends.Any(x1=>x1.Id==check_id)&& !user.Followers.Any(x1 => x1.Id == check_id))
+        //    //{
 
-            return PartialView();
-        }
+        //    //}
+
+
+        //    return PartialView();
+        //}
 
         [Authorize]
         public ActionResult CreateGroup(Group a)
@@ -1061,6 +1123,11 @@ namespace server_info_web_desk.Controllers
                     res.Messages.Add(i);
             }
             db.SaveChanges();
+
+            foreach(var i in res.Messages)
+            {
+                i.Creator.LoadDataForShort();
+            }
             return PartialView(res);
         }
 
@@ -1105,5 +1172,87 @@ namespace server_info_web_desk.Controllers
             return View();
 
         }
+        [AllowAnonymous]
+        public ActionResult LoadFollowersGroup(string id, int start, int count)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return new HttpStatusCodeResult(404);
+            int int_id = Convert.ToInt32(id);
+            var group = db.Groups.FirstOrDefault(x1 => x1.Id == int_id);
+            if (group == null)
+                return new HttpStatusCodeResult(404);
+
+            List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
+            if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
+                db.Entry(group).Collection(x1 => x1.Users).Load();
+            start = start > 0 ? start - 1 : 0;
+            start = group.Users.Count - start - count;
+            res.AddRange(group.Users.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+
+
+            return PartialView("ListUsers", res);
+
         }
+
+
+        [AllowAnonymous]
+        public ActionResult LoadFriends(string id,int start, int count)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return new HttpStatusCodeResult(404);
+            var user = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+
+            List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
+            if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Friends).Load();
+            start = start > 0 ? start - 1 : 0;
+            start = user.Friends.Count - start - count;
+            res.AddRange(user.Friends.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+
+            
+            return PartialView("ListUsers",res);
+
+        }
+        [AllowAnonymous]
+        public ActionResult LoadFollowers(string id, int start, int count)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return new HttpStatusCodeResult(404);
+            var user = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+
+            List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
+            if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.Followers).Load();
+            start = start > 0 ? start - 1 : 0;
+            start = user.Followers.Count - start - count;
+            res.AddRange(user.Followers.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+
+            return PartialView("ListUsers", res);
+
+        }
+        [AllowAnonymous]
+        public ActionResult LoadFollowUser(string id, int start, int count)
+        {
+            if (string.IsNullOrWhiteSpace(id))
+                return new HttpStatusCodeResult(404);
+            var user = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+
+            List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
+            if (!db.Entry(user).Collection(x1 => x1.FollowUser).IsLoaded)
+                db.Entry(user).Collection(x1 => x1.FollowUser).Load();
+            start = start > 0 ? start - 1 : 0;
+            start = user.FollowUser.Count - start - count;
+            res.AddRange(user.FollowUser.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+
+            return PartialView("ListUsers", res);
+
+        }
+
+    }
 }

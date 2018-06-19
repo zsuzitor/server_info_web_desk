@@ -14,12 +14,12 @@ namespace server_info_web_desk.Hubs
 {
     public class UserForHub
     {
-        public ApplicationUser User { get; set; }
+        public string UserId { get; set; }
         public string ConnectionId { get; set; }
 
         public UserForHub()
         {
-            User = null;
+            UserId = null;
             ConnectionId = null;
         }
     }
@@ -37,17 +37,17 @@ namespace server_info_web_desk.Hubs
             var user = db.Users.First(x1 => x1.Id == check_id);
             if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
                 db.Entry(user).Collection(x1 => x1.Chats).Load();
-            var chat = user.Chats.FirstOrDefault(x1=>x1.Id==id_dialog);
+            var chat = user.Chats.FirstOrDefault(x1 => x1.Id == id_dialog);
             if (chat == null)
                 return;
             if (!db.Entry(chat).Collection(x1 => x1.Messages).IsLoaded)
                 db.Entry(chat).Collection(x1 => x1.Messages).Load();
-            var need_read_mess_im = chat.Messages.FirstOrDefault(x1=> {
-                if(x1.CreatorId == check_id)
+            var need_read_mess_im = chat.Messages.FirstOrDefault(x1 => {
+                if (x1.CreatorId == check_id)
                 {
                     if (!db.Entry(x1).Collection(x2 => x2.UserNeedRead).IsLoaded)
                         db.Entry(x1).Collection(x2 => x2.UserNeedRead).Load();
-                    var us = x1.UserNeedRead.FirstOrDefault(x2=>x2.Id==check_id);
+                    var us = x1.UserNeedRead.FirstOrDefault(x2 => x2.Id == check_id);
                     if (us != null)
                         return true;
                 }
@@ -59,31 +59,39 @@ namespace server_info_web_desk.Hubs
             {
                 Clients.Group(id_dialog.ToString()).NeedDownloadChangesMessages(id_dialog);
             }
-           
+
         }
         public void JoinToHub()
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.First(x1=>x1.Id==check_id);
 
+            ApplicationUser user = null;
+            if(check_id!=null)
+                user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
             var id = Context.ConnectionId;
 
 
             if (!Users.Any(x => x.ConnectionId == id))
             {
-                Users.Add(new UserForHub { ConnectionId = id, User = user });
+                Users.Add(new UserForHub { ConnectionId = id, UserId = check_id });
 
-                if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.Chats).Load();
-                foreach (var i in user.Chats)
+
+                //подключание к чатам\диалогам
+                if (user != null)
                 {
-                    Groups.Add(Context.ConnectionId, i.Id.ToString());
+                    if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                        db.Entry(user).Collection(x1 => x1.Chats).Load();
+                    foreach (var i in user.Chats)
+                    {
+                        Groups.Add(Context.ConnectionId, i.Id.ToString());
+                    }
                 }
+                
 
             }
 
         }
-            
+
 
         //// Подключение нового пользователя
         //private void Connect(ApplicationUser user,int id_dialog)

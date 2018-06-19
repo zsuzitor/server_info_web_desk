@@ -1,0 +1,11 @@
+﻿@model IEnumerable<server_info_web_desk.Models.ApplicationUserShort>
+
+
+
+<div>
+    @foreach(var i in Model)
+    {
+        @Healpers.UserListItem(i)
+    }
+</div>
+

@@ -291,7 +291,19 @@ namespace server_info_web_desk.Models
 
             return true;
         }
+        public bool LoadDataForShort()
+        {
+            if (!db.Entry(this).Collection(x2 => x2.Albums).IsLoaded)
+            {
+                db.Entry(this).Collection(x2 => x2.Albums).Load();
+            }
+            if (!db.Entry(this.Albums.First()).Collection(x2 => x2.Images).IsLoaded)
+            {
+                db.Entry(this.Albums.First()).Collection(x2 => x2.Images).Load();
+            }
 
+            return true;
+        }
     }
 
     public class ApplicationUserShort
@@ -322,16 +334,7 @@ namespace server_info_web_desk.Models
             Online = a.Online;
             PageId = a.Id;
 
-            if (!db.Entry(a).Collection(x2 => x2.Albums).IsLoaded)
-            {
-                db.Entry(a).Collection(x2 => x2.Albums).Load();
-            }
-            if (!db.Entry(a.Albums.First()).Collection(x2 => x2.Images).IsLoaded)
-            {
-                db.Entry(a.Albums.First()).Collection(x2 => x2.Images).Load();
-            }
-            
-
+            a.LoadDataForShort();
             Image = a.Albums.First().Images.FirstOrDefault()?.Image;
         }
     }
