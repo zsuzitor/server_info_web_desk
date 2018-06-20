@@ -18,7 +18,7 @@ function PreloaderAction(show) {
     if (show == true)
         document.getElementById('Main_preloader_id').style.display = 'block';
         else
-        document.getElementById('Main_preloader_id').style.display = 'none;';
+        document.getElementById('Main_preloader_id').style.display = 'none';
 }
 
 function convert_string(str) {

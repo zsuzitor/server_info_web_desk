@@ -58,20 +58,33 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         }
 
-
-        public  void GetUserShortList( List<ApplicationUserShort> a,int count)
+        public static Group GetGroup(int? id)
         {
+            //string check_id = ApplicationUser.GetUserId();
+            Group res = null;
+            if (id==null||id<1)
+                return res;
+             res = db.Groups.FirstOrDefault(x1 => x1.Id == id);
+            return res;
+        }
+
+
+
+        public List<ApplicationUserShort> GetUserShortList( int count)
+        {
+            List<ApplicationUserShort> res = new List<ApplicationUserShort>();
             if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Users).Load();
-            a.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users,null,count));
-            return;
+            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users,null,count));
+            return res;
         }
-        public  void GetAdminShortList( List<ApplicationUserShort> a, int count)
+        public List<ApplicationUserShort> GetAdminShortList( int count)
         {
+            List<ApplicationUserShort> res = new List<ApplicationUserShort>();
             if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Admins).Load();
-            a.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, null, count));
-            return;
+            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, null, count));
+            return res;
         }
 
         public  GroupShort GetGroupShort()
@@ -98,17 +111,14 @@ namespace server_info_web_desk.Models.SocialNetwork
             return res;
         }
 
-
+        //добавляет на стену и раскидывает по новостям
         public void AddRecordMemeWall(Record record)
         {
             this.WallRecord.Add(record);
             if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Users).Load();
             ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Users);
-            //foreach(var i in group.Users)
-            //{
-            //    i.News.Add(record);
-            //}
+
             db.SaveChanges();
         }
 
@@ -120,8 +130,11 @@ namespace server_info_web_desk.Models.SocialNetwork
                 db.Entry(this).Collection(x1 => x1.WallRecord).Load();
             
             List<Record> res = new List<Record>();//System.Collections.Generic.
-           
-            res.AddRange(this.WallRecord.Reverse().Skip(start > 0 ? start - 1 : 0).Take(count));
+
+            start = start > 0 ? start - 1 : 0;
+            start = this.WallRecord.Count - start - count;
+
+            res.AddRange(this.WallRecord.Skip(start).Take(count));
             foreach (var i in res)
             {
                 i.RecordLoadForView();
@@ -175,7 +188,59 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
 
+        //проверить может ли пользователь редактировать группу(является админом)
+        public bool HaveAccessAdminGroup(string userId)
+        {
+            if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Admins).Load();
+            if (this.Admins.Any(x1 => x1.Id == userId))
+
+                return true;
+            return false;
         }
+
+        //проверить может ли пользователь просматривать группу
+        public bool HaveAccessGroup(string userId)
+        {
+           // bool res = false;
+            if (!this.OpenGroup)
+            {
+                db.Entry(this).Collection(x1 => x1.Users).Load();
+                var us_c = this.Users.FirstOrDefault(x1 => x1.Id == userId);
+                if (us_c == null)
+                {
+                    //TODO тут отправлять усеченную версию группы для тех кто не подписан и группа закрытая
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        public List<Album> GetAlbums(int? id, int start = 0, int count = 1)
+        {
+            List<Album> res = new List<Album>();
+            if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Albums).Load();
+            if (id != null)
+            {
+                var al = this.Albums.FirstOrDefault(x1 => x1.Id == id);
+                if (al != null)
+                    res.Add(al);
+            }
+            else
+            {
+                start = start > 0 ? start - 1 : 0;
+                //start = this.Albums.Count - start - count;
+                res.AddRange(this.Albums.Skip(start).Take(count));
+            }
+
+
+            return res;
+        }
+
+
+    }
 
 
     public class GroupShort

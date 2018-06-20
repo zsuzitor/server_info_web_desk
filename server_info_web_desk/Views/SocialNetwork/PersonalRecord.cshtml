@@ -125,10 +125,12 @@
         <div class="div_padding_top_10_px">
             <div class="div_color_white">
                 <div class="div_padding_top_10_px">
-                    @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
+                    <div>
+                        @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
+                    </div>
                     @foreach (var i in Model.Image)
             {
-                        <div class="div_padding_left_10_px one_image_small_block">
+                        <div class="div_padding_left_10_px one_image_small_block div_inline_block">
                             @Healpers.ImageLink(i)
                         </div>
                     }

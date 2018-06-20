@@ -72,6 +72,94 @@ namespace server_info_web_desk.Models.SocialNetwork
             Comments = new List<Comment>();
         }
 
+        //возвращает true если лайк поставлен(красное сердце) и false если снят(серое)
+        public bool? LikeAction(string id_user)
+        {
+            if (id_user == null)
+                return null;
+            if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
+            var like = this.UsersLikes.FirstOrDefault(x1 => x1.Id == id_user);
+            bool red_heart = false;
+            if (like == null)
+            {
+                this.UsersLikes.Add(db.Users.First(x1 => x1.Id == id_user));
+                red_heart = true;
+            }
+
+            else
+            {
+                this.UsersLikes.Remove(db.Users.First(x1 => x1.Id == id_user));
+                red_heart = false;
+            }
+
+            db.SaveChanges();
+
+            return red_heart;
+        }
+
+        public static Record AddRecordMem(string user_id,int? group_id,List<byte[]>images,string text)
+        {
+            
+
+            Record record = null;
+            if (group_id != null&& group_id > 0)
+            
+                record = new Record() { GroupId = group_id };
+                
+            else
+                record=new Record() { UserId = user_id };
+
+            db.Record.Add(record);
+            db.SaveChanges();
+            //if (group_id != null && group_id > 0)
+            //    record.GroupWall.Add(Group.GetGroup(group_id));
+
+            Meme mem = new Meme() { Id = record.Id, Description = text, CreatorId = user_id };
+            db.Memes.Add(mem);
+            db.SaveChanges();
+            var list_img = images.Select(x1 => new Image() { MemeId = mem.Id, Data = x1, UserId = user_id });
+            db.ImagesSocial.AddRange(list_img);
+            db.SaveChanges();
+
+            return record;
+        }
+        public static Record AddRecordImage(Album album,ApplicationUser user, Group group, List<byte[]> images, string text)
+        {
+            //var album = user.GetAlbums(album_id).FirstOrDefault();
+            if (album == null)
+                return null;
+            if(user==null)
+                return null;
+            var img = new Image() { Data = images?.ElementAt(0), UserId = user.Id };
+            db.ImagesSocial.Add(img);
+            db.SaveChanges();
+            Record record = null;
+            if (group == null)
+                record = new Record() { AlbumId = album.Id, UserId = user.Id, Description = text };
+            else
+                record = new Record() { AlbumId = album.Id, GroupId = group.Id, Description = text };
+            db.Record.Add(record);
+            db.SaveChanges();
+            img.RecordId = record.Id;
+            record.ImageId = img.Id;
+
+            db.SaveChanges();
+            return record;
+        }
+
+
+        public static Record GetRecord(int? id)
+        {
+            if (id == null)
+                return null;
+            var record = db.Record.FirstOrDefault(x1 => x1.Id == id);
+            if (record == null)
+                return null;
+
+
+            return record;
+        }
         public  void RecordLoadForView()
         {
             if (this.ImageId != null && !db.Entry(this).Reference(x1 => x1.Image).IsLoaded)

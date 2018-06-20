@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Web;
+using static server_info_web_desk.Models.DataBase.DataBase;
+
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
@@ -51,19 +53,44 @@ namespace server_info_web_desk.Models.SocialNetwork
         //{
         //    Id = a.Id;
         //    Data = a.Data;
-           
+
         //    UserId = a.UserId;
 
         //    if (!with_out_reference)
         //    {
-                
+
         //    }
         //    else
         //    {
-                
+
         //    }
         //}
-    }
+
+            //ищет в бд по id  если id нет то создает record только для представления(бд не трогает)
+        public void GetRecordForShow()
+        {
+            
+            if (this.RecordId != null)
+            {
+                this.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == this.RecordId);
+                this.Record_NM.Image = this;
+                if (!db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
+                    db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+            }
+            else
+            {
+                this.Record_NM = new Record();
+                this.Record_NM.Image = this;
+                //if (!db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
+                //    db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+            }
+
+        }
+
+
+
+
+        }
 
     public class ImageShort
     {

@@ -14,6 +14,9 @@
 
         <div class="div_color_white">
             <div class="div_padding_top_10_px">
+                <div>
+                    @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
+                </div>
                 @foreach (var i in Model.Image)
             {
                     <div class="div_padding_left_10_px one_image_small_block">
@@ -25,39 +28,39 @@
             </div>
         </div>
 
+        <div class="div_padding_top_10_px">
+            <div class="div_color_white">
 
-        <div class="div_color_white">
-
-            <p>Стена</p>
-            @if (Model.CanAddMeme == true)
+                <p>Стена</p>
+                @if (Model.CanAddMeme == true)
             {
-                <div>
-                    @*@using (Ajax.BeginForm("AddMemeGroup", "SocialNetwork", new AjaxOptions
-                    {
-                        UpdateTargetId = "PersonalRecord_wall_meme_block",
-                        LoadingElementId = "Main_preloader_id",
-                        LoadingElementDuration = 200,
-                        InsertionMode = InsertionMode.InsertBefore,
-                        OnComplete = "OnComplete"
-                    }))*@
-                    @using (Html.BeginForm("AddMemeGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
-                    {
-                        @Html.Hidden("id_group", Model.IdGroup)
-                        @Html.TextArea("text")
-                        <input type="file" name="uploadImage" multiple />
+                    <div>
+                        @*@using (Ajax.BeginForm("AddMemeGroup", "SocialNetwork", new AjaxOptions
+                        {
+                            UpdateTargetId = "PersonalRecord_wall_meme_block",
+                            LoadingElementId = "Main_preloader_id",
+                            LoadingElementDuration = 200,
+                            InsertionMode = InsertionMode.InsertBefore,
+                            OnComplete = "OnComplete"
+                        }))*@
+                        @using (Html.BeginForm("AddMemeGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        {
+                            @Html.Hidden("id_group", Model.IdGroup)
+                            @Html.TextArea("text")
+                            <input type="file" name="uploadImage" multiple />
                             <input type="submit" value="Добавить" />
-                    }
+                        }
+                    </div>
+                }
+                <div id="PersonalRecord_wall_meme_block">
+                    @Html.Action("MemeRecordListPartial", "SocialNetwork", new { id = Model.IdGroup, type = 2, start = 0, count = 10 })
                 </div>
-            }
-            <div id="PersonalRecord_wall_meme_block">
-                @Html.Action("MemeRecordListPartial", "SocialNetwork", new { id = Model.IdGroup, type = 2, start = 0, count = 10 })
-            </div>
 
+            </div>
         </div>
 
 
-
-    </div>
+        </div>
     <div class="GroupRecord_right div_content_main_size_1 div_inline_block" id="div_content_main_size_1_id">
 
         <div class="div_color_white">

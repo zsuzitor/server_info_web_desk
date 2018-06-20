@@ -14,6 +14,7 @@ using static server_info_web_desk.Models.DataBase.DataBase;
 using server_info_web_desk.Models.SocialNetwork;
 using server_info_web_desk.Models.ViewModel;
 using static server_info_web_desk.Models.functions.FunctionsProject;
+using server_info_web_desk.Models;
 //using server_info_web_desk.Models;
 
 namespace server_info_web_desk.Controllers
@@ -36,7 +37,7 @@ namespace server_info_web_desk.Controllers
             //Session["NameAction"] = "WallMeme";
             //Session["StartLoad"] = 0;
             //Session["CountLoad"] = 10;
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             
             //id = id ?? check_id;
             if (id == null&&check_id==null)
@@ -46,33 +47,15 @@ namespace server_info_web_desk.Controllers
             if(id==null)
                 return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = check_id });
 
-             var user =  db.Users.First(x1=>x1.Id==id);
+            var user = ApplicationUser.GetUser(id) ;
             
             PersonalRecordView res = new PersonalRecordView(user);
             res.IdUser = check_id;
 
-            if (res.IdUser != res.IdPage)
-            {
-                if (user.WallOpenWrite == true)
-                    res.CanAddMeme = true;
-                else
-                    if (user.WallOpenWrite == null)
-                {
-                    if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-                        db.Entry(user).Collection(x1 => x1.Friends).Load();
-                    var ch_acc = user.Friends.FirstOrDefault(x1 => x1.Id == check_id);
-                    if (ch_acc != null)
-                        res.CanAddMeme = true;
-                }
-            }
-            else
-                res.CanAddMeme = true;
+            res.CanAddMeme = user.CanAddRecordWall(res.IdUser);
 
-
-            if (!db.Entry(user).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(user).Collection(x1 => x1.Albums).Load();
-            res.IdMainAlbum = user.Albums.First().Id;
-            res.IdNotMainAlbum = user.Albums.ElementAt(1).Id;
+            res.IdMainAlbum = user.GetAlbums(null,0,1).First().Id;
+            res.IdNotMainAlbum = user.GetAlbums(null, 1, 1).First().Id;
 
             res.Albums=Models.SocialNetwork.Album.GetAlbumShortListForView(user.Albums,2);
 
@@ -85,32 +68,9 @@ namespace server_info_web_desk.Controllers
 
             //TODO сейчас плохо будет работать
             res.GroupCount = user.Group.Count;
-            
-            //res.WallMeme.AddRange(user.GetWallRecords(0,10));
-           
 
-            if(!db.Entry(user).Collection(x1=>x1.Friends).IsLoaded)
-            {
-                db.Entry(user).Collection(x1 => x1.Friends).Load();
-            }
-            if (check_id != null)
-            {
-                var check_friends = user.Friends.FirstOrDefault(x1 => x1.Id == check_id);
-                if (check_friends != null)
-                {
-                    res.CanAddFriend = false;
-                }
-                else
-                {
-                    check_friends = user.Followers.FirstOrDefault(x1=>x1.Id==check_id);
-                    if (check_friends == null)
-                    {
-                        res.CanAddFriend = true;
-                    }
-                    }
-            }
+            res.CanAddFriend = user.CanFollow(check_id);
             
-
             res.Friends.AddRange(user.Friends.Skip(user.Friends.Count-6>0? (user.Friends.Count-6):0).Select(x1=>new Models.ApplicationUserShort(x1)));
             Session["NewMessageType"] = "2";
             return View(res);
@@ -119,12 +79,11 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult EditPersonalRecord()
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            if (check_id == null)
-                return new HttpStatusCodeResult(404);
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             if (user == null)
                 return new HttpStatusCodeResult(404);
+
             Session["NewMessageType"] = "2";
             return View(user);
         }
@@ -134,61 +93,44 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult GroupRecord(int id)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-
-            var group = db.Groups.FirstOrDefault(x1 => x1.Id == id);
+            string check_id = ApplicationUser.GetUserId();
+           // var ffff = db.Record.ToList();
+            Group group = Group.GetGroup(id) ;
             if (group == null)
+                return new HttpStatusCodeResult(404);
+
+            if (!group.HaveAccessGroup(check_id))
             {
+                //TODO тут отправлять усеченную версию группы для тех кто не подписан и группа закрытая
                 return new HttpStatusCodeResult(404);
             }
-            if (!group.OpenGroup)
-            {
-                db.Entry(group).Collection(x1 => x1.Users).Load();
-                var us_c=group.Users.FirstOrDefault(x1 => x1.Id == check_id);
-                if (us_c == null)
-                {
-                    //TODO тут отправлять усеченную версию группы для тех кто не подписан и группа закрытая
-                    return new HttpStatusCodeResult(404);
-                }
-            }
+            
 
             GroupRecordView res = new GroupRecordView(group);
             res.IdUser = check_id;
-            if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Users).Load();
-            if (!db.Entry(group).Collection(x1 => x1.Admins).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Admins).Load();
-            if (group.Admins.FirstOrDefault(x1 => x1.Id == check_id) != null)
+
+            if (group.HaveAccessAdminGroup(check_id))
                 res.Admin = true;
             
                 res.CanFollow = group.CanFollow(check_id);
 
 
-            group.GetUserShortList(res.Users,-6);
-            group.GetAdminShortList( res.Admins, 6);
-            
+            res.Users=group.GetUserShortList(-6);
+            res.Admins=group.GetAdminShortList( 6);
 
-            if (!db.Entry(group).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Albums).Load();
-            
-            res.IdMainAlbum = group.Albums.First().Id;
-            res.IdNotMainAlbum = group.Albums.ElementAt(1).Id;
-
+            res.IdMainAlbum = group.GetAlbums(null, 0, 1).First().Id;
+            res.IdNotMainAlbum = group.GetAlbums(null, 1, 1).First().Id;
 
             res.Albums = Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)group.Albums, 2);
             res.MainImage= Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.First(), 1).FirstOrDefault();
 
             res.Image = Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.ElementAt(1), 4);
-
-
-           
-            //res.WallMeme.AddRange(group.GetWallRecords(0, 10));
+            
+            res.WallMeme.AddRange(group.GetWallRecords(0, 10));
 
            
             res.CanAddMeme = group.CanAddMeme(check_id);
 
-            //Albums = new List<Album>();
-            //WallRecord = new List<Record>();
             Session["NewMessageType"] = "2";
             return View(res);
         }
@@ -203,7 +145,7 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult News()
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             ViewBag.check_id = check_id;
             Session["NewMessageType"] = "2";
             return View();
@@ -213,36 +155,15 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult Messages()
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.First(x1 => x1.Id == check_id);
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
+                return new HttpStatusCodeResult(404);
             if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
                 db.Entry(user).Collection(x1 => x1.Chats).Load();
 
 
             List<ChatShort> res = new List<ChatShort>();
-            res.AddRange(user.Chats.Select(x1 => {
-                var us_s = new ChatShort() { Id=x1.Id,Image=x1.Image, Name=x1.Name };
-
-                if (!db.Entry(x1).Collection(x2 => x2.Messages).IsLoaded)
-                    db.Entry(x1).Collection(x2 => x2.Messages).Load();
-                var last_message = x1.Messages.LastOrDefault();
-                if (last_message == null)
-                {
-                    us_s.User = null;
-                    us_s.Text = null;
-                }
-                else
-                {
-                    if (!db.Entry(last_message).Reference(x2 => x2.Creator).IsLoaded)
-                        db.Entry(last_message).Reference(x2 => x2.Creator).Load();
-                    us_s.User = new Models.ApplicationUserShort(last_message?.Creator);
-                    us_s.Text = last_message.Text;
-                }
-               
-                //us_s.CountNewMessage=;
-
-                return us_s;
-                }));
+            res.AddRange(user.Chats.Select(x1 => x1.GetChatShort()));
 
 
             Session["NewMessageType"] = "3";
@@ -253,14 +174,15 @@ namespace server_info_web_desk.Controllers
         public ActionResult AlbumsPerson(string id,int? select_id)
         {
             //TODO проверять есть ли доступ
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             ListAlbumsShortView res = new ListAlbumsShortView() {UserId= check_id,PageUserId=id, SelectAlbum=select_id };
-            var userPage = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            //var userPage = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            ApplicationUser userPage = ApplicationUser.GetUser(id);
+            if (userPage == null)
+                return new HttpStatusCodeResult(404);
             if (!db.Entry(userPage).Collection(x1 => x1.Albums).IsLoaded)
                 db.Entry(userPage).Collection(x1 => x1.Albums).Load();
             
-          
-
              res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
 
             Session["NewMessageType"] = "2";
@@ -270,34 +192,20 @@ namespace server_info_web_desk.Controllers
         //TODOвместе с AlbumsPerson редиректить на 1 метод в котором все будет происходить????
         public ActionResult AlbumsGroup(int id, int? select_id)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             ListAlbumsShortView res = new ListAlbumsShortView() { UserId = check_id, PageGroupId = id, SelectAlbum = select_id };
-            var GroupPage = db.Groups.FirstOrDefault(x1 => x1.Id == id);
-            if (!db.Entry(GroupPage).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(GroupPage).Collection(x1 => x1.Albums).Load();
+            Group group = Group.GetGroup(id);
+            if (group == null)
+                return new HttpStatusCodeResult(404);
+            if (!db.Entry(group).Collection(x1 => x1.Albums).IsLoaded)
+                db.Entry(group).Collection(x1 => x1.Albums).Load();
 
-
-
-            res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)GroupPage.Albums, GroupPage.Albums.Count));
+            
+            res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)group.Albums, group.Albums.Count));
             Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
         }
 
-        //[AllowAnonymous]
-        ////TODO 
-        //public ActionResult Album(int id)
-        //{
-        //    return View();
-        //}
-
-        [AllowAnonymous]
-        //TODO 
-        public ActionResult Image(int id)
-        {
-            //если прикреплено к записи то открывать запись
-            Session["NewMessageType"] = "2";
-            return PartialView();
-        }
 
 
         [Authorize]
@@ -310,15 +218,16 @@ namespace server_info_web_desk.Controllers
 
             //TODO УРОВЕНЬ ДОСТУПА
 
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
+                return new HttpStatusCodeResult(404);
             Chat res = new Chat();
 
-            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                db.Entry(user).Collection(x1 => x1.Chats).Load();
+            //if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+            //    db.Entry(user).Collection(x1 => x1.Chats).Load();
             if (id != null)
             {
-                var dialog = user.Chats.FirstOrDefault(x1 => x1.Id == id);
+                var dialog = user.GetChat(id);
                 if (dialog == null)
                     return new HttpStatusCodeResult(404);
                 res = dialog;
@@ -327,27 +236,7 @@ namespace server_info_web_desk.Controllers
             else
             if (user_id != null)
             {
-                Chat chat = user.Chats.FirstOrDefault(x1 =>
-                {
-
-                    if (!db.Entry(x1).Collection(x2 => x2.Users).IsLoaded)
-                        db.Entry(x1).Collection(x2 => x2.Users).Load();
-                    if (x1.Users.FirstOrDefault(x2 => x2.Id == user_id) != null && x1.Users.Count == 2)
-                        return true;
-
-                    return false;
-                });
-                //Chat chat = null;
-                //foreach (var i in user.Chats)
-                //{
-                //    if (!db.Entry(i).Collection(x2 => i.Users).IsLoaded)
-                //        db.Entry(i).Collection(x2 => i.Users).Load();
-                //    if (i.Users.FirstOrDefault(x2 => x2.Id == user_id) != null && i.Users.Count == 2)
-                //        chat = i;
-                //    break;
-                //}
-
-
+                Chat chat = user.GetChat(user_id);
 
                 //СОЗДАТЬ НОВЫЙ ЧАТ
                 if (chat == null)
@@ -355,7 +244,7 @@ namespace server_info_web_desk.Controllers
                     var user2 = db.Users.FirstOrDefault(x1=>x1.Id== user_id);
                     if(user2==null)
                         return new HttpStatusCodeResult(404);
-                    chat = new Chat() { CreatorId=check_id };
+                    chat = new Chat() { CreatorId= user.Id };
                     db.Chats.Add(chat);
                     db.SaveChanges();
                     chat.Users.Add(user);
@@ -374,11 +263,9 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult Friends(string id)
         {
-            //GroupUsers
-            //if (string.IsNullOrWhiteSpace(id))
-            //    return new HttpStatusCodeResult(404);
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            
+
+            string check_id = ApplicationUser.GetUserId();
+
             ViewBag.id = id;
             ViewBag.check_id = check_id;
             Session["NewMessageType"] = "2";
@@ -404,23 +291,18 @@ namespace server_info_web_desk.Controllers
         //TODO
         public ActionResult Groups(string id)
         {
-            if(id==null)
+            ApplicationUser user = ApplicationUser.GetUser(id);
+            if (user == null)
                 return new HttpStatusCodeResult(404);
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.FirstOrDefault(x1=>x1.Id==id);
-            if(user==null)
-                return new HttpStatusCodeResult(404);
-            GroupsListView res = new GroupsListView();
+            
 
+            GroupsListView res = new GroupsListView();
 
             res.Groups.AddRange(user.UserGroupToShort(0,10));
 
             Session["NewMessageType"] = "2";
             return View(res);
         }
-
-
-
 
 
 
@@ -441,11 +323,11 @@ namespace server_info_web_desk.Controllers
         [ChildActionOnly]
         public ActionResult LeftMenuPersonal()
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            ViewBag.id = check_id;
-            if (check_id != null)
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            ViewBag.id = user?.Id;
+            if (user != null)
             {
-                var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+                
                 if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
                     db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
                 ViewBag.CountNewMessage = user.MessageNeedRead.Count;
@@ -462,40 +344,21 @@ namespace server_info_web_desk.Controllers
         [HttpPost]
         public JsonResult LikeRecord(int? id)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            if(id==null)
-                return Json(null);
-            var record = db.Record.FirstOrDefault(x1=>x1.Id==id);
+            string check_id = ApplicationUser.GetUserId();
+            
+            var record = Record.GetRecord(id) ;
             if (record == null)
                 return Json(null);
-            //TODO тут обработать ошибки и уровень доступа, нельзя лайкнуть если нельзя просмотреть
-            if (!db.Entry(record).Collection(x1 => x1.UsersLikes).IsLoaded)
-                db.Entry(record).Collection(x1 => x1.UsersLikes).Load();
-            var like = record.UsersLikes.FirstOrDefault(x1 => x1.Id == check_id);
-            bool red_heart = false;
-            if (like == null)
-            {
-                record.UsersLikes.Add(db.Users.First(x1 => x1.Id == check_id));
-                red_heart = true;
-            }
 
-            else
-            {
-                record.UsersLikes.Remove(db.Users.First(x1 => x1.Id == check_id));
-                red_heart = false;
-            }
-              
-            db.SaveChanges();
-
-
-
+            bool? red_heart=record.LikeAction(check_id);
+            
             return Json(new { red_heart, id,count= record.UsersLikes.Count });
         }
         [Authorize]
         public ActionResult GroupCreate([Bind(Include="Name")]GroupShort a)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            if(string.IsNullOrWhiteSpace(a.Name))
+            string check_id = ApplicationUser.GetUserId();
+            if (string.IsNullOrWhiteSpace(a.Name))
                 return new HttpStatusCodeResult(404);
             Group res = new Group() { Name=a.Name, MainAdminId=check_id };
             db.Groups.Add(res);
@@ -514,7 +377,7 @@ namespace server_info_web_desk.Controllers
                 Description = "Сюда добавляются фотографии с вашей страницы",
                 GroupId = res.Id
             });
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+            ApplicationUser user = ApplicationUser.GetUser(check_id);
             res.Admins.Add(user);
             res.Users.Add(user);
             db.SaveChanges();
@@ -525,15 +388,17 @@ namespace server_info_web_desk.Controllers
         [Authorize]
         public ActionResult FollowGroup(int? id)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+
             bool? res = true;
-            if(id==null)
+            
+            Group group = Group.GetGroup(id);
+            if (group == null)
                 return new HttpStatusCodeResult(404);
-            var group = db.Groups.FirstOrDefault(x1=>x1.Id==id);
-            if(group==null)
-                return new HttpStatusCodeResult(404);
-            res = group.CanFollow(check_id);
-            var user = db.Users.First(x1 => x1.Id == check_id);
+            res = group.CanFollow(user.Id);
+           
             if (res == true)
             {
                 group.Users.Add(user);
@@ -564,8 +429,10 @@ namespace server_info_web_desk.Controllers
 
             if(string.IsNullOrWhiteSpace(id))
                 return new HttpStatusCodeResult(404);
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.First(x1 => x1.Id == check_id);
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+
             if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
                 db.Entry(user).Collection(x1 => x1.Friends).Load();
             var us = user.Friends.FirstOrDefault(x1=>x1.Id==id);
@@ -594,44 +461,35 @@ namespace server_info_web_desk.Controllers
         [Authorize]
         public ActionResult FollowPerson(string id)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            bool? res = true;
-            if (id == null)
+            ApplicationUser user_act = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user_act == null)
                 return new HttpStatusCodeResult(404);
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            bool? res = true;
+            ApplicationUser user = ApplicationUser.GetUser(id);
             if (user == null)
                 return new HttpStatusCodeResult(404);
-            res = user.CanFollow(check_id);
-            var user_act = db.Users.First(x1 => x1.Id == check_id);
+            
+            res = user.CanFollow(user_act.Id);
+
             if (res == true)
             {
                 user.Followers.Add(user_act);
                 res = false;
             }
-            //else
-            //if (res == false)
-            //{
-            //    //уже в друзьях
-            //    user.Friends.Remove(user_act);
-            //    res = true;
-            //}
-            //else
-            //if (res == null)
-            //{
-            //    //подписан на
-            //    user.Followers.Remove(user_act);
-            //    res = true;
-            //}
 
-            if (!db.Entry(user_act).Collection(x1 => x1.Followers).IsLoaded)
-                db.Entry(user_act).Collection(x1 => x1.Followers).Load();
-            if (user_act.Followers.FirstOrDefault(x1 => x1.Id == id) != null)
+            else
             {
-                user.Followers.Remove(user_act);
-                user_act.Friends.Add(user);
-            }
 
-                db.SaveChanges();
+
+                if (!db.Entry(user_act).Collection(x1 => x1.Followers).IsLoaded)
+                    db.Entry(user_act).Collection(x1 => x1.Followers).Load();
+                if (user_act.Followers.FirstOrDefault(x1 => x1.Id == id) != null)
+                {
+                    user.Followers.Remove(user_act);
+                    user_act.Friends.Add(user);
+                }
+            }
+            db.SaveChanges();
 
 
             //res = !res;
@@ -640,114 +498,51 @@ namespace server_info_web_desk.Controllers
 
 
 
-
-        //[Authorize]
-        //public ActionResult AddFriend(string id)
-        //{
-        //    //string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-        //    //var user= db.Users.FirstOrDefault(x1 => x1.Id == check_id);
-        //    //var user_act = db.Users.FirstOrDefault(x1=>x1.Id==id);
-        //    //if(user_act==null)
-        //    //    return new HttpStatusCodeResult(404);
-        //    //if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-        //    //    db.Entry(user).Collection(x1 => x1.Friends).Load();
-        //    //if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
-        //    //    db.Entry(user).Collection(x1 => x1.Followers).Load();
-        //    //if (!user.Friends.Any(x1=>x1.Id==check_id)&& !user.Followers.Any(x1 => x1.Id == check_id))
-        //    //{
-
-        //    //}
-
-
-        //    return PartialView();
-        //}
-
-        [Authorize]
-        public ActionResult CreateGroup(Group a)
-        {
-            return View();
-        }
-
         [Authorize]
         public ActionResult AddMemePerson(string id_user, HttpPostedFileBase[] uploadImage,string text)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             //TODO проверять есть ли доступ к добавлению мемов на чужую стену
             //int gg = Request.Files.Count;
 
             bool access = false;
             id_user = id_user ?? check_id;
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == id_user);
+            //var user = db.Users.FirstOrDefault(x1 => x1.Id == id_user);
+            ApplicationUser user = ApplicationUser.GetUser(id_user);
+            if (user == null)
+                return new HttpStatusCodeResult(404);
 
-            if (id_user == check_id)
-                access = true;
-            else
-            {
-                if (user.WallOpenWrite==true)
-                    access = true;
-                else
-                    if(user.WallOpenWrite == null)
-                {
-                    if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-                        db.Entry(user).Collection(x1 => x1.Friends).Load();
-                    var ch_acc=user.Friends.FirstOrDefault(x1 => x1.Id == check_id);
-                    if (ch_acc != null)
-                        access = true;
-                }
-            }
+            access = user.CanAddRecordWall(check_id);
+            
             if (!access)
                 return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = id_user });
                 //return PartialView(null);
 
             var list_img_byte = Get_photo_post(uploadImage);
 
-            Record record = new Record() { UserId = id_user };
-            db.Record.Add(record);
-            db.SaveChanges();
-
-            Meme mem = new Meme() {Id=record.Id, Description=text, CreatorId = check_id };
-            db.Memes.Add(mem);
-            db.SaveChanges();
-            var list_img = list_img_byte.Select(x1 => new Image() { MemeId=mem.Id, Data=x1, UserId=check_id });
-            db.ImagesSocial.AddRange(list_img);
-            db.SaveChanges();
-            user.AddRecordMemeWall(record);
-
-
-
+            Record record = Record.AddRecordMem(check_id, null, list_img_byte, text);
+            user.AddRecordWall(record);
+            
             return RedirectToAction("PersonalRecord", "SocialNetwork",new {id= id_user });
            // return PartialView(record);
         }
         [Authorize]
         public ActionResult AddMemeGroup(int id_group, HttpPostedFileBase[] uploadImage, string text)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var group=db.Groups.FirstOrDefault(x1 => x1.Id == id_group);
-            if(group==null)
+            string check_id = ApplicationUser.GetUserId();
+            Group group = Group.GetGroup(id_group);
+            if (group == null)
                 return new HttpStatusCodeResult(404);
-
 
             bool CanAddMeme = group.CanAddMeme(check_id);
 
             if (!CanAddMeme)
                 return new HttpStatusCodeResult(404);
-
-
+            
             var list_img_byte = Get_photo_post(uploadImage);
 
-            Record record = new Record() { GroupId = id_group };
-            db.Record.Add(record);
-            db.SaveChanges();
-
-            Meme mem = new Meme() { Id = record.Id, Description = text, CreatorId = check_id };
-            db.Memes.Add(mem);
-            db.SaveChanges();
-            var list_img = list_img_byte.Select(x1 => new Image() { MemeId = mem.Id, Data = x1, UserId = check_id });
-            db.ImagesSocial.AddRange(list_img);
-            db.SaveChanges();
-
-            
-
+            var record=Record.AddRecordMem(check_id, id_group, list_img_byte, text);
+            group.AddRecordMemeWall(record);
             return RedirectToAction("GroupRecord", "SocialNetwork",new {id= id_group });
         }
 
@@ -756,28 +551,21 @@ namespace server_info_web_desk.Controllers
         {
             if(uploadImage.Count()<1|| album_id==null)
                 return new HttpStatusCodeResult(404);
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.FirstOrDefault(x1=>x1.Id==check_id);
-            if (!db.Entry(user).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(user).Collection(x1 => x1.Albums).Load();
-            var album=user.Albums.FirstOrDefault(x1 => x1.Id == album_id);
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+
+            var album = user.GetAlbums(album_id).FirstOrDefault();
             if(album==null)
                 return new HttpStatusCodeResult(404);
             var list_img_byte = Get_photo_post(uploadImage);
-            var img= new Image() {  Data = list_img_byte?.ElementAt(0), UserId = check_id };
-            db.ImagesSocial.Add(img);
-            db.SaveChanges();
-            
-            var record = new Record() {  AlbumId= album.Id, UserId=check_id, Description = text };
-            db.Record.Add(record);
-            db.SaveChanges();
-            img.RecordId= record.Id;
-            record.ImageId=img.Id;
-            
-            db.SaveChanges();
-            user.AddRecordMemeWall(record);
 
-            return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = check_id});
+            var record=Record.AddRecordImage(album, user,null, list_img_byte, text);
+            if(record == null)
+                return new HttpStatusCodeResult(404);
+            user.AddRecordWall(record);
+
+            return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = user.Id });
         }
         [Authorize]
         public ActionResult AddImageGroup(string text, HttpPostedFileBase[] uploadImage, int? album_id,int? id_group)
@@ -786,44 +574,27 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
 
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
 
-            var group = db.Groups.FirstOrDefault(x1 => x1.Id == id_group);
+            Group group = Group.GetGroup(id_group);
             if (group == null)
                 return new HttpStatusCodeResult(404);
 
+            ApplicationUser user = null;
 
-            //if (group.AddMemesPrivate)
-            //{
-            //    if (!db.Entry(group).Collection(x1 => x1.Admins).IsLoaded)
-            //        db.Entry(group).Collection(x1 => x1.Admins).Load();
-            //    var a=group.Admins.FirstOrDefault(x1 => x1.Id == check_id);
-            //    if(a==null)
-            //        return new HttpStatusCodeResult(404);
-            //}
-            //if (!group.OpenGroup)
-            //{
-            //    if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
-            //        db.Entry(group).Collection(x1 => x1.Users).Load();
-            //    var u = group.Users.FirstOrDefault(x1 => x1.Id == check_id);
-            //    if (u == null)
-            //        return new HttpStatusCodeResult(404);
-            //}
             bool can_add = group.CanAddMeme(check_id);
             if (!can_add)
                 return new HttpStatusCodeResult(404);
-            if (!db.Entry(group).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(group).Collection(x1 => x1.Albums).Load();
 
-            
-            var album = group.Albums.FirstOrDefault(x1 => x1.Id == album_id);
+
+            var album = group.GetAlbums(album_id).FirstOrDefault();
             //TODO проверка
-            var ch_al = group.Albums.First();
-            
+            var ch_al = group.GetAlbums(null,0,1).First();
+
             if (can_add&&ch_al.Id==album.Id)
             {
-                var a=group.Admins.FirstOrDefault(x1 => x1.Id == check_id);
-                if (a == null)
+                 user = group.Admins.FirstOrDefault(x1 => x1.Id == check_id);
+                if (user == null)
                     can_add = false;
             }
             if(!can_add)
@@ -832,16 +603,11 @@ namespace server_info_web_desk.Controllers
             if (album == null)
                 return new HttpStatusCodeResult(404);
             var list_img_byte = Get_photo_post(uploadImage);
-            var img = new Image() { Data = list_img_byte?.ElementAt(0), UserId = check_id };
-            db.ImagesSocial.Add(img);
-            db.SaveChanges();
+            if(user==null)
+                user=db.Users.FirstOrDefault(x1 => x1.Id == check_id);
 
-            var record = new Record() { AlbumId = album.Id, GroupId = group.Id, Description = text };
-
-            db.SaveChanges();
-            img.RecordId = record.Id;
-            record.ImageId = img.Id;
-            db.SaveChanges();
+            var record = Record.AddRecordImage(album, user, group, list_img_byte, text);
+            
             group.AddRecordMemeWall(record);
             return RedirectToAction("GroupRecord", "SocialNetwork", new { id = id_group });
         }
@@ -852,51 +618,15 @@ namespace server_info_web_desk.Controllers
         public ActionResult SaveChangesPersonalRecord(Models.ApplicationUser a)
         {
             //TODO валидация
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            if(check_id==null)
-                return new HttpStatusCodeResult(404);
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             if (user == null)
                 return new HttpStatusCodeResult(404);
+            user.ChageUserData(a);
 
-            if (!string.IsNullOrWhiteSpace(a.Name))
-                user.Name = a.Name;
-            if (!string.IsNullOrWhiteSpace(a.Surname))
-                user.Surname = a.Surname;
-
-            user.Status = a.Status;
-            user.Birthday = a.Birthday;
-            user.Sex = a.Sex;
-            user.Country = a.Country;
-            user.Town = a.Town;
-            user.Street = a.Street;
-            user.Description = a.Description;
-            user.WallOpenWrite = a.WallOpenWrite;
-            user.PrivatePage = a.PrivatePage;
-            user.Open_data_info = a.Open_data_info;
-            db.SaveChanges();
             return RedirectToAction("EditPersonalRecord", "SocialNetwork",new { });
         }
 
         //------------------------------------------------------------
-
-
-        //не помню зачем нужно мб что бы при создании мема его возвращать
-        //[ChildActionOnly]
-        //[AllowAnonymous]
-        //public ActionResult MemeRecordPartial(int id_record, Record a)
-        //{
-        //    //@Healpers.MemeRecord(Model, (string)ViewBag.check_id)
-        //    string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-        //    if (a == null)
-        //    {
-        //        //загрузить
-        //    }
-        //    //загрузить все ужные данные для отображения
-        //    ViewBag.check_id = check_id;
-        //    return PartialView(a);
-        //}
-
 
         [AllowAnonymous]
         public ActionResult LoadImagesAlbum(int id, int start, int count)
@@ -918,17 +648,16 @@ namespace server_info_web_desk.Controllers
             List<Record> res = new List<Record>();
 
             //@Healpers.MemeRecord(Model, (string)ViewBag.check_id)
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            ViewBag.check_id = check_id;
-            Models.ApplicationUser user = null;
-            if (check_id != null)
-                user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+
+
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            ViewBag.check_id = user?.Id;
             switch (type)
             {
                 case 1:
                     if (id == null)
                         return new HttpStatusCodeResult(404);
-                    var user_page = db.Users.FirstOrDefault(x1 => x1.Id == id);
+                    var user_page = ApplicationUser.GetUser(id);
                     res.AddRange(user_page.GetWallRecords(start, count));
                     break;
 
@@ -936,18 +665,20 @@ namespace server_info_web_desk.Controllers
                     if (id == null)
                         return new HttpStatusCodeResult(404);
                     int int_id = Convert.ToInt32(id);
-                    var group_page = db.Groups.FirstOrDefault(x1 => x1.Id == int_id);
-                    res.AddRange(group_page.GetWallRecords(start, count));
+                    Group group = Group.GetGroup(int_id);
+                    if (group == null)
+                        return new HttpStatusCodeResult(404);
+                    res.AddRange(group.GetWallRecords(start, count));
                     break;
 
                 case 3:
                     
                     
-                    if (check_id==null)
+                    if (user?.Id == null)
                         return new HttpStatusCodeResult(404);
                     
-                    var user_page2 = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
-                    res.AddRange(user_page2.GetNewsRecords(start, count));
+                    //var user_page2 = db.Users.FirstOrDefault(x1 => x1.Id == user.Id);
+                    res.AddRange(user.GetNewsRecords(start, count));
 
                     
                     break;
@@ -960,7 +691,7 @@ namespace server_info_web_desk.Controllers
         [Authorize]
         public ActionResult LoadNewMessages(int dialog)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             string type_message_need = (string)Session["NewMessageType"];
 
             switch (type_message_need)
@@ -970,7 +701,7 @@ namespace server_info_web_desk.Controllers
                     break;
                 case "2":
                     //отправить колличество
-                    var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+                    ApplicationUser user = ApplicationUser.GetUser(check_id);
                     if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
                         db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
                     return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork",new { str=user.MessageNeedRead.Count.ToString() }));
@@ -984,66 +715,16 @@ namespace server_info_web_desk.Controllers
 
             return View();
 
-
-            //List<Message> res = new List<Message>();
-            //var user = db.Users.First(x1 => x1.Id == check_id);
-            ////if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-            ////    db.Entry(user).Collection(x1 => x1.Chats).Load();
-            ////var chat = user.Chats.FirstOrDefault(x1 => x1.Id == dialog);
-            ////if(chat==null)
-            ////    return new HttpStatusCodeResult(404);
-
-            //if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
-            //    db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
-            //res.AddRange(user.MessageNeedRead.Where(x1 =>
-            //{
-            //    if (!db.Entry(x1).Reference(x2 => x2.Chat).IsLoaded)
-            //        db.Entry(x1).Reference(x2 => x2.Chat).Load();
-            //    if (x1.Chat.Id == dialog)
-            //        return true;
-            //    return false;
-            //}));
-
-            ////вынести + написать представление которое должно стандартно отобразиться
-            //return PartialView("ListMessagesUser", new Chat() { Messages = res });//"SocialNetwork",
         }
         [Authorize]
         public JsonResult SendNewMessageForm(int dialog, HttpPostedFileBase[] uploadImage, string text)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            //TODO проверить доступ к диалогу
-            var user = db.Users.FirstOrDefault(x1=>x1.Id==check_id);
-            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                db.Entry(user).Collection(x1 => x1.Chats).Load();
-            var chat = user.Chats.FirstOrDefault(x1=>x1.Id==dialog);
-            if(chat==null)
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
                 return null;
+
             var list_img_byte = Get_photo_post(uploadImage);
-            
-            Message res = new Message() { Text=text, CreatorId = check_id, ChatId=dialog };
-
-            db.Messages.Add(res);
-            db.SaveChanges();
-
-            List<Image> image_list = new List<Models.SocialNetwork.Image>();
-            foreach (var i in list_img_byte)
-            {
-                //кратинки еще и в бд и тдтд
-
-                var img = new Image() { Data = i, UserId = check_id, MessageId = res.Id };
-                db.ImagesSocial.Add(img);
-                db.SaveChanges();
-                image_list.Add(img);
-
-            }
-            
-            if (!db.Entry(chat).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(chat).Collection(x1 => x1.Users).Load();
-            foreach (var i in chat.Users)
-                res.UserNeedRead.Add(i);
-            db.SaveChanges();
-
-            user.SendNewMessage(res);
+            var res=user.SendNewMessage(dialog, list_img_byte,text);
 
             return Json(new { dialog= dialog });
         }
@@ -1055,7 +736,7 @@ namespace server_info_web_desk.Controllers
         [Authorize]
         public ActionResult FollowGroupPartial(int IdGroup,bool? CanFollow)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             ViewBag.IdGroup = IdGroup;
             ViewBag.check_id = check_id;
 
@@ -1065,7 +746,7 @@ namespace server_info_web_desk.Controllers
         [Authorize]
         public ActionResult FollowUserPartial(string Iduser, bool? CanAddFriend)
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            string check_id = ApplicationUser.GetUserId();
             ViewBag.IdPage = Iduser;
             ViewBag.check_id = check_id;
 
@@ -1081,53 +762,10 @@ namespace server_info_web_desk.Controllers
             {
                 return new HttpStatusCodeResult(404);
             }
-                string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
-            Chat res = new Chat();
-            List<Message> not_res = new List<Message>();
-            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                db.Entry(user).Collection(x1 => x1.Chats).Load();
-            
-                var dialog = user.Chats.FirstOrDefault(x1 => x1.Id == id);
-                if (dialog == null)
-                    return new HttpStatusCodeResult(404);
-                res = new Chat() {Id=dialog.Id };
-            if (!db.Entry(dialog).Collection(x1 => x1.Messages).IsLoaded)
-                db.Entry(dialog).Collection(x1 => x1.Messages).Load();
-
-            //dialog.Messages= dialog.Messages.Reverse().ToList();
-            start = start > 0 ? start - 1 : 0;
-            start = dialog.Messages.Count - start - count;
-            not_res.AddRange(dialog.Messages.Skip(start).Take(count));
-            //if (new_m == true)
-            //{
-            //    ((List<Message>)res.Messages).RemoveRange(res.Messages.Where());
-            //}
-            foreach(var i in not_res)
-            {
-                if (!db.Entry(i).Collection(x1 => x1.UserNeedRead).IsLoaded)
-                    db.Entry(i).Collection(x1 => x1.UserNeedRead).Load();
-                var us = i.UserNeedRead.FirstOrDefault(x1=>x1.Id==check_id);
-                if (us != null)
-                {
-                    i.UserNeedRead.Remove(us);
-                }
-                if (new_m == true)
-                {
-                    if (us != null)
-                    {
-                        res.Messages.Add(i);
-                    }
-                }
-                else
-                    res.Messages.Add(i);
-            }
-            db.SaveChanges();
-
-            foreach(var i in res.Messages)
-            {
-                i.Creator.LoadDataForShort();
-            }
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+            var res=user.GetListMessages(id, new_m, start, count);
             return PartialView(res);
         }
 
@@ -1135,32 +773,16 @@ namespace server_info_web_desk.Controllers
         public ActionResult LoadShowImageRecord(int? id)
         {
             //TODO проверить доступ загрузить соседние id и тд
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            
-            if(id==null)
+            string check_id = ApplicationUser.GetUserId();
+
+            if (id==null)
                 return new HttpStatusCodeResult(404);
 
             ViewBag.check_id = check_id;
+            var img = db.ImagesSocial.FirstOrDefault(x1 => x1.Id == id);
+            img.GetRecordForShow();
 
-            var img = db.ImagesSocial.FirstOrDefault(x1=>x1.Id==id);
-            if (img.RecordId != null)
-            {
-                img.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == img.RecordId);
-                img.Record_NM.Image = img;
-                if (!db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
-                    db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).Load();
-            }
-            else
-            {
-                img.Record_NM = new Record();
-                img.Record_NM.Image = img;
-                if (!db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
-                    db.Entry(img.Record_NM).Collection(x1 => x1.UsersLikes).Load();
-            }
-            
-            //Image res = new Models.SocialNetwork.Image();
-
-
+           
             return PartialView(img.Record_NM);
         }
 
@@ -1178,7 +800,7 @@ namespace server_info_web_desk.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return new HttpStatusCodeResult(404);
             int int_id = Convert.ToInt32(id);
-            var group = db.Groups.FirstOrDefault(x1 => x1.Id == int_id);
+            Group group = Group.GetGroup(int_id);
             if (group == null)
                 return new HttpStatusCodeResult(404);
 
@@ -1198,9 +820,7 @@ namespace server_info_web_desk.Controllers
         [AllowAnonymous]
         public ActionResult LoadFriends(string id,int start, int count)
         {
-            if (string.IsNullOrWhiteSpace(id))
-                return new HttpStatusCodeResult(404);
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            ApplicationUser user = ApplicationUser.GetUser(id);
             if (user == null)
                 return new HttpStatusCodeResult(404);
 
@@ -1218,9 +838,7 @@ namespace server_info_web_desk.Controllers
         [AllowAnonymous]
         public ActionResult LoadFollowers(string id, int start, int count)
         {
-            if (string.IsNullOrWhiteSpace(id))
-                return new HttpStatusCodeResult(404);
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            ApplicationUser user = ApplicationUser.GetUser(id);
             if (user == null)
                 return new HttpStatusCodeResult(404);
 
@@ -1237,9 +855,7 @@ namespace server_info_web_desk.Controllers
         [AllowAnonymous]
         public ActionResult LoadFollowUser(string id, int start, int count)
         {
-            if (string.IsNullOrWhiteSpace(id))
-                return new HttpStatusCodeResult(404);
-            var user = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            ApplicationUser user = ApplicationUser.GetUser(id);
             if (user == null)
                 return new HttpStatusCodeResult(404);
 

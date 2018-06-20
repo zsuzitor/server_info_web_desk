@@ -48,6 +48,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         }
+
         public static List<Image> GetLastImageAlbum(Album a, int count)
         {
             List<Image> res = new List<Image>();
