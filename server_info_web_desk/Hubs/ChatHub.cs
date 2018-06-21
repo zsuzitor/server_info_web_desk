@@ -33,9 +33,11 @@ namespace server_info_web_desk.Hubs
         public void Send(int id_dialog)
         {
             //Clients.All.NeedDownloadChangesMessages(id_dialog);
-            string check_id = ApplicationUser.GetUserId();
-            ApplicationUser user = ApplicationUser.GetUser(check_id);
+            //string check_id = ApplicationUser.GetUserId();
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             //var user = db.Users.First(x1 => x1.Id == check_id);
+            if(user==null)
+                return;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<ApplicationUser>().Attach(user);
@@ -48,11 +50,11 @@ namespace server_info_web_desk.Hubs
                     db.Entry(chat).Collection(x1 => x1.Messages).Load();
                 var need_read_mess_im = chat.Messages.FirstOrDefault(x1 =>
                 {
-                    if (x1.CreatorId == check_id)
+                    if (x1.CreatorId == user.Id)
                     {
                         if (!db.Entry(x1).Collection(x2 => x2.UserNeedRead).IsLoaded)
                             db.Entry(x1).Collection(x2 => x2.UserNeedRead).Load();
-                        var us = x1.UserNeedRead.FirstOrDefault(x2 => x2.Id == check_id);
+                        var us = x1.UserNeedRead.FirstOrDefault(x2 => x2.Id == user.Id);
                         if (us != null)
                             return true;
                     }
@@ -68,25 +70,26 @@ namespace server_info_web_desk.Hubs
         }
         public void JoinToHub()
         {
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+            //string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
-            ApplicationUser user = null;
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
 
-                user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
-                db.Set<ApplicationUser>().Attach(user);
+                
+                
                 var id = Context.ConnectionId;
 
                 //db.Set<ApplicationUser>().Attach(user);
                 if (!Users.Any(x => x.ConnectionId == id))
                 {
-                    Users.Add(new UserForHub { ConnectionId = id, UserId = check_id });
+                    Users.Add(new UserForHub { ConnectionId = id, UserId = user?.Id });
 
 
                     //подключание к чатам\диалогам
                     if (user != null)
                     {
+                        db.Set<ApplicationUser>().Attach(user);
                         if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
                             db.Entry(user).Collection(x1 => x1.Chats).Load();
                         foreach (var i in user.Chats)

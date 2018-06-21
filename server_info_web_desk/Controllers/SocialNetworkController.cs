@@ -391,6 +391,7 @@ namespace server_info_web_desk.Controllers
             if (string.IsNullOrWhiteSpace(a.Name))
                 return new HttpStatusCodeResult(404);
             Group res = new Group() { Name=a.Name, MainAdminId=check_id };
+            ApplicationUser user = ApplicationUser.GetUser(check_id);
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Groups.Add(res);
@@ -409,7 +410,7 @@ namespace server_info_web_desk.Controllers
                     Description = "Сюда добавляются фотографии с вашей страницы",
                     GroupId = res.Id
                 });
-                ApplicationUser user = ApplicationUser.GetUser(check_id);
+                
                 db.Set<ApplicationUser>().Attach(user);
                 
                 res.Admins.Add(user);
@@ -431,12 +432,12 @@ namespace server_info_web_desk.Controllers
             Group group = Group.GetGroup(id);
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                db.Set<ApplicationUser>().Attach(user);
-                db.Set<Group>().Attach(group);
+               
                 if (group == null)
                     return new HttpStatusCodeResult(404);
                 res = group.CanFollow(user.Id);
-
+                db.Set<ApplicationUser>().Attach(user);
+                db.Set<Group>().Attach(group);
                 if (res == true)
                 {
                     group.Users.Add(user);
@@ -673,7 +674,7 @@ namespace server_info_web_desk.Controllers
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             if (user == null)
                 return new HttpStatusCodeResult(404);
-            //using (ApplicationDbContext db = new ApplicationDbContext())
+            
             
                 user.ChageUserData(a);
 
@@ -941,6 +942,7 @@ namespace server_info_web_desk.Controllers
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<ApplicationUser>().Attach(user);
+                
                 if (!db.Entry(user).Collection(x1 => x1.FollowUser).IsLoaded)
                     db.Entry(user).Collection(x1 => x1.FollowUser).Load();
             }

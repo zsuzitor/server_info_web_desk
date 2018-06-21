@@ -486,19 +486,26 @@ namespace server_info_web_desk.Models
                     {
                         if (us != null)
                         {
+                            if (!db.Entry(i).Reference(x1 => x1.Creator).IsLoaded)
+                                db.Entry(i).Reference(x1 => x1.Creator).Load();
                             res.Messages.Add(i);
                         }
                     }
                     else
+                    {
+                        if (!db.Entry(i).Reference(x1 => x1.Creator).IsLoaded)
+                            db.Entry(i).Reference(x1 => x1.Creator).Load();
                         res.Messages.Add(i);
+                    }
+                       
                 }
                 db.SaveChanges();
-
-                foreach (var i in res.Messages)
-                {
-                    i.Creator.LoadDataForShort();
-                }
             }
+            foreach (var i in res.Messages)
+                {
+                i.Creator.LoadDataForShort();
+                }
+           
             return res;
         }
 
