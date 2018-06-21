@@ -36,7 +36,7 @@ namespace server_info_web_desk.Controllers
         public ActionResult Index()
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var ff = db.Users.ToList();
+            
 
             return View();
         }
@@ -53,33 +53,36 @@ namespace server_info_web_desk.Controllers
                 return RedirectToAction("Login", "Account");
             IndexInfoView res = new IndexInfoView();
             Section first_sec = null;
-            try
-            {
-                //var first_sec_id = db.Sections.AsNoTracking().Where(x1 => x1.UserId == person_id).Min(x1 => x1.Id);
-                //first_sec = db.Sections.AsNoTracking().First(x1 => x1.Id == first_sec_id);
-                first_sec = db.Sections.Where(x1 => x1.UserId == person_id).First(x1=>x1.SectionParrentId == null);
-                if (person_id != check_id)
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            { 
+                try
                 {
-                    db.Entry(first_sec).Reference(x1 => x1.User).Load();
-                    if(!first_sec.User.Open_data_info)
-                        return new HttpStatusCodeResult(423);
-                }
-               
-            }
-            catch (Exception ex)
-            {
-                if (!(ex is ArgumentNullException) && !(ex is InvalidOperationException))
-                {
-                    throw ex;
-                }
+                    //var first_sec_id = db.Sections.AsNoTracking().Where(x1 => x1.UserId == person_id).Min(x1 => x1.Id);
+                    //first_sec = db.Sections.AsNoTracking().First(x1 => x1.Id == first_sec_id);
+                    first_sec = db.Sections.Where(x1 => x1.UserId == person_id).First(x1 => x1.SectionParrentId == null);
+                    if (person_id != check_id)
+                    {
+                        db.Entry(first_sec).Reference(x1 => x1.User).Load();
+                        if (!first_sec.User.Open_data_info)
+                            return new HttpStatusCodeResult(423);
+                    }
 
-               
+                }
+                catch (Exception ex)
+                {
+                    if (!(ex is ArgumentNullException) && !(ex is InvalidOperationException))
+                    {
+                        throw ex;
+                    }
+
+
                     ApplicationUser pers = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
-                    first_sec=new Section() { Head="ALL",User= pers };
+                    first_sec = new Section() { Head = "ALL", User = pers };
                     db.Sections.Add(first_sec);
                     db.SaveChanges();
-                
 
+
+                }
             }
             res.Sections.Add(first_sec);//главная секция должна быть первой в списке
             GetSectionInside(first_sec.Id, res.Sections, res.Articles);
@@ -99,12 +102,16 @@ namespace server_info_web_desk.Controllers
             if (string.IsNullOrWhiteSpace(id.ToString()))
                 return Json(false, JsonRequestBehavior.AllowGet);
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            Article res = db.Articles.FirstOrDefault(x1 => x1.Id == id);
-            if (res.UserId != check_id)
+            Article res = null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                db.Entry(res).Reference(x1 => x1.User).Load();
-                if(!res.User.Open_data_info)
-                    return Json(false, JsonRequestBehavior.AllowGet);
+                 res = db.Articles.FirstOrDefault(x1 => x1.Id == id);
+                if (res.UserId != check_id)
+                {
+                    db.Entry(res).Reference(x1 => x1.User).Load();
+                    if (!res.User.Open_data_info)
+                        return Json(false, JsonRequestBehavior.AllowGet);
+                }
             }
             
             return Json(new Article(res, true), JsonRequestBehavior.AllowGet);
@@ -118,23 +125,25 @@ namespace server_info_web_desk.Controllers
                 return Json(false, JsonRequestBehavior.AllowGet);
             //TODO проверить есть ли доступ
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-
-
-            var section = db.Sections.FirstOrDefault(x1 => x1.Id == id);//AsNoTracking()
-            if(section==null)
-                return Json(false, JsonRequestBehavior.AllowGet);
-            db.Entry(section).Reference(x1 => x1.User).Load();
-            if (!section.User.Open_data_info&& section.User.Id != check_id)
+            Section section = null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                
-                return Json(false, JsonRequestBehavior.AllowGet);
+                 section = db.Sections.FirstOrDefault(x1 => x1.Id == id);//AsNoTracking()
+                if (section == null)
+                    return Json(false, JsonRequestBehavior.AllowGet);
+                db.Entry(section).Reference(x1 => x1.User).Load();
+                if (!section.User.Open_data_info && section.User.Id != check_id)
+                {
+
+                    return Json(false, JsonRequestBehavior.AllowGet);
+                }
+                db.Entry(section).Collection(x1 => x1.Sections).Load();
+                db.Entry(section).Collection(x1 => x1.Articles).Load();
+                section = new Section(section) { User = null, SectionParrentId = null };
+                section.Articles = section.Articles.Select(x1 => x1 = new Article() { Id = x1.Id, Head = x1.Head, Body = null, SectionParrentId = x1.SectionParrentId }).ToList();
+                section.Sections = section.Sections.Select(x1 => x1 = new Section() { Id = x1.Id, Head = x1.Head, SectionParrentId = x1.SectionParrentId }).ToList();
+                //return JsonConvert.SerializeObject(section);
             }
-            db.Entry(section).Collection(x1=>x1.Sections).Load();
-            db.Entry(section).Collection(x1=>x1.Articles).Load();
-            section = new Section(section) { User = null, SectionParrentId = null };
-            section.Articles=section.Articles.Select(x1=>x1=new Article() { Id=x1.Id, Head=x1.Head, Body=null, SectionParrentId = x1.SectionParrentId }).ToList();
-            section.Sections=section.Sections.Select(x1 => x1 = new Section() { Id = x1.Id, Head = x1.Head, SectionParrentId = x1.SectionParrentId }).ToList();
-            //return JsonConvert.SerializeObject(section);
             return Json(section, JsonRequestBehavior.AllowGet);
             /*
              function OnSuccess(data) {
@@ -164,12 +173,14 @@ namespace server_info_web_desk.Controllers
                 //return new HttpStatusCodeResult(423);//Locked
                 return Json(false, JsonRequestBehavior.AllowGet);
             }
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
 
-            db.Sections.Add(a);
-            a.SectionParrentId = parrent_sec.Id;
-            a.UserId = check_id;
-            db.SaveChanges();
-            
+                db.Sections.Add(a);
+                a.SectionParrentId = parrent_sec.Id;
+                a.UserId = check_id;
+                db.SaveChanges();
+            }
             //parrent_sec.Sections.Add(a);
             
            // parrent_sec.User.Sections.Add(a);
@@ -200,11 +211,12 @@ namespace server_info_web_desk.Controllers
             a.SectionParrentId = (int)parrent_sec_id;
             a.UserId = check_id;
 
-           
-            
-            db.Articles.Add(a);
-            db.SaveChanges();
 
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Articles.Add(a);
+                db.SaveChanges();
+            }
 
             return Json(new Article(a,true) , JsonRequestBehavior.AllowGet);
         }
@@ -217,18 +229,21 @@ namespace server_info_web_desk.Controllers
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             //bool success = true;
             
-            Section section = db.Sections.FirstOrDefault(x1 => x1.Id == a.Id&&x1.UserId== check_id);
-            //db.Entry(section).Reference(x1 => x1.Section_parrent).Load();
-            //CheckAccessSection(check_id, section.Section_parrent.Id, out success);
-            if (section==null)
+            Section section =null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                //TODO обработать ошибку
-                //return new HttpStatusCodeResult(423);//Locked
-                return Json(false, JsonRequestBehavior.AllowGet);
+                section = db.Sections.FirstOrDefault(x1 => x1.Id == a.Id && x1.UserId == check_id);
+                //db.Entry(section).Reference(x1 => x1.Section_parrent).Load();
+                //CheckAccessSection(check_id, section.Section_parrent.Id, out success);
+                if (section == null)
+                {
+                    //TODO обработать ошибку
+                    //return new HttpStatusCodeResult(423);//Locked
+                    return Json(false, JsonRequestBehavior.AllowGet);
+                }
+                section.Head = a.Head;
+                db.SaveChanges();
             }
-            section.Head = a.Head;
-            db.SaveChanges();
-
             return Json(new Section(section,true) , JsonRequestBehavior.AllowGet);
         }
 
@@ -239,20 +254,22 @@ namespace server_info_web_desk.Controllers
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
             //bool success = true;
-
-            Article article = db.Articles.FirstOrDefault(x1 => x1.Id == a.Id&&x1.UserId==check_id);
-            //db.Entry(article).Reference(x1 => x1.Section_parrent).Load();
-            //CheckAccessSection(check_id, article.Section_parrent.Id, out success);
-            if (article == null)
+            Article article = null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                //TODO обработать ошибку
-                //return new HttpStatusCodeResult(423);//Locked
-                return Json(false, JsonRequestBehavior.AllowGet);
+                 article = db.Articles.FirstOrDefault(x1 => x1.Id == a.Id && x1.UserId == check_id);
+                //db.Entry(article).Reference(x1 => x1.Section_parrent).Load();
+                //CheckAccessSection(check_id, article.Section_parrent.Id, out success);
+                if (article == null)
+                {
+                    //TODO обработать ошибку
+                    //return new HttpStatusCodeResult(423);//Locked
+                    return Json(false, JsonRequestBehavior.AllowGet);
+                }
+                article.Head = a.Head;
+                article.Body = a.Body;
+                db.SaveChanges();
             }
-            article.Head = a.Head;
-            article.Body= a.Body;
-            db.SaveChanges();
-
 
 
             return Json(new Article(article,true), JsonRequestBehavior.AllowGet);
@@ -263,30 +280,33 @@ namespace server_info_web_desk.Controllers
         [HttpPost]
         public JsonResult Delete_section(int? id)
         {
-            var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var sec = db.Sections.FirstOrDefault(x1 => x1.Id == id && x1.UserId == check_id);
-            if(sec==null)
-                return Json(false);
-            List<int> sec_list = new List<int>();
-            //List<int> art_list = new List<int>();
-            if (sec.SectionParrentId != null)
-                sec_list.Add(sec.Id);
-            else
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                var lst = db.Articles.Where(x1 => x1.SectionParrentId == sec.Id).ToList();
-                if(lst.Count>0)
-                db.Articles.RemoveRange(lst);
-            }
-            Get_inside_id((int)id, sec_list, null);
-            var section_for_delete = db.Sections.Join(sec_list, p => p.Id, c => c, (p, c) => p);
-            int? parrent_id = sec.SectionParrentId;
-            db.Sections.RemoveRange(section_for_delete);
-            db.SaveChanges();
+                var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
+                var sec = db.Sections.FirstOrDefault(x1 => x1.Id == id && x1.UserId == check_id);
+                if (sec == null)
+                    return Json(false);
+                List<int> sec_list = new List<int>();
+                //List<int> art_list = new List<int>();
+                if (sec.SectionParrentId != null)
+                    sec_list.Add(sec.Id);
+                else
+                {
+                    var lst = db.Articles.Where(x1 => x1.SectionParrentId == sec.Id).ToList();
+                    if (lst.Count > 0)
+                        db.Articles.RemoveRange(lst);
+                }
+                Get_inside_id((int)id, sec_list, null);
+                var section_for_delete = db.Sections.Join(sec_list, p => p.Id, c => c, (p, c) => p);
+                int? parrent_id = sec.SectionParrentId;
+                db.Sections.RemoveRange(section_for_delete);
+                db.SaveChanges();
 
-            //var gg = db.Articles.ToList();
-            //var gg2 = db.Sections.ToList();
-            //return Json("inside_"+id);
-            return Json(new {main_id=id,parrent_id_main= parrent_id, sec_list= sec_list });
+                //var gg = db.Articles.ToList();
+                //var gg2 = db.Sections.ToList();
+                //return Json("inside_"+id);
+                return Json(new { main_id = id, parrent_id_main = parrent_id, sec_list = sec_list });
+            }
         }
 
         //TODO
@@ -295,12 +315,14 @@ namespace server_info_web_desk.Controllers
         public JsonResult Delete_article(int? id)
         {
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var art = db.Articles.FirstOrDefault(x1 => x1.Id == id && x1.UserId == check_id);
-            if (art == null)
-                return Json(false);
-            db.Articles.Remove(art);
-            db.SaveChanges();
-
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                var art = db.Articles.FirstOrDefault(x1 => x1.Id == id && x1.UserId == check_id);
+                if (art == null)
+                    return Json(false);
+                db.Articles.Remove(art);
+                db.SaveChanges();
+            }
 
             return Json(id);
         }
@@ -356,7 +378,9 @@ namespace server_info_web_desk.Controllers
             }
             if (check_id != user_id)
             {
-                bool? sc = db.Users.FirstOrDefault(x1 => x1.Id == user_id)?.Open_data_info;
+                bool? sc = false;
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                    sc = db.Users.FirstOrDefault(x1 => x1.Id == user_id)?.Open_data_info;
                 if(sc!=true)
                     return Json(false);
             }
@@ -364,70 +388,34 @@ namespace server_info_web_desk.Controllers
 
 
             var mass_words = src.Split(' ');
-            var art = db.Articles.AsNoTracking().Where(x1 => x1.UserId == user_id).ToList();
-            //Dictionary<int, double> Mark = new Dictionary<int, double>();
-
-            List<int> atr_list_id = new List<int>();
-            if (id_for_search != null)
-            {
-                //Get_inside_id
-                //добавить список вложенных статей к результату для отрисовки на клиенте доп поля
-                Get_inside_id((int)id_for_search, null, atr_list_id);
-            }
-
             List<dynamic> Mark = new List<dynamic>();
-            foreach (var i in art)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                int tmp=atr_list_id.FirstOrDefault(x1 => x1 == i.Id);
-                Mark.Add(new { Id = i.Id, Mark = GetMarkArticle(i, mass_words),
-                    Head = i.Head, inside = tmp == 0 ? false : true
-                });
+                var art = db.Articles.AsNoTracking().Where(x1 => x1.UserId == user_id).ToList();
+                //Dictionary<int, double> Mark = new Dictionary<int, double>();
 
+                List<int> atr_list_id = new List<int>();
+                if (id_for_search != null)
+                {
+                    //Get_inside_id
+                    //добавить список вложенных статей к результату для отрисовки на клиенте доп поля
+                    Get_inside_id((int)id_for_search, null, atr_list_id);
+                }
+
+                
+                foreach (var i in art)
+                {
+                    int tmp = atr_list_id.FirstOrDefault(x1 => x1 == i.Id);
+                    Mark.Add(new
+                    {
+                        Id = i.Id,
+                        Mark = GetMarkArticle(i, mass_words),
+                        Head = i.Head,
+                        inside = tmp == 0 ? false : true
+                    });
+
+                }
             }
-           
-
-            //var main_mass_obj_articles =[];
-            //var not_main_mass_obj_articles =[];
-            //List<List<string>> mass_bracket =new List<List<string>>();
-            //List<List<string>> mass_plus =new List<List<string>>();
-            //List<string> mass_tag =new List<string>();
-            //for (var i = 0; i < mass_words.Count(); ++i)
-            //{
-            //    if (mass_words[i] == "+")
-            //    {
-            //        List<string> tmp_mass =new List<string>();
-            //        tmp_mass.Add(mass_words[i - 1]);
-            //        tmp_mass.Add(mass_words[++i]);
-            //        while (++i < mass_words.Count() && mass_words[i] == "+")
-            //        {
-            //            tmp_mass.Add(mass_words[++i]);
-            //        }
-
-            //        mass_plus.Add(tmp_mass);
-
-
-            //    }
-            //    if (mass_words[i] == "(")
-            //    {
-            //        List<string> tmp_mass =new List<string>();
-            //        tmp_mass.Add(mass_words[++i]);
-            //        while (++i < mass_words.Count() && mass_words[i] != ")")
-            //        {
-            //            tmp_mass.Add(mass_words[i]);
-            //        }
-
-            //        mass_bracket.Add(tmp_mass);
-            //    }
-            //    if (mass_words[i] == "#")
-            //    {
-            //        mass_tag.Add("#" + mass_words[++i]);
-            //    }
-            //}
-
-
-
-
-
 
 
 
@@ -452,17 +440,19 @@ namespace server_info_web_desk.Controllers
             var check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
             AllData res = new AllData();
-            
-            res.Articles.AddRange(db.Articles.Where(x1 => x1.UserId == check_id).ToList().Select(x1 => new Article(x1, true) { UserId = null }));
-            res.Sections.AddRange(db.Sections.Where(x1 => x1.UserId == check_id).ToList().Select(x1 => new Section(x1, true) { UserId=null }));
-            foreach(var i in res.Articles)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                try
+                res.Articles.AddRange(db.Articles.Where(x1 => x1.UserId == check_id).ToList().Select(x1 => new Article(x1, true) { UserId = null }));
+                res.Sections.AddRange(db.Sections.Where(x1 => x1.UserId == check_id).ToList().Select(x1 => new Section(x1, true) { UserId = null }));
+                foreach (var i in res.Articles)
                 {
-                    res.Images.AddRange(db.ImagesInfo.Where(x1 => x1.Article_parrentId == i.Id).ToList().Select(x1 => new ImageInfo(x1, true)));
+                    try
+                    {
+                        res.Images.AddRange(db.ImagesInfo.Where(x1 => x1.Article_parrentId == i.Id).ToList().Select(x1 => new ImageInfo(x1, true)));
+                    }
+                    catch { }
+
                 }
-                catch { }
-               
             }
 
             return Json(res);
@@ -498,115 +488,117 @@ namespace server_info_web_desk.Controllers
             //идти по файлу и сравнивать с бд менять
             //если в файле есть блок которого нет в бд то добавлять
 
-
-            var lst_sec = db.Sections.Where(x1 => x1.UserId == check_id).ToList();
-            foreach(var i in lst_sec)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                var tmp_sec=data.Sections.FirstOrDefault(x1 => x1.Id == i.Id);
-                if (tmp_sec == null)
-                    db.Sections.Remove(i);
-                else
+                var lst_sec = db.Sections.Where(x1 => x1.UserId == check_id).ToList();
+                foreach (var i in lst_sec)
                 {
-                    if (!i.Head.Equals(tmp_sec.Head))
+                    var tmp_sec = data.Sections.FirstOrDefault(x1 => x1.Id == i.Id);
+                    if (tmp_sec == null)
+                        db.Sections.Remove(i);
+                    else
                     {
-                        tmp_sec.Head = tmp_sec.Head;
+                        if (!i.Head.Equals(tmp_sec.Head))
+                        {
+                            tmp_sec.Head = tmp_sec.Head;
+                        }
+                        i.Order = tmp_sec.Order;
+                        bool owner_sec = true;
+                        if (i.SectionParrentId != tmp_sec.SectionParrentId)
+                        {
+                            CheckAccessSection(check_id, tmp_sec.SectionParrentId, out owner_sec);
+                        }
+                        if (owner_sec)
+                            i.SectionParrentId = tmp_sec.SectionParrentId;
+                        data.Sections.Remove(tmp_sec);
                     }
-                    i.Order = tmp_sec.Order;
-                    bool owner_sec=true;
-                    if (i.SectionParrentId != tmp_sec.SectionParrentId)
-                    {
-                        CheckAccessSection(check_id, tmp_sec.SectionParrentId, out owner_sec);
-                    }
-                    if (owner_sec)
-                        i.SectionParrentId = tmp_sec.SectionParrentId;
-                    data.Sections.Remove(tmp_sec);
                 }
-            }
-            foreach (var i in data.Sections)
-            {
-                bool owner_sec = true;
-                //тут мб при ошибке проставлять Section_parrentId id главной секции?
-                CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
-                    if (i.SectionParrentId == null|| owner_sec)
+                foreach (var i in data.Sections)
+                {
+                    bool owner_sec = true;
+                    //тут мб при ошибке проставлять Section_parrentId id главной секции?
+                    CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
+                    if (i.SectionParrentId == null || owner_sec)
                     {
                         i.Id = 0;
                         i.UserId = check_id;
                         db.Sections.Add(i);
                     }
-                
-            }
-            var lst_art = db.Articles.Where(x1 => x1.UserId == check_id).ToList();
-            foreach (var i in lst_art)
-            {
-                var tmp_art = data.Articles.FirstOrDefault(x1 => x1.Id == i.Id);
-                if (tmp_art == null)
-                    db.Articles.Remove(i);
-                else
-                {
-                    if (!i.Head.Equals(tmp_art.Head))
-                    {
-                        tmp_art.Head = tmp_art.Head;
-                    }
-                    if (!i.Body.Equals(tmp_art.Body))
-                    {
-                        tmp_art.Body = tmp_art.Body;
-                    }
-                    i.Order = tmp_art.Order;
-                    bool owner_sec = true;
-                    if (i.SectionParrentId != tmp_art.SectionParrentId)
-                    {
-                        CheckAccessSection(check_id, tmp_art.SectionParrentId, out owner_sec);
-                    }
-                    if (owner_sec)
-                        i.SectionParrentId = tmp_art.SectionParrentId;
-                    data.Articles.Remove(tmp_art);
-                }
-            }
-            foreach (var i in data.Articles)
-            {
-                //i.Section_parrentId ==0   НЕ УВЕРЕН ЧТО НУЖНО не знаю как json парсит null для типов INT //i.Section_parrentId ==0||
-                bool owner_sec = true;
-                //тут мб при ошибке проставлять Section_parrentId id главной секции?
-                CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
-                if (owner_sec)
-                {
-                    
-                    i.Id = 0;
-                    i.UserId = check_id;
-                    db.Articles.Add(i);
-                }
-            }
-            var lst_img = db.ImagesInfo.Where(x1 => x1.UserId == check_id).ToList();
-            foreach (var i in lst_img)
-            {
-                var tmp_img = data.Images.FirstOrDefault(x1 => x1.Id == i.Id);
-                if (tmp_img == null)
-                    db.ImagesInfo.Remove(i);
-                else
-                {
-                    
-                    i.Data = tmp_img.Data;
-                    bool owner_sec = true;
-                    if (i.Article_parrentId != tmp_img.Article_parrentId)
-                    {
-                        CheckAccessSection(check_id, db.Articles.FirstOrDefault(x1=>x1.Id== tmp_img.Article_parrentId)?.SectionParrentId, out owner_sec);
-                    }
-                    if (owner_sec)
-                        i.Article_parrentId = tmp_img.Article_parrentId;
-                    data.Images.Remove(tmp_img);
-                }
-            }
-            foreach (var i in data.Images)
-            {
-                if (i.Article_parrentId == null || db.Articles.FirstOrDefault(x1 => x1.Id == i.Article_parrentId && x1.UserId == check_id) != null)
-                {
-                    i.Id = 0;
-                    i.UserId = check_id;
-                    db.ImagesInfo.Add(i);
-                }
-            }
 
-            db.SaveChanges();
+                }
+                var lst_art = db.Articles.Where(x1 => x1.UserId == check_id).ToList();
+                foreach (var i in lst_art)
+                {
+                    var tmp_art = data.Articles.FirstOrDefault(x1 => x1.Id == i.Id);
+                    if (tmp_art == null)
+                        db.Articles.Remove(i);
+                    else
+                    {
+                        if (!i.Head.Equals(tmp_art.Head))
+                        {
+                            tmp_art.Head = tmp_art.Head;
+                        }
+                        if (!i.Body.Equals(tmp_art.Body))
+                        {
+                            tmp_art.Body = tmp_art.Body;
+                        }
+                        i.Order = tmp_art.Order;
+                        bool owner_sec = true;
+                        if (i.SectionParrentId != tmp_art.SectionParrentId)
+                        {
+                            CheckAccessSection(check_id, tmp_art.SectionParrentId, out owner_sec);
+                        }
+                        if (owner_sec)
+                            i.SectionParrentId = tmp_art.SectionParrentId;
+                        data.Articles.Remove(tmp_art);
+                    }
+                }
+                foreach (var i in data.Articles)
+                {
+                    //i.Section_parrentId ==0   НЕ УВЕРЕН ЧТО НУЖНО не знаю как json парсит null для типов INT //i.Section_parrentId ==0||
+                    bool owner_sec = true;
+                    //тут мб при ошибке проставлять Section_parrentId id главной секции?
+                    CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
+                    if (owner_sec)
+                    {
+
+                        i.Id = 0;
+                        i.UserId = check_id;
+                        db.Articles.Add(i);
+                    }
+                }
+                var lst_img = db.ImagesInfo.Where(x1 => x1.UserId == check_id).ToList();
+                foreach (var i in lst_img)
+                {
+                    var tmp_img = data.Images.FirstOrDefault(x1 => x1.Id == i.Id);
+                    if (tmp_img == null)
+                        db.ImagesInfo.Remove(i);
+                    else
+                    {
+
+                        i.Data = tmp_img.Data;
+                        bool owner_sec = true;
+                        if (i.Article_parrentId != tmp_img.Article_parrentId)
+                        {
+                            CheckAccessSection(check_id, db.Articles.FirstOrDefault(x1 => x1.Id == tmp_img.Article_parrentId)?.SectionParrentId, out owner_sec);
+                        }
+                        if (owner_sec)
+                            i.Article_parrentId = tmp_img.Article_parrentId;
+                        data.Images.Remove(tmp_img);
+                    }
+                }
+                foreach (var i in data.Images)
+                {
+                    if (i.Article_parrentId == null || db.Articles.FirstOrDefault(x1 => x1.Id == i.Article_parrentId && x1.UserId == check_id) != null)
+                    {
+                        i.Id = 0;
+                        i.UserId = check_id;
+                        db.ImagesInfo.Add(i);
+                    }
+                }
+
+                db.SaveChanges();
+            }
             return Json(true);
         }
 

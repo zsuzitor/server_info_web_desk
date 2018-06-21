@@ -18,10 +18,12 @@ namespace server_info_web_desk.Models.functions
             //ListData res = null;
             if (section == null)
                 section = new List<Section>();
-            section.AddRange( db.Sections.AsNoTracking().Where(x1 => x1.SectionParrentId == id_section));
-            //article.AddRange(db.Articles.AsNoTracking().Where(x1 => x1.Section_parrentId == id_section).Select(x1=>new{ Id=x1.Id, Head=x1.Head }).ToList().Select(x1=>new Article() { Id = x1.Id, Head = x1.Head }));
-            article.AddRange(db.Articles.AsNoTracking().Where(x1 => x1.SectionParrentId == id_section).ToList().Select(x1=> new Article() { Id=x1.Id, Head=x1.Head }).ToList());
-
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                section.AddRange(db.Sections.AsNoTracking().Where(x1 => x1.SectionParrentId == id_section));
+                //article.AddRange(db.Articles.AsNoTracking().Where(x1 => x1.Section_parrentId == id_section).Select(x1=>new{ Id=x1.Id, Head=x1.Head }).ToList().Select(x1=>new Article() { Id = x1.Id, Head = x1.Head }));
+                article.AddRange(db.Articles.AsNoTracking().Where(x1 => x1.SectionParrentId == id_section).ToList().Select(x1 => new Article() { Id = x1.Id, Head = x1.Head }).ToList());
+            }
 
             return true;
         }
@@ -29,18 +31,21 @@ namespace server_info_web_desk.Models.functions
         //ВСЕ вложенные
         public static void Get_inside_id(int id,List<int>sections_id, List<int> articles_id)
         {
-            var sec_list=db.Sections.Where(x1 => x1.SectionParrentId == id).Select(x1=>x1.Id).ToList();
-            if (articles_id != null)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                var art_list = db.Articles.Where(x1 => x1.SectionParrentId == id).Select(x1=>x1.Id).ToList();
-                articles_id.AddRange(art_list);
-            }
-            if (sections_id == null)
-                sections_id = new List<int>();
-            sections_id.AddRange(sec_list);
-            foreach (var i in sec_list)
-            {
-                Get_inside_id(i,  sections_id,  articles_id);
+                var sec_list = db.Sections.Where(x1 => x1.SectionParrentId == id).Select(x1 => x1.Id).ToList();
+                if (articles_id != null)
+                {
+                    var art_list = db.Articles.Where(x1 => x1.SectionParrentId == id).Select(x1 => x1.Id).ToList();
+                    articles_id.AddRange(art_list);
+                }
+                if (sections_id == null)
+                    sections_id = new List<int>();
+                sections_id.AddRange(sec_list);
+                foreach (var i in sec_list)
+                {
+                    Get_inside_id(i, sections_id, articles_id);
+                }
             }
             return;
         }
@@ -57,7 +62,9 @@ namespace server_info_web_desk.Models.functions
             {
                 return null;
             }
-            sec = db.Sections.FirstOrDefault(x1 => x1.Id == section_id);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            
+                sec = db.Sections.FirstOrDefault(x1 => x1.Id == section_id);
             if (sec == null)
             {
                 return null;

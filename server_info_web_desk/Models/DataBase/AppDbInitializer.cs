@@ -29,22 +29,23 @@ namespace server_info_web_desk.Models.DataBase
             var admin = new ApplicationUser { Email = "admin@mail.ru", UserName = "admin@mail.ru", Name="zsuz",Surname="zsuzSUR",Birthday=DateTime.Now };
             string password = "Admin1!";
             var result = userManager.Create(admin, password);
-
-            server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album()
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                Name = "Main",
-                Description = "Сюда добавляются главные фотографии с вашей страницы",
-                //User = admin
-                UserId = admin.Id
-            });
-            server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album()
-            {
-                Name = "NotMain",
-                Description = "Сюда добавляются фотографии с вашей страницы",
-                UserId = admin.Id
-            });
-            server_info_web_desk.Models.DataBase.DataBase.db.SaveChanges();
-
+                db.Albums.Add(new Models.SocialNetwork.Album()
+                {
+                    Name = "Main",
+                    Description = "Сюда добавляются главные фотографии с вашей страницы",
+                    //User = admin
+                    UserId = admin.Id
+                });
+                db.Albums.Add(new Models.SocialNetwork.Album()
+                {
+                    Name = "NotMain",
+                    Description = "Сюда добавляются фотографии с вашей страницы",
+                    UserId = admin.Id
+                });
+                db.SaveChanges();
+            }
             // если создание пользователя прошло успешно
             if (result.Succeeded)
             {

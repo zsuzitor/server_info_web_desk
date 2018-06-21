@@ -72,10 +72,14 @@ namespace server_info_web_desk.Models.SocialNetwork
             
             if (this.RecordId != null)
             {
-                this.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == this.RecordId);
-                this.Record_NM.Image = this;
-                if (!db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
-                    db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    db.Set<Image>().Attach(this);
+                    this.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == this.RecordId);
+                    this.Record_NM.Image = this;
+                    if (!db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
+                        db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).Load();
+                }
             }
             else
             {

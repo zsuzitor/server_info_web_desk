@@ -41,25 +41,29 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
         public ChatShort GetChatShort()
         {
-            var res = new ChatShort() { Id = this.Id, Image = this.Image, Name = this.Name };
-            if (!db.Entry(this).Collection(x2 => x2.Messages).IsLoaded)
-                db.Entry(this).Collection(x2 => x2.Messages).Load();
-            var last_message = this.Messages.LastOrDefault();
-            if (last_message == null)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                res.User = null;
-                res.Text = null;
-            }
-            else
-            {
-                if (!db.Entry(last_message).Reference(x2 => x2.Creator).IsLoaded)
-                    db.Entry(last_message).Reference(x2 => x2.Creator).Load();
-                res.User = new Models.ApplicationUserShort(last_message?.Creator);
-                res.Text = last_message.Text;
-            }
+                var res = new ChatShort() { Id = this.Id, Image = this.Image, Name = this.Name };
+                db.Set<Chat>().Attach(this);
+                if (!db.Entry(this).Collection(x2 => x2.Messages).IsLoaded)
+                    db.Entry(this).Collection(x2 => x2.Messages).Load();
+                var last_message = this.Messages.LastOrDefault();
+                if (last_message == null)
+                {
+                    res.User = null;
+                    res.Text = null;
+                }
+                else
+                {
+                    if (!db.Entry(last_message).Reference(x2 => x2.Creator).IsLoaded)
+                        db.Entry(last_message).Reference(x2 => x2.Creator).Load();
+                    res.User = new Models.ApplicationUserShort(last_message?.Creator);
+                    res.Text = last_message.Text;
+                }
 
-
+           
             return res;
+            }
         }
         }
 

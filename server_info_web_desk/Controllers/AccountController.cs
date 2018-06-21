@@ -170,21 +170,26 @@ namespace server_info_web_desk.Controllers
 
                     await UserManager.AddToRoleAsync(user.Id, "user");
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
-
-                    server_info_web_desk.Models.DataBase.DataBase.db.Sections.Add(new server_info_web_desk.Models.Info.Section() { Head = "ALL", UserId = user.Id });
-                    
-
-                    server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album() { Name="Main",
-                        Description ="Сюда добавляются главные фотографии с вашей страницы",
-                        UserId = user.Id
-                    });
-                    server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album()
+                    using (ApplicationDbContext db = new ApplicationDbContext())
                     {
-                        Name = "NotMain",
-                        Description = "Сюда добавляются фотографии с вашей страницы",
-                        UserId = user.Id
-                    });
-                    server_info_web_desk.Models.DataBase.DataBase.db.SaveChanges();
+                        db.Sections.Add(new server_info_web_desk.Models.Info.Section() { Head = "ALL", UserId = user.Id });
+
+
+                       db.Albums.Add(new Models.SocialNetwork.Album()
+                        {
+                            Name = "Main",
+                            Description = "Сюда добавляются главные фотографии с вашей страницы",
+                            UserId = user.Id
+                        });
+                        db.Albums.Add(new Models.SocialNetwork.Album()
+                        {
+                            Name = "NotMain",
+                            Description = "Сюда добавляются фотографии с вашей страницы",
+                            UserId = user.Id
+                        });
+                        db.SaveChanges();
+                    }
+                        
 
 
                     return RedirectToAction("Index", "Home");

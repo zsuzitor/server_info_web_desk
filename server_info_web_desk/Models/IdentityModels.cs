@@ -155,7 +155,11 @@ namespace server_info_web_desk.Models
             ApplicationUser res = null;
             if (string.IsNullOrWhiteSpace(id))
                 return res;
-             res = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                res = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            }
+                
             return res;
         }
 
@@ -167,8 +171,14 @@ namespace server_info_web_desk.Models
                 return null;
             else
             {
-                if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Chats).Load();
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    db.Set<ApplicationUser>().Attach(this);
+                    if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
+                        db.Entry(this).Collection(x1 => x1.Chats).Load();
+                }
+                    
+                
                 var dialog = this.Chats.FirstOrDefault(x1 => x1.Id == id_chat);
               
                 return dialog;
@@ -179,15 +189,19 @@ namespace server_info_web_desk.Models
         {
             if (id_user == null)
                 return null;
-            if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Chats).Load();
-
-            foreach(var i in this.Chats)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(i).Collection(x2 => x2.Users).IsLoaded)
-                    db.Entry(i).Collection(x2 => x2.Users).Load();
-                if (i.Users.FirstOrDefault(x2 => x2.Id == id_user) != null && i.Users.Count == 2)
-                    return i;
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Chats).Load();
+
+                foreach (var i in this.Chats)
+                {
+                    if (!db.Entry(i).Collection(x2 => x2.Users).IsLoaded)
+                        db.Entry(i).Collection(x2 => x2.Users).Load();
+                    if (i.Users.FirstOrDefault(x2 => x2.Id == id_user) != null && i.Users.Count == 2)
+                        return i;
+                }
             }
             return null;
         }
@@ -218,7 +232,11 @@ namespace server_info_web_desk.Models
         //редактирует и сохраняем данные пользователя
         public bool ChageUserData(ApplicationUser a)
         {
-            if (!string.IsNullOrWhiteSpace(a.Name))
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(a);
+
+                if (!string.IsNullOrWhiteSpace(a.Name))
                 this.Name = a.Name;
             if (!string.IsNullOrWhiteSpace(a.Surname))
                 this.Surname = a.Surname;
@@ -233,8 +251,9 @@ namespace server_info_web_desk.Models
             this.WallOpenWrite = a.WallOpenWrite;
             this.PrivatePage = a.PrivatePage;
             this.Open_data_info = a.Open_data_info;
-            db.SaveChanges();
-
+            
+                db.SaveChanges();
+            }
             return true;
 
         }
@@ -243,36 +262,52 @@ namespace server_info_web_desk.Models
         //добавить запись на стену пользователя
         public void AddRecordWall(Record record)
         {
-            if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Friends).Load();
-            if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Followers).Load();
-            if (!db.Entry(this).Collection(x1 => x1.News).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.News).Load();
-            this.News.Add(record);
-            //user.WallRecord.Add(record);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                db.Set<Record>().Attach(record);
+                if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Friends).Load();
+                if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Followers).Load();
+                if (!db.Entry(this).Collection(x1 => x1.News).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.News).Load();
+                this.News.Add(record);
+                //user.WallRecord.Add(record);
 
 
-            ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Friends);
-            ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Followers);
-
-
-            db.SaveChanges();
+                ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Friends);
+                ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Followers);
+                
+                db.SaveChanges();
+            }
         }
 
         //добавить запись в новости пользователя
         public void AddRecordNews( Record record)
         {
-            this.News.Add(record);
-            db.SaveChanges();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                db.Set<Record>().Attach(record);
+                this.News.Add(record);
+                
+                db.SaveChanges();
+            }
         }
 
         //вернуть список усеченных гурупп пользователя
         public  List<GroupShort> UserGroupToShort( int? start, int count)
         {
             List<GroupShort> res = new List<GroupShort>();
-            if (!db.Entry(this).Collection(x1 => x1.Group).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Group).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Group).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Group).Load();
+            }
+            
+                
 
             res.AddRange(this.Group.Select(x1 => x1.GetGroupShort()));
             
@@ -281,8 +316,14 @@ namespace server_info_web_desk.Models
         //получить список записей на стене
         public List<Record> GetWallRecords(int start, int count)
         {
-            if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.WallRecord).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.WallRecord).Load();
+            }
+            
+               
            
             List<Record> res = new List<Record>();//System.Collections.Generic.
             //this.WallRecord.Reverse();
@@ -301,8 +342,14 @@ namespace server_info_web_desk.Models
         //получить список записей в новостях
         public List<Record> GetNewsRecords(int start, int count)
         {
-            if (!db.Entry(this).Collection(x1 => x1.News).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.News).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.News).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.News).Load();
+            }
+            
+                
            
             List<Record> res = new List<Record>();//System.Collections.Generic.
             //this.News.Reverse();
@@ -322,8 +369,14 @@ namespace server_info_web_desk.Models
         public List<Album> GetAlbums(int? id,int start=0, int count=1)
         {
             List<Album> res = new List<Album>();
-            if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Albums).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Albums).Load();
+            }
+            
+                
             if (id != null)
             {
                 var al=this.Albums.FirstOrDefault(x1=>x1.Id==id);
@@ -352,8 +405,14 @@ namespace server_info_web_desk.Models
                 else
                     if (this.WallOpenWrite == null)
                 {
-                    if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
-                        db.Entry(this).Collection(x1 => x1.Friends).Load();
+                    using (ApplicationDbContext db = new ApplicationDbContext())
+                    {
+                        db.Set<ApplicationUser>().Attach(this);
+                        if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.Friends).Load();
+                    }
+
+                        
                     var ch_acc = this.Friends.FirstOrDefault(x1 => x1.Id == user_id_action);
                     if (ch_acc != null)
                         res = true;
@@ -368,21 +427,25 @@ namespace server_info_web_desk.Models
         //проверка на то что отобразить (добавить отписаться удалить)
         public bool? CanFollow(string user_id)
         {
+
             bool? res = true;
-            if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Friends).Load();
-            var ch_can_foll = this.Friends.FirstOrDefault(x1 => x1.Id == user_id);
-            if (ch_can_foll != null)
-                res = false;
-            if (res==true)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Followers).Load();
-                ch_can_foll = this.Followers.FirstOrDefault(x1 => x1.Id == user_id);
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Friends).Load();
+                var ch_can_foll = this.Friends.FirstOrDefault(x1 => x1.Id == user_id);
                 if (ch_can_foll != null)
-                    res = null;
+                    res = false;
+                if (res == true)
+                {
+                    if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                        db.Entry(this).Collection(x1 => x1.Followers).Load();
+                    ch_can_foll = this.Followers.FirstOrDefault(x1 => x1.Id == user_id);
+                    if (ch_can_foll != null)
+                        res = null;
+                }
             }
-            
             //TODO тут еще искать по списку не одобренных заявок и если найдено то отправлять null
 
 
@@ -391,46 +454,50 @@ namespace server_info_web_desk.Models
         public Chat GetListMessages(int? id,bool? new_m,int start, int count)
         {
             Chat res = new Chat();
-            List<Message> not_res = new List<Message>();
-            if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Chats).Load();
-
-            var dialog = this.Chats.FirstOrDefault(x1 => x1.Id == id);
-            if (dialog == null)
-                return null;
-            res = new Chat() { Id = dialog.Id };
-            if (!db.Entry(dialog).Collection(x1 => x1.Messages).IsLoaded)
-                db.Entry(dialog).Collection(x1 => x1.Messages).Load();
-
-            //dialog.Messages= dialog.Messages.Reverse().ToList();
-            start = start > 0 ? start - 1 : 0;
-            start = dialog.Messages.Count - start - count;
-            not_res.AddRange(dialog.Messages.Skip(start).Take(count));
-
-            foreach (var i in not_res)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(i).Collection(x1 => x1.UserNeedRead).IsLoaded)
-                    db.Entry(i).Collection(x1 => x1.UserNeedRead).Load();
-                var us = i.UserNeedRead.FirstOrDefault(x1 => x1.Id == this.Id);
-                if (us != null)
+                db.Set<ApplicationUser>().Attach(this);
+                List<Message> not_res = new List<Message>();
+                if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Chats).Load();
+
+                var dialog = this.Chats.FirstOrDefault(x1 => x1.Id == id);
+                if (dialog == null)
+                    return null;
+                res = new Chat() { Id = dialog.Id };
+                if (!db.Entry(dialog).Collection(x1 => x1.Messages).IsLoaded)
+                    db.Entry(dialog).Collection(x1 => x1.Messages).Load();
+
+                //dialog.Messages= dialog.Messages.Reverse().ToList();
+                start = start > 0 ? start - 1 : 0;
+                start = dialog.Messages.Count - start - count;
+                not_res.AddRange(dialog.Messages.Skip(start).Take(count));
+
+                foreach (var i in not_res)
                 {
-                    i.UserNeedRead.Remove(us);
-                }
-                if (new_m == true)
-                {
+                    if (!db.Entry(i).Collection(x1 => x1.UserNeedRead).IsLoaded)
+                        db.Entry(i).Collection(x1 => x1.UserNeedRead).Load();
+                    var us = i.UserNeedRead.FirstOrDefault(x1 => x1.Id == this.Id);
                     if (us != null)
                     {
-                        res.Messages.Add(i);
+                        i.UserNeedRead.Remove(us);
                     }
+                    if (new_m == true)
+                    {
+                        if (us != null)
+                        {
+                            res.Messages.Add(i);
+                        }
+                    }
+                    else
+                        res.Messages.Add(i);
                 }
-                else
-                    res.Messages.Add(i);
-            }
-            db.SaveChanges();
+                db.SaveChanges();
 
-            foreach (var i in res.Messages)
-            {
-                i.Creator.LoadDataForShort();
+                foreach (var i in res.Messages)
+                {
+                    i.Creator.LoadDataForShort();
+                }
             }
             return res;
         }
@@ -439,51 +506,57 @@ namespace server_info_web_desk.Models
         public Message SendNewMessage(int dialog,List<byte[]>images,string text)
         {
             Message res = null;
-            if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Chats).Load();
-            var chat = this.Chats.FirstOrDefault(x1 => x1.Id == dialog);
-            if (chat == null)
-                return null;
-            
-
-             res = new Message() { Text = text, CreatorId = this.Id, ChatId = dialog };
-
-            db.Messages.Add(res);
-            db.SaveChanges();
-
-            List<Image> image_list = new List<Models.SocialNetwork.Image>();
-            foreach (var i in images)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                //кратинки еще и в бд и тдтд
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Chats).Load();
+                var chat = this.Chats.FirstOrDefault(x1 => x1.Id == dialog);
+                if (chat == null)
+                    return null;
 
-                var img = new Image() { Data = i, UserId = this.Id, MessageId = res.Id };
-                db.ImagesSocial.Add(img);
+
+                res = new Message() { Text = text, CreatorId = this.Id, ChatId = dialog };
+
+                db.Messages.Add(res);
                 db.SaveChanges();
-                image_list.Add(img);
+
+                List<Image> image_list = new List<Models.SocialNetwork.Image>();
+                foreach (var i in images)
+                {
+                    //кратинки еще и в бд и тдтд
+
+                    var img = new Image() { Data = i, UserId = this.Id, MessageId = res.Id };
+                    db.ImagesSocial.Add(img);
+                    db.SaveChanges();
+                    image_list.Add(img);
+
+                }
+
+                if (!db.Entry(chat).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(chat).Collection(x1 => x1.Users).Load();
+                foreach (var i in chat.Users)
+                    res.UserNeedRead.Add(i);
+                db.SaveChanges();
+
 
             }
-
-            if (!db.Entry(chat).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(chat).Collection(x1 => x1.Users).Load();
-            foreach (var i in chat.Users)
-                res.UserNeedRead.Add(i);
-            db.SaveChanges();
-
-
-
             return res;
         }
         public bool LoadDataForShort()
         {
-            if (!db.Entry(this).Collection(x2 => x2.Albums).IsLoaded)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                db.Entry(this).Collection(x2 => x2.Albums).Load();
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x2 => x2.Albums).IsLoaded)
+                {
+                    db.Entry(this).Collection(x2 => x2.Albums).Load();
+                }
+                if (!db.Entry(this.Albums.First()).Collection(x2 => x2.Images).IsLoaded)
+                {
+                    db.Entry(this.Albums.First()).Collection(x2 => x2.Images).Load();
+                }
             }
-            if (!db.Entry(this.Albums.First()).Collection(x2 => x2.Images).IsLoaded)
-            {
-                db.Entry(this.Albums.First()).Collection(x2 => x2.Images).Load();
-            }
-
             return true;
         }
     }

@@ -33,61 +33,69 @@ namespace server_info_web_desk.Hubs
         public void Send(int id_dialog)
         {
             //Clients.All.NeedDownloadChangesMessages(id_dialog);
-            string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-            var user = db.Users.First(x1 => x1.Id == check_id);
-            if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                db.Entry(user).Collection(x1 => x1.Chats).Load();
-            var chat = user.Chats.FirstOrDefault(x1 => x1.Id == id_dialog);
-            if (chat == null)
-                return;
-            if (!db.Entry(chat).Collection(x1 => x1.Messages).IsLoaded)
-                db.Entry(chat).Collection(x1 => x1.Messages).Load();
-            var need_read_mess_im = chat.Messages.FirstOrDefault(x1 => {
-                if (x1.CreatorId == check_id)
+            string check_id = ApplicationUser.GetUserId();
+            ApplicationUser user = ApplicationUser.GetUser(check_id);
+            //var user = db.Users.First(x1 => x1.Id == check_id);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(user);
+                if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                    db.Entry(user).Collection(x1 => x1.Chats).Load();
+                var chat = user.Chats.FirstOrDefault(x1 => x1.Id == id_dialog);
+                if (chat == null)
+                    return;
+                if (!db.Entry(chat).Collection(x1 => x1.Messages).IsLoaded)
+                    db.Entry(chat).Collection(x1 => x1.Messages).Load();
+                var need_read_mess_im = chat.Messages.FirstOrDefault(x1 =>
                 {
-                    if (!db.Entry(x1).Collection(x2 => x2.UserNeedRead).IsLoaded)
-                        db.Entry(x1).Collection(x2 => x2.UserNeedRead).Load();
-                    var us = x1.UserNeedRead.FirstOrDefault(x2 => x2.Id == check_id);
-                    if (us != null)
-                        return true;
-                }
-                return false;
-            });
-
+                    if (x1.CreatorId == check_id)
+                    {
+                        if (!db.Entry(x1).Collection(x2 => x2.UserNeedRead).IsLoaded)
+                            db.Entry(x1).Collection(x2 => x2.UserNeedRead).Load();
+                        var us = x1.UserNeedRead.FirstOrDefault(x2 => x2.Id == check_id);
+                        if (us != null)
+                            return true;
+                    }
+                    return false;
+                });
+            
 
             if (need_read_mess_im != null)
             {
                 Clients.Group(id_dialog.ToString()).NeedDownloadChangesMessages(id_dialog);
             }
-
+            }
         }
         public void JoinToHub()
         {
             string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
             ApplicationUser user = null;
-            if(check_id!=null)
-                user = db.Users.FirstOrDefault(x1 => x1.Id == check_id);
-            var id = Context.ConnectionId;
-
-
-            if (!Users.Any(x => x.ConnectionId == id))
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                Users.Add(new UserForHub { ConnectionId = id, UserId = check_id });
 
+                user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+                db.Set<ApplicationUser>().Attach(user);
+                var id = Context.ConnectionId;
 
-                //подключание к чатам\диалогам
-                if (user != null)
+                //db.Set<ApplicationUser>().Attach(user);
+                if (!Users.Any(x => x.ConnectionId == id))
                 {
-                    if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                        db.Entry(user).Collection(x1 => x1.Chats).Load();
-                    foreach (var i in user.Chats)
-                    {
-                        Groups.Add(Context.ConnectionId, i.Id.ToString());
-                    }
-                }
-                
+                    Users.Add(new UserForHub { ConnectionId = id, UserId = check_id });
 
+
+                    //подключание к чатам\диалогам
+                    if (user != null)
+                    {
+                        if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.Chats).Load();
+                        foreach (var i in user.Chats)
+                        {
+                            Groups.Add(Context.ConnectionId, i.Id.ToString());
+                        }
+                    }
+
+                }
             }
 
         }

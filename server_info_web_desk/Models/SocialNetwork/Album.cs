@@ -52,8 +52,13 @@ namespace server_info_web_desk.Models.SocialNetwork
         public static List<Image> GetLastImageAlbum(Album a, int count)
         {
             List<Image> res = new List<Image>();
-            if (!db.Entry(a).Collection(x1 => x1.Images).IsLoaded)
-                db.Entry(a).Collection(x1 => x1.Images).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Album>().Attach(a);
+                if (!db.Entry(a).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(a).Collection(x1 => x1.Images).Load();
+            }
+                
             res.AddRange(a.Images.Skip(a.Images.Count-count>0? a.Images.Count - count:0).Select(x1=> x1.Image));
 
                 return res;
@@ -71,24 +76,32 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         public static AlbumShort GetAlbumShortForView(Album a)
         {
-            if (!db.Entry(a).Collection(x1 => x1.Images).IsLoaded)
-                db.Entry(a).Collection(x1 => x1.Images).Load();
-            var check = a.Images.LastOrDefault();
-            if (check != null)
-                if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
-                    db.Entry(check).Reference(x1 => x1.Image).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Album>().Attach(a);
+                if (!db.Entry(a).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(a).Collection(x1 => x1.Images).Load();
+                var check = a.Images.LastOrDefault();
+                if (check != null)
+                    if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
+                        db.Entry(check).Reference(x1 => x1.Image).Load();
+            }
             return new AlbumShort(a);
 
         }
 
         public  void GetAlbumImages( int start, int count)
         {
-            if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Images).Load();
-            foreach(var i in this.Images)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(i).Reference(x1 => x1.Image).IsLoaded)
-                    db.Entry(i).Reference(x1 => x1.Image).Load();
+                db.Set<Album>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Images).Load();
+                foreach (var i in this.Images)
+                {
+                    if (!db.Entry(i).Reference(x1 => x1.Image).IsLoaded)
+                        db.Entry(i).Reference(x1 => x1.Image).Load();
+                }
             }
 
 

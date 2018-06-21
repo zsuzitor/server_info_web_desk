@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
@@ -64,7 +65,8 @@ namespace server_info_web_desk.Models.SocialNetwork
             Group res = null;
             if (id==null||id<1)
                 return res;
-             res = db.Groups.FirstOrDefault(x1 => x1.Id == id);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+                res = db.Groups.FirstOrDefault(x1 => x1.Id == id);
             return res;
         }
 
@@ -73,16 +75,26 @@ namespace server_info_web_desk.Models.SocialNetwork
         public List<ApplicationUserShort> GetUserShortList( int count)
         {
             List<ApplicationUserShort> res = new List<ApplicationUserShort>();
-            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Users).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Group>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Users).Load();
+            }
+                
             res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users,null,count));
             return res;
         }
         public List<ApplicationUserShort> GetAdminShortList( int count)
         {
             List<ApplicationUserShort> res = new List<ApplicationUserShort>();
-            if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Admins).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Group>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Admins).Load();
+            }
+                
             res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, null, count));
             return res;
         }
@@ -90,22 +102,25 @@ namespace server_info_web_desk.Models.SocialNetwork
         public  GroupShort GetGroupShort()
         {
             //картинка
-            if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Albums).Load();
-            if (!db.Entry(this.Albums.First()).Collection(x1 => x1.Images).IsLoaded)
-                db.Entry(this.Albums.First()).Collection(x1 => x1.Images).Load();
-            var check = this.Albums.First().Images.LastOrDefault();
-            if (check != null)
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
-                    db.Entry(check).Reference(x1 => x1.Image).Load();
+                db.Set<Group>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Albums).Load();
+                if (!db.Entry(this.Albums.First()).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this.Albums.First()).Collection(x1 => x1.Images).Load();
+                var check = this.Albums.First().Images.LastOrDefault();
+                if (check != null)
+                {
+                    if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
+                        db.Entry(check).Reference(x1 => x1.Image).Load();
+                }
+
+
+                //подписчики
+                if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Users).Load();
             }
-            
-
-            //подписчики
-            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Users).Load();
-
             GroupShort res = new GroupShort(this);
 
             return res;
@@ -114,20 +129,32 @@ namespace server_info_web_desk.Models.SocialNetwork
         //добавляет на стену и раскидывает по новостям
         public void AddRecordMemeWall(Record record)
         {
-            this.WallRecord.Add(record);
-            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Users).Load();
-            ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Users);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Group>().Attach(this);
+                db.Set<Record>().Attach(record);
+                this.WallRecord.Add(record);
 
-            db.SaveChanges();
+                if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Users).Load();
+                ((List<Models.ApplicationUser>)record.UsersNews).AddRange(this.Users);
+                
+                db.SaveChanges();
+            }
         }
 
 
 
         public List<Record> GetWallRecords(int start, int count)
         {
-            if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.WallRecord).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Group>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.WallRecord).Load();
+            }
+            
+                
             
             List<Record> res = new List<Record>();//System.Collections.Generic.
 
@@ -151,8 +178,14 @@ namespace server_info_web_desk.Models.SocialNetwork
             {
                 if (!this.OpenGroup)
                 {
-                    if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
-                        db.Entry(this).Collection(x1 => x1.Users).Load();
+                    using (ApplicationDbContext db = new ApplicationDbContext())
+                    {
+                        db.Set<Group>().Attach(this);
+                        if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.Users).Load();
+                    }
+                    
+                       
                     var u = this.Users.FirstOrDefault(x1 => x1.Id == user_id);
                     if (u == null)
                         res = false;
@@ -164,8 +197,14 @@ namespace server_info_web_desk.Models.SocialNetwork
             }
             else
             {
-                if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Admins).Load();
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    db.Set<Group>().Attach(this);
+                    if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
+                        db.Entry(this).Collection(x1 => x1.Admins).Load();
+                }
+                
+                    
                 var ch_adm = this.Admins.FirstOrDefault(x1 => x1.Id == user_id);
                 if (ch_adm != null)
                     res = true;
@@ -176,8 +215,14 @@ namespace server_info_web_desk.Models.SocialNetwork
         public bool? CanFollow(string user_id)
         {
             bool? res = true;
-            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Users).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Group>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Users).Load();
+            }
+            
+                
             var ch_can_foll = this.Users.FirstOrDefault(x1 => x1.Id == user_id);
             if (ch_can_foll != null)
                 res = false;
@@ -191,8 +236,14 @@ namespace server_info_web_desk.Models.SocialNetwork
         //проверить может ли пользователь редактировать группу(является админом)
         public bool HaveAccessAdminGroup(string userId)
         {
-            if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Admins).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Group>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Admins).Load();
+            }
+            
+                
             if (this.Admins.Any(x1 => x1.Id == userId))
 
                 return true;
@@ -205,7 +256,13 @@ namespace server_info_web_desk.Models.SocialNetwork
            // bool res = false;
             if (!this.OpenGroup)
             {
-                db.Entry(this).Collection(x1 => x1.Users).Load();
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    db.Set<Group>().Attach(this);
+                    if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                        db.Entry(this).Collection(x1 => x1.Users).Load();
+                }
+                    
                 var us_c = this.Users.FirstOrDefault(x1 => x1.Id == userId);
                 if (us_c == null)
                 {
@@ -220,8 +277,13 @@ namespace server_info_web_desk.Models.SocialNetwork
         public List<Album> GetAlbums(int? id, int start = 0, int count = 1)
         {
             List<Album> res = new List<Album>();
-            if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
-                db.Entry(this).Collection(x1 => x1.Albums).Load();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Group>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Albums).Load();
+            }
+                
             if (id != null)
             {
                 var al = this.Albums.FirstOrDefault(x1 => x1.Id == id);

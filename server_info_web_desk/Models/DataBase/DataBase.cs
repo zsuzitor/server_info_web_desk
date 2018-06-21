@@ -7,7 +7,7 @@ namespace server_info_web_desk.Models.DataBase
 {
     public static class DataBase
     {
-        public static ApplicationDbContext db = new ApplicationDbContext();
+        //public static ApplicationDbContext db = new ApplicationDbContext();
 
 
         //protected override void Dispose(bool disposing)
