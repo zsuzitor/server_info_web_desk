@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace server_info_web_desk.Models
@@ -79,6 +80,19 @@ namespace server_info_web_desk.Models
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; }
+
+        //[Required(ErrorMessage = "Обязательный параметр")]
+        [Display(Name = "Имя")]
+        public string Name { get; set; }
+
+        //[Required(ErrorMessage = "Обязательный параметр")]
+        [Display(Name = "День Рождения")]
+        [DataType(DataType.Date)]
+        public DateTime? Birthday { get; set; }
+
+        //[Required(ErrorMessage = "Обязательный параметр")]
+        [Display(Name = "Фамилия")]
+        public string Surname { get; set; }
     }
 
     public class ResetPasswordViewModel

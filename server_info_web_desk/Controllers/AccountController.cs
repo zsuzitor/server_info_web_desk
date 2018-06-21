@@ -152,7 +152,11 @@ namespace server_info_web_desk.Controllers
         {
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser { UserName = model.Email, Email = model.Email };
+                var user = new ApplicationUser { UserName = model.Email, Email = model.Email
+                    , Name=model.Name,
+                    Birthday = model.Birthday,
+                    Surname = model.Surname
+                };
                 var result = await UserManager.CreateAsync(user, model.Password);
                 if (result.Succeeded)
                 {
@@ -167,18 +171,18 @@ namespace server_info_web_desk.Controllers
                     await UserManager.AddToRoleAsync(user.Id, "user");
                     await SignInManager.SignInAsync(user, isPersistent: false, rememberBrowser: false);
 
-                    server_info_web_desk.Models.DataBase.DataBase.db.Sections.Add(new server_info_web_desk.Models.Info.Section() { Head = "ALL", User = user });
+                    server_info_web_desk.Models.DataBase.DataBase.db.Sections.Add(new server_info_web_desk.Models.Info.Section() { Head = "ALL", UserId = user.Id });
                     
 
                     server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album() { Name="Main",
                         Description ="Сюда добавляются главные фотографии с вашей страницы",
-                        User=user
+                        UserId = user.Id
                     });
                     server_info_web_desk.Models.DataBase.DataBase.db.Albums.Add(new Models.SocialNetwork.Album()
                     {
                         Name = "NotMain",
                         Description = "Сюда добавляются фотографии с вашей страницы",
-                        User = user
+                        UserId = user.Id
                     });
                     server_info_web_desk.Models.DataBase.DataBase.db.SaveChanges();
 

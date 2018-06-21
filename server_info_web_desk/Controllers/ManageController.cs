@@ -18,7 +18,7 @@ namespace server_info_web_desk.Controllers
 
         public ManageController()
         {
-        }
+        } 
 
         public ManageController(ApplicationUserManager userManager, ApplicationSignInManager signInManager)
         {
