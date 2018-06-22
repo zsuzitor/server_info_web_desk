@@ -23,7 +23,7 @@ namespace server_info_web_desk.Models.ViewModel
         public bool OpenGroup { get; set; }
         public bool AddMemesPrivate { get; set; }
 
-        public bool? CanFollow { get; set; }//true-можно подать заявку false-можно убрать из групп null-можно отписаться(заявка не подтверждена)
+        public int CanFollow { get; set; }//true-можно подать заявку false-можно убрать из групп null-можно отписаться(заявка не подтверждена)
         public bool CanAddMeme { get; set; }
 
         public Image MainImage { get; set; }
@@ -52,7 +52,7 @@ namespace server_info_web_desk.Models.ViewModel
             OpenGroup = false;
             AddMemesPrivate = true;
             CanAddMeme = false;
-            CanFollow = true;
+            CanFollow = 0;
             IdMainAlbum = 0;
             IdNotMainAlbum = 0;
             Admin = false;
@@ -74,7 +74,7 @@ namespace server_info_web_desk.Models.ViewModel
             AddMemesPrivate = a.AddMemesPrivate;
             MainImage = null;
             CanAddMeme = false;
-            CanFollow = true;
+            CanFollow = 0;
             IdMainAlbum = 0;
             IdNotMainAlbum = 0;
             Admin = false;

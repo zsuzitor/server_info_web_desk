@@ -5,7 +5,8 @@
 
 
 
-<div class="div_content_main_size_2 div_inline_block">
+<input type="hidden" id="page_type_meme_id" value="3" />
+<div class="div_content_main_size_2 div_inline_block" id="div_content_main_size_2_id">
     @*для добавления поста, просто форма с страницы пользователя*@
     <div>
         @using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
@@ -17,8 +18,10 @@
         }
 
     </div>
-    <div>
+    <div id="Wall_meme_block_update_id">
+        @*первоначальная загрузка обязательно 10, тк в js подвязано*@
         @Html.Action("MemeRecordListPartial", "SocialNetwork", new {  type = 3, start = 0, count = 10 })
     </div>
+    <button onclick="load_more_records()">загрузить</button>
 </div>
-<div class="div_content_main_size_1 News_div_right_block div_inline_block"></div>
+<div class="div_content_main_size_1 News_div_right_block div_inline_block" id="div_content_main_size_1_id"></div>

@@ -4,7 +4,7 @@
 }
 
 <div>
-
+    <input type="hidden" id="page_type_meme_id" value="2" />
     <div class="GroupRecord_left div_content_main_size_2 div_inline_block" id="div_content_main_size_2_id">
         <div class="div_color_white">
             <h1>@Model.Name</h1>
@@ -52,10 +52,11 @@
                         }
                     </div>
                 }
-                <div id="PersonalRecord_wall_meme_block">
+                <div id="Wall_meme_block_update_id">
+                    @*первоначальная загрузка обязательно 10, тк в js подвязано*@
                     @Html.Action("MemeRecordListPartial", "SocialNetwork", new { id = Model.IdGroup, type = 2, start = 0, count = 10 })
                 </div>
-
+                <button onclick="load_more_records()">загрузить</button>
             </div>
         </div>
 
@@ -103,9 +104,9 @@
                 <div>
                     @foreach (var i in Model.Users)
                     {
-
-                        @Healpers.UserShort(i, 1)
-
+                        <div class="div_inline_block">
+                            @Healpers.UserShort(i, 1)
+                        </div>
                     }
 
                 </div>

@@ -1,0 +1,8 @@
+﻿@model IEnumerable<server_info_web_desk.Models.SocialNetwork.GroupShort>
+
+@foreach (var i in Model)
+{
+    <div>
+        @Healpers.GroupShort(i, 1)
+    </div>
+}

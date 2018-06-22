@@ -12,7 +12,8 @@
             <div class="PersonalRecord_main_img_div">
                 
                     @Healpers.ImageLink(Model?.MainImage)
-                  
+                  <input type="hidden" id="page_id_input_id" value="@Model.IdPage"/>
+                <input type="hidden" id="page_type_meme_id" value="1" />
             </div>
             <div class="div_padding_left_10_px">
                 @if (Model.IdPage == Model.IdUser)
@@ -154,25 +155,46 @@
                             <input type="submit" value="Добавить" />
                         }
                         @*@using (Ajax.BeginForm("AddMemePerson", "SocialNetwork", new { enctype = "multipart/form-data" }, new AjaxOptions {
-                        UpdateTargetId = "PersonalRecord_wall_meme_block",
-                        LoadingElementId="Main_preloader_id",
-                        LoadingElementDuration=200,
-                        InsertionMode= InsertionMode.InsertBefore,
-                        OnComplete = "OnComplete"
-                    }))
-                    {
-                        @Html.Hidden( "id_user", Model.IdPage)
-                        @Html.TextArea("text")
-                        <input type="file" name="uploadImage[0]" multiple="multiple" accept="image/*" />
-                        <input type="submit" value="Добавить" />
-                    }*@
+        UpdateTargetId = "Wall_meme_block_update_id",
+        LoadingElementId="Main_preloader_id",
+        LoadingElementDuration=200,
+        InsertionMode= InsertionMode.InsertBefore,
+        OnComplete = "OnComplete"
+    }))
+    {
+        @Html.Hidden( "id_user", Model.IdPage)
+        @Html.TextArea("text")
+        <input type="file" name="uploadImage[0]" multiple="multiple" accept="image/*" />
+        <input type="submit" value="Добавить" />
+    }*@
                     </div>
                 }
             </div>
-                <div class="div_padding_top_10_px" id="PersonalRecord_wall_meme_block">
+                <div class="div_padding_top_10_px" id="Wall_meme_block_update_id">
+                    @*первоначальная загрузка обязательно 10, тк в js подвязано*@
                     @Html.Action("MemeRecordListPartial", "SocialNetwork",new { id=Model.IdPage, type=1, start=0, count=10 })
                    
                 </div>
+            <div>
+                @*@using (Ajax.BeginForm("MemeRecordListPartial", "SocialNetwork", new AjaxOptions
+        {
+            UpdateTargetId = "Wall_meme_block_update_id",
+            LoadingElementId = "Main_preloader_id",
+            LoadingElementDuration = 200,
+            InsertionMode = InsertionMode.InsertAfter,
+            OnSuccess = "OnSuccessLoadWallRecords"
+
+    }))
+    {
+        <input type="hidden" name="id" value="@Model.IdPage"/>
+        <input type="hidden" name="type" value="1" />
+        <input type="hidden" name="start" value="11" />
+        <input type="hidden" name="count" value="10" />
+        <input type="submit" value="загрузить" />
+    }*@
+                <button onclick="load_more_records()">загрузить</button>
+
+            </div>
            
         </div>
 

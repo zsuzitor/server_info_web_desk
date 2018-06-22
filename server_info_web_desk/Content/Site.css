@@ -182,6 +182,7 @@ div.div_for_replace_ajax_2{
         position:fixed;
         width:100%;
         z-index:5;
+        min-width:960px;
     }
 
 

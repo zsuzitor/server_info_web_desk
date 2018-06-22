@@ -336,6 +336,8 @@
     <Content Include="Views\SocialNetwork\ReturnStringPartial.cshtml" />
     <Content Include="Views\SocialNetwork\Friends.cshtml" />
     <Content Include="Views\SocialNetwork\ListUsers.cshtml" />
+    <Content Include="Views\SocialNetwork\DialogListPartial.cshtml" />
+    <Content Include="Views\SocialNetwork\GroupsListPartial.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

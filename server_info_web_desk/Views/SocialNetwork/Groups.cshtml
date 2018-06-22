@@ -3,15 +3,14 @@
 @{
     ViewBag.Title = "Groups";
 }
-
+<input type="hidden" id="page_id_input_id" value="@ViewBag.id" />
 <div>
     <div class="div_content_main_size_2 div_inline_block">
-        @foreach (var i in Model.Groups)
-        {
-            <div>
-                @Healpers.GroupShort(i, 1)
-            </div>
-        }
+        <div id="Groups_block_update_id">
+            @Html.Action("GroupsListPartial", "SocialNetwork", new { id = (string)ViewBag.id,  start = 0, count = 10 })
+        </div>
+        <button onclick="load_more_groups()">загрузить</button>
+        
     </div>
     <div class="div_content_main_size_1 div_inline_block">
         @using (Html.BeginForm("GroupCreate", "SocialNetwork"))

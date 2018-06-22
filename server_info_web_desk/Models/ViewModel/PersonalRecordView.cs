@@ -31,7 +31,7 @@ namespace server_info_web_desk.Models.ViewModel
         public string Description { get; set; }
         public Image MainImage { get; set; }
 
-        public bool? CanAddFriend { get; set; }//true-можно добавить false-удалить null-отписаться
+        public int CanAddFriend { get; set; }//true-можно добавить false-удалить null-отписаться
         public bool CanAddMeme { get; set; }
 
         public int AlbumCount { get; set; }
@@ -68,7 +68,7 @@ namespace server_info_web_desk.Models.ViewModel
             //о себе 
             Description = null;
             WallOpenWrite = false;
-            CanAddFriend = null;
+            CanAddFriend = 0;
             CanAddMeme = false;
             AlbumCount = 0;
             ImageCount = 0;
@@ -99,7 +99,7 @@ namespace server_info_web_desk.Models.ViewModel
             Birthday = a.Birthday;
             Sex = a.Sex;
             WallOpenWrite = a.WallOpenWrite;
-            CanAddFriend = null;
+            CanAddFriend = 0;
             MainImage = null;
             PrivatePage = a.PrivatePage;
             //о себе 

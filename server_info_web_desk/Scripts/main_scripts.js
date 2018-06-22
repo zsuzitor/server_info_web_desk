@@ -234,6 +234,65 @@ function OnComplete_LikeRecordClick(data){
 }
 
 
+
+
+
+var WallRecord_OBJECT = { id: null, type:null, start: 11, count: 10, can_load: true };
+
+function load_more_records() {
+    if (WallRecord_OBJECT.id == null && WallRecord_OBJECT.type==null) {
+        WallRecord_OBJECT.id = document.getElementById('page_id_input_id').value;
+        WallRecord_OBJECT.type = document.getElementById('page_type_meme_id').value;
+
+    }
+    if (!WallRecord_OBJECT.can_load) {
+        alert("попробуйте позже");
+        return;
+    }
+
+    var dt = {
+        'id': WallRecord_OBJECT.id,
+        'start': WallRecord_OBJECT.start,
+        'count': WallRecord_OBJECT.count
+    };
+    $.ajax({
+        url: "/SocialNetwork/MemeRecordListPartial",
+        data: dt,
+        success: OnSuccessLoadWallRecords,
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+            WallRecord_OBJECT.can_load = true;
+        },
+        beforeSend: function () { PreloaderAction(true); WallRecord_OBJECT.can_load = false; },
+        complete: function () {
+            PreloaderAction(false);
+            WallRecord_OBJECT.start += WallRecord_OBJECT.count;
+            WallRecord_OBJECT.can_load = true;
+
+        },
+        type: 'POST', dataType: 'html'//html
+    });
+
+
+}
+
+
+
+function OnSuccessLoadWallRecords(data) {
+    var div = document.getElementById("Wall_meme_block_update_id");
+    div.innerHTML += data;
+}
+
+
+
+
+
+
+
+
+
+
 //-------------------------------------------------NOT NEED NEW FILE
 
 function ShowImageRecordAJAX(a) {
@@ -454,13 +513,14 @@ function OnComplete_Load_new_messages(data) {
             //пришли сообщения для этого диалога и их надо вставить
             var div = document.getElementById("Dialog_div_message_id");
             if (div != undefined || div != null) {
-                div.innerHTML += data;
+                //div.innerHTML += data;
+                alert('на данный момент не предустмотрено');
             }
         }
         else {
             div = document.getElementById("num_CountNewMessage_id");
                 if (div != undefined || div != null) {
-                    div.innerHTML += data;
+                    div.innerHTML = data;
                 }
         }
     }
@@ -479,3 +539,149 @@ function OnComplete_Load_new_messages(data) {
     //}
     
 }
+
+
+
+var Dialog_OBJECT = { dialog: null, start: 11, count: 10, can_load: true };
+
+function load_more_dialogs() {
+    if (Dialog_OBJECT.dialog == null) {
+        Dialog_OBJECT.dialog = document.getElementById('dialog_id_input_id').value;
+       
+    }
+
+    if (!Dialog_OBJECT.can_load) {
+        alert("попробуйте позже");
+        return;
+    }
+
+    var dt = {
+        'start': Dialog_OBJECT.start,
+        'count': Dialog_OBJECT.count
+    };
+    $.ajax({
+        url: "/SocialNetwork/ListMessagesUser",
+        data: dt,
+        success: OnSuccessLoadDialogsMessages,
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+            Dialog_OBJECT.can_load = true;
+        },
+        beforeSend: function () { PreloaderAction(true); Dialog_OBJECT.can_load = false; },
+        complete: function () {
+            PreloaderAction(false);
+            Dialog_OBJECT.start += Dialog_OBJECT.count;
+            Dialog_OBJECT.can_load = true;
+
+        },
+        type: 'POST', dataType: 'html'//html
+    });
+
+
+}
+
+
+function OnSuccessLoadDialogsMessages(data) {
+    var div = document.getElementById("Dialog_div_message_id");
+    div.innerHTML = data + div.innerHTML;
+}
+
+
+
+///-----------------------------------------------------------------------GROUPS LIST   PAGE--------------------------
+
+var Groups_OBJECT = { id: null, start: 11, count: 10, can_load: true };
+
+function load_more_groups() {
+    if (Groups_OBJECT.id == null) {
+        Groups_OBJECT.id = document.getElementById('page_id_input_id').value;
+
+    }
+
+    if (!Groups_OBJECT.can_load) {
+        alert("попробуйте позже");
+        return;
+    }
+
+    var dt = {
+        'id': Groups_OBJECT.id,
+        'start': Groups_OBJECT.start,
+        'count': Groups_OBJECT.count
+    };
+    $.ajax({
+        url: "/SocialNetwork/GroupsListPartial",
+        data: dt,
+        success: OnSuccessLoadGroups,
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+            Groups_OBJECT.can_load = true;
+        },
+        beforeSend: function () { PreloaderAction(true); Groups_OBJECT.can_load = false; },
+        complete: function () {
+            PreloaderAction(false);
+            Groups_OBJECT.start += Groups_OBJECT.count;
+            Groups_OBJECT.can_load = true;
+
+        },
+        type: 'POST', dataType: 'html'//html
+    });
+
+
+}
+
+
+function OnSuccessLoadGroups(data) {
+    var div = document.getElementById("Groups_block_update_id");
+    div.innerHTML += data ;
+}
+
+
+
+
+//--------------------------------------------------------------------MESSAGES DIALOGs------------------------
+
+var Messages_d_OBJECT = {start: 11, count: 10, can_load: true };
+
+function load_more_dialogs() {
+  
+    if (!Messages_d_OBJECT.can_load) {
+        alert("попробуйте позже");
+        return;
+    }
+
+    var dt = {
+        'start': Messages_d_OBJECT.start,
+        'count': Messages_d_OBJECT.count
+    };
+    $.ajax({
+        url: "/SocialNetwork/DialogListPartial",
+        data: dt,
+        success: OnSuccessLoadDialogs,
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+            Messages_d_OBJECT.can_load = true;
+        },
+        beforeSend: function () { PreloaderAction(true); Messages_d_OBJECT.can_load = false; },
+        complete: function () {
+            PreloaderAction(false);
+            Messages_d_OBJECT.start += Messages_d_OBJECT.count;
+            Messages_d_OBJECT.can_load = true;
+
+        },
+        type: 'POST', dataType: 'html'//html
+    });
+
+
+}
+
+
+
+function OnSuccessLoadDialogs(data) {
+    var div = document.getElementById("Messages_block_dialogs");
+    div.innerHTML += data;
+}
+
+

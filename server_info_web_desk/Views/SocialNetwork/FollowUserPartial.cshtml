@@ -3,21 +3,21 @@
     var ajax_options_add_frieds = new AjaxOptions
     {
         UpdateTargetId = "PersonalRecord_block_add_friend",
-        OnComplete = "OnComplete_add_friend",
+        //OnComplete = "OnComplete_add_friend",
         LoadingElementId = "Main_preloader_id",
         LoadingElementDuration = 200
     };
-    if (ViewBag.CanAddFriend == true)
+    if (ViewBag.CanAddFriend == 1|| ViewBag.CanAddFriend == 4)
     {
         @Ajax.ActionLink("Добавить в друзья", "FollowPerson", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
     }
-    if (ViewBag.CanAddFriend == false)
+    if (ViewBag.CanAddFriend == 2)
     {
-        @Ajax.ActionLink("Удалить из друзей", "DeleteFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+        @Ajax.ActionLink("Удалить из друзей", "FollowPerson", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
     }
-    if (ViewBag.CanAddFriend == null)
+    if (ViewBag.CanAddFriend == 3)
     {
-        @Ajax.ActionLink("Отписаться", "DeleteFriend", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
+        @Ajax.ActionLink("Отписаться", "FollowPerson", "SocialNetwork", new { id = ViewBag.IdPage }, ajax_options_add_frieds)
     }
 
 }

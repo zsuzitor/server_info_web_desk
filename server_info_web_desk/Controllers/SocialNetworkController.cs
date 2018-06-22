@@ -71,7 +71,13 @@ namespace server_info_web_desk.Controllers
             res.GroupCount = user.Group.Count;
 
             res.CanAddFriend = user.CanFollow(check_id);
-            
+
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(user);
+                if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
+                    db.Entry(user).Collection(x1 => x1.Friends).Load();
+            }
             res.Friends.AddRange(user.Friends.Skip(user.Friends.Count-6>0? (user.Friends.Count-6):0).Select(x1=>new Models.ApplicationUserShort(x1)));
             Session["NewMessageType"] = "2";
             return View(res);
@@ -159,22 +165,10 @@ namespace server_info_web_desk.Controllers
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             if (user == null)
                 return new HttpStatusCodeResult(404);
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(user);
-                if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.Chats).Load();
-            }
-            
-                
-
-
-            List<ChatShort> res = new List<ChatShort>();
-            res.AddRange(user.Chats.Select(x1 => x1.GetChatShort()));
-
+           
 
             Session["NewMessageType"] = "3";
-            return View(res);
+            return View();
         }
         [AllowAnonymous]
         //TODO вместе с AlbumsGroup редиректить на 1 метод в котором все будет происходить????
@@ -268,7 +262,16 @@ namespace server_info_web_desk.Controllers
                     using (ApplicationDbContext db = new ApplicationDbContext())
                     {
                         db.Set<ApplicationUser>().Attach(user2);
-                        db.Set<ApplicationUser>().Attach(user);
+                        try
+                        {
+                            db.Set<ApplicationUser>().Attach(user);
+                        }
+                        catch
+                        {
+                            //оставить именно так а не методом
+                            user = ApplicationUser.GetUser(user.Id,db);
+                        }
+                        //db.Set<ApplicationUser>().Attach(user);
                         
                         db.Chats.Add(chat);
                         db.SaveChanges();
@@ -320,11 +323,11 @@ namespace server_info_web_desk.Controllers
             ApplicationUser user = ApplicationUser.GetUser(id);
             if (user == null)
                 return new HttpStatusCodeResult(404);
-            
+            ViewBag.id = id;
 
             GroupsListView res = new GroupsListView();
 
-            res.Groups.AddRange(user.UserGroupToShort(0,10));
+            
 
             Session["NewMessageType"] = "2";
             return View(res);
@@ -427,7 +430,7 @@ namespace server_info_web_desk.Controllers
             if (user == null)
                 return new HttpStatusCodeResult(404);
 
-            bool? res = true;
+            int res = 0;
             
             Group group = Group.GetGroup(id);
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -437,24 +440,29 @@ namespace server_info_web_desk.Controllers
                     return new HttpStatusCodeResult(404);
                 res = group.CanFollow(user.Id);
                 db.Set<ApplicationUser>().Attach(user);
-                db.Set<Group>().Attach(group);
-                if (res == true)
+                try
+                {
+                    db.Set<Group>().Attach(group);
+                }
+                catch
+                {
+                    //оставить именно так а не методом
+                    //group = db.Groups.First(x1 => x1.Id == group.Id);
+                    group = Group.GetGroup(group.Id, db);
+                }
+               
+                if (res == 1)
                 {
                     group.Users.Add(user);
-                    res = false;
+                    res = -1;
                 }
                 else
-                if (res == false)
+                if (res == 2)
                 {
                     group.Users.Remove(user);
-                    res = true;
+                    res = -1;
                 }
-                else
-                     if (res == null)
-                {
-                    group.Users.Remove(user);
-                    res = true;
-                }
+                
 
 
                 db.SaveChanges();
@@ -469,7 +477,7 @@ namespace server_info_web_desk.Controllers
         [Authorize]
         public ActionResult DeleteFriend(string id)
         {
-
+            //удалять прямо из списка
             if(string.IsNullOrWhiteSpace(id))
                 return new HttpStatusCodeResult(404);
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
@@ -508,10 +516,11 @@ namespace server_info_web_desk.Controllers
         [Authorize]
         public ActionResult FollowPerson(string id)
         {
+            //взаимодействовать на странице пользователя
             ApplicationUser user_act = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             if (user_act == null)
                 return new HttpStatusCodeResult(404);
-            bool? res = true;
+            int res = 0;
             ApplicationUser user = ApplicationUser.GetUser(id);
             if (user == null)
                 return new HttpStatusCodeResult(404);
@@ -520,27 +529,59 @@ namespace server_info_web_desk.Controllers
             
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
+                
                 db.Set<ApplicationUser>().Attach(user);
-                db.Set<ApplicationUser>().Attach(user_act);
-                if (res == true)
+                try
                 {
-                    user.Followers.Add(user_act);
-                    res = false;
+                    db.Set<ApplicationUser>().Attach(user_act);
+                }
+                catch
+                {
+                    //оставить именно так а не методом
+                    user_act = ApplicationUser.GetUser(ApplicationUser.GetUserId(), db);
+                   // user_act = db.Users.First(x1 => x1.Id == id);
                 }
 
-                else
-                {
 
-                    //db.Set<ApplicationUser>().Attach(user_act);
-                    if (!db.Entry(user_act).Collection(x1 => x1.Followers).IsLoaded)
-                        db.Entry(user_act).Collection(x1 => x1.Followers).Load();
-                    if (user_act.Followers.FirstOrDefault(x1 => x1.Id == id) != null)
-                    {
+                switch (res)
+                {
+                    case 1:
+                        if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.Followers).Load();
+                        user.Followers.Add(user_act);
+                        res = 3;
+                        break;
+                    case 2:
+                        if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.Friends).Load();
+                        if (!db.Entry(user).Collection(x1 => x1.FriendUser).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.FriendUser).Load();
+                        user.Friends.Remove(user_act);
+                        user.FriendUser.Remove(user_act);
+                        user.FollowUser.Add(user_act);
+                        res = 3;
+                        break;
+                    case 3:
+                        if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.Followers).Load();
                         user.Followers.Remove(user_act);
-                        user_act.Friends.Add(user);
-                    }
+                        res = 1;
+                        break;
+                    case 4:
+                        if (!db.Entry(user).Collection(x1 => x1.FollowUser).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.FollowUser).Load();
+                        if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.Friends).Load();
+                        if (!db.Entry(user).Collection(x1 => x1.FriendUser).IsLoaded)
+                            db.Entry(user).Collection(x1 => x1.FriendUser).Load();
+                        user.FollowUser.Remove(user_act);
+                        user.Friends.Add(user_act);
+                        user.FriendUser.Add(user_act);
+                        res = 2;
+                        break;
                 }
-               
+                
+                
                 db.SaveChanges();
             }
 
@@ -645,7 +686,13 @@ namespace server_info_web_desk.Controllers
 
             if (can_add&&ch_al.Id==album.Id)
             {
-                 user = group.Admins.FirstOrDefault(x1 => x1.Id == check_id);
+                using (ApplicationDbContext db = new ApplicationDbContext())
+                {
+                    db.Set<Group>().Attach(group);
+                    if (!db.Entry(group).Collection(x1 => x1.Admins).IsLoaded)
+                        db.Entry(group).Collection(x1 => x1.Admins).Load();
+                }
+                    user = group.Admins.FirstOrDefault(x1 => x1.Id == check_id);
                 if (user == null)
                     can_add = false;
             }
@@ -697,7 +744,42 @@ namespace server_info_web_desk.Controllers
             
         }
 
-        
+        [AllowAnonymous]
+        public ActionResult GroupsListPartial(string id,int start, int count)
+        {
+            ApplicationUser user = ApplicationUser.GetUser(id);
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+            List<GroupShort> res=user.UserGroupToShort(start, count);
+
+            return View(res);
+        }
+
+
+
+
+        [Authorize]
+        public ActionResult DialogListPartial(int start, int count)
+        {
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            if (user == null)
+                return new HttpStatusCodeResult(404);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(user);
+                if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
+                    db.Entry(user).Collection(x1 => x1.Chats).Load();
+            }
+
+            
+            List<ChatShort> res = new List<ChatShort>();
+            res.AddRange(user.Chats.Select(x1 => x1.GetChatShort()));
+
+
+            return PartialView(res);
+        }
+
+
         [AllowAnonymous]
         public ActionResult MemeRecordListPartial(string id,int type,int start,int count)
         {
@@ -806,7 +888,7 @@ namespace server_info_web_desk.Controllers
             return PartialView();
         }
         [Authorize]
-        public ActionResult FollowUserPartial(string Iduser, bool? CanAddFriend)
+        public ActionResult FollowUserPartial(string Iduser, int CanAddFriend)
         {
             string check_id = ApplicationUser.GetUserId();
             ViewBag.IdPage = Iduser;
@@ -855,7 +937,7 @@ namespace server_info_web_desk.Controllers
         public ActionResult ReturnStringPartial(string str)
         {
             ViewBag.str = str;
-            return View();
+            return PartialView();
 
         }
         [AllowAnonymous]

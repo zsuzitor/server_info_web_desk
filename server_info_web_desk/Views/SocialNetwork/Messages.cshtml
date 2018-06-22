@@ -1,4 +1,4 @@
-﻿@model IEnumerable<server_info_web_desk.Models.SocialNetwork.ChatShort>
+﻿
 
 @{
     ViewBag.Title = "Messages";
@@ -7,12 +7,12 @@
 
 <div>
     <div class="Messages_div_left div_content_main_size_2 div_inline_block">
+        <div id="Messages_block_dialogs">
+            @Html.Action("DialogListPartial", "SocialNetwork", new { start = 0, count = 10 })
 
-        @foreach(var i in Model)
-        {
-        @Healpers.Chat(i)
-        }
 
+        </div>
+        <button onclick="load_more_dialogs()">загрузить</button>
     </div>
     <div class="div_content_main_size_1 Messages_div_right div_inline_block"></div>
 </div>

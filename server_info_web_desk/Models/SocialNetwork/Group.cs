@@ -63,9 +63,18 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             //string check_id = ApplicationUser.GetUserId();
             Group res = null;
-            if (id==null||id<1)
-                return res;
+
             using (ApplicationDbContext db = new ApplicationDbContext())
+                res = Group.GetGroup(id,db);
+            return res;
+        }
+        public static Group GetGroup(int? id, ApplicationDbContext db)
+        {
+            //string check_id = ApplicationUser.GetUserId();
+            Group res = null;
+            if (id == null || id < 1)
+                return res;
+
                 res = db.Groups.FirstOrDefault(x1 => x1.Id == id);
             return res;
         }
@@ -99,7 +108,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             return res;
         }
 
-        public  GroupShort GetGroupShort()
+        public  void LoadDataForShort()
         {
             //картинка
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -121,9 +130,9 @@ namespace server_info_web_desk.Models.SocialNetwork
                 if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.Users).Load();
             }
-            GroupShort res = new GroupShort(this);
+            //GroupShort res = new GroupShort(this);
 
-            return res;
+            return;
         }
 
         //добавляет на стену и раскидывает по новостям
@@ -212,24 +221,27 @@ namespace server_info_web_desk.Models.SocialNetwork
             
             return res;
         }
-        public bool? CanFollow(string user_id)
+        //1 можно подписаться в списках нет, 2уже в одобренных подписках 3 user_id  подписан на this  но заявка не одобрена 0 ошибка или просто не отображать
+        public int CanFollow(string user_id)
         {
-            bool? res = true;
+            if (string.IsNullOrWhiteSpace(user_id))
+                return 0;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<Group>().Attach(this);
                 if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.Users).Load();
+                if (this.Users.Any(x1 => x1.Id == user_id))
+                    return 2;
+                //if (!db.Entry(this).Collection(x1 => x1.NotApproveUser).IsLoaded)
+                //    db.Entry(this).Collection(x1 => x1.NotApproveUser).Load();
+                //if (this.NotApproveUser.Any(x1 => x1.Id == user_id))
+                //    return 3;
             }
-            
-                
-            var ch_can_foll = this.Users.FirstOrDefault(x1 => x1.Id == user_id);
-            if (ch_can_foll != null)
-                res = false;
-            //TODO тут еще искать по списку не одобренных заявок и если найдено то отправлять null
 
+            return 1;
 
-            return res;
+           
         }
 
 

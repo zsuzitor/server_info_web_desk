@@ -132,6 +132,8 @@ namespace server_info_web_desk.Models
             GroupAdmin = new List<Group>();
             Followers = new List<ApplicationUser>();
             FollowUser = new List<ApplicationUser>();
+            Friends = new List<ApplicationUser>();
+            FriendUser= new List<ApplicationUser>();
         }
 
         public async Task<ClaimsIdentity> GenerateUserIdentityAsync(UserManager<ApplicationUser> manager)
@@ -153,13 +155,23 @@ namespace server_info_web_desk.Models
         {
             //string check_id = ApplicationUser.GetUserId();
             ApplicationUser res = null;
-            if (string.IsNullOrWhiteSpace(id))
-                return res;
+            //if (string.IsNullOrWhiteSpace(id))
+            //    return res;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                res = db.Users.FirstOrDefault(x1 => x1.Id == id);
+                res = ApplicationUser.GetUser(id,db);
             }
                 
+            return res;
+        }
+        public static ApplicationUser GetUser(string id, ApplicationDbContext db)
+        {
+            //string check_id = ApplicationUser.GetUserId();
+            ApplicationUser res = null;
+            if (string.IsNullOrWhiteSpace(id))
+                return res;
+            res = db.Users.FirstOrDefault(x1 => x1.Id == id);
+            
             return res;
         }
 
@@ -309,7 +321,10 @@ namespace server_info_web_desk.Models
             
                 
 
-            res.AddRange(this.Group.Select(x1 => x1.GetGroupShort()));
+            res.AddRange(this.Group.Select(x1 => {
+                x1.LoadDataForShort();
+                return new GroupShort(x1);
+                }));
             
             return res;
         }
@@ -425,31 +440,35 @@ namespace server_info_web_desk.Models
 
 
         //проверка на то что отобразить (добавить отписаться удалить)
-        public bool? CanFollow(string user_id)
+        //1 можно добавить в списках нет, 2уже в друзьях 3 user_id  подписан н this 4 this подписан на user_id 0 ошибка или просто не отображать
+        public int CanFollow(string user_id)
         {
-
-            bool? res = true;
+            if (string.IsNullOrWhiteSpace(user_id))
+                return 0;
+            //int res = 0;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<ApplicationUser>().Attach(this);
                 if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.Friends).Load();
-                var ch_can_foll = this.Friends.FirstOrDefault(x1 => x1.Id == user_id);
-                if (ch_can_foll != null)
-                    res = false;
-                if (res == true)
-                {
-                    if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
-                        db.Entry(this).Collection(x1 => x1.Followers).Load();
-                    ch_can_foll = this.Followers.FirstOrDefault(x1 => x1.Id == user_id);
-                    if (ch_can_foll != null)
-                        res = null;
-                }
+
+                if (this.Friends.Any(x1 => x1.Id == user_id))
+                    return 2;
+
+                if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Followers).Load();
+                if (this.Followers.Any(x1 => x1.Id == user_id))
+                    return 3;
+                if (!db.Entry(this).Collection(x1 => x1.FollowUser).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.FollowUser).Load();
+                if (this.FollowUser.Any(x1 => x1.Id == user_id))
+                    return 4;
+                return 1;
             }
             //TODO тут еще искать по списку не одобренных заявок и если найдено то отправлять null
 
 
-            return res;
+            //return res;
         }
         public Chat GetListMessages(int? id,bool? new_m,int start, int count)
         {
@@ -562,6 +581,12 @@ namespace server_info_web_desk.Models
                 if (!db.Entry(this.Albums.First()).Collection(x2 => x2.Images).IsLoaded)
                 {
                     db.Entry(this.Albums.First()).Collection(x2 => x2.Images).Load();
+                }
+                var check = this.Albums.First().Images.FirstOrDefault();
+                if(check!=null)
+                if (!db.Entry(check).Reference(x2 => x2.Image).IsLoaded)
+                {
+                    db.Entry(check).Reference(x2 => x2.Image).Load();
                 }
             }
             return true;

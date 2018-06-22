@@ -77,9 +77,20 @@ namespace server_info_web_desk.Models.SocialNetwork
                     db.Set<Image>().Attach(this);
                     this.Record_NM = db.Record.FirstOrDefault(x1 => x1.Id == this.RecordId);
                     this.Record_NM.Image = this;
+
+                    if(this.Record_NM.UserId!=null)
+                    if (!db.Entry(this.Record_NM).Reference(x1 => x1.User).IsLoaded)
+                        db.Entry(this.Record_NM).Reference(x1 => x1.User).Load();
+                    if (this.Record_NM.GroupId != null)
+                        if (!db.Entry(this.Record_NM).Reference(x1 => x1.Group).IsLoaded)
+                            db.Entry(this.Record_NM).Reference(x1 => x1.Group).Load();
                     if (!db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).IsLoaded)
                         db.Entry(this.Record_NM).Collection(x1 => x1.UsersLikes).Load();
                 }
+                if (this.Record_NM.UserId != null)
+                    this.Record_NM.User.LoadDataForShort();
+                if (this.Record_NM.GroupId != null)
+                    this.Record_NM.Group.LoadDataForShort();
             }
             else
             {

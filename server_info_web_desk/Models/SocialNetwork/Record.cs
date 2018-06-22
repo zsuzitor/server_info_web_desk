@@ -137,6 +137,8 @@ namespace server_info_web_desk.Models.SocialNetwork
                 return null;
             if(user==null)
                 return null;
+            if(images==null|| images.Count<1)
+                return null;
             var img = new Image() { Data = images?.ElementAt(0), UserId = user.Id };
             Record record = null;
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -201,6 +203,32 @@ namespace server_info_web_desk.Models.SocialNetwork
                 if (this.ImageId != null)
                     if (!db.Entry(this).Reference(x1 => x1.Image).IsLoaded)
                         db.Entry(this).Reference(x1 => x1.Image).Load();
+
+                if (this.GroupId != null)
+                {
+                    if (!db.Entry(this).Reference(x1 => x1.Group).IsLoaded)
+                        db.Entry(this).Reference(x1 => x1.Group).Load();
+                   
+                }
+
+                if (this.UserId != null)
+                {
+                    if (!db.Entry(this).Reference(x1 => x1.User).IsLoaded)
+                        db.Entry(this).Reference(x1 => x1.User).Load();
+                    
+                }
+                
+            }
+            if (this.GroupId != null)
+            {
+                
+                this.Group.LoadDataForShort();
+            }
+
+            if (this.UserId != null)
+            {
+                
+                this.User.LoadDataForShort();
             }
             //i.Meme_NM.Record_NM=
         }
