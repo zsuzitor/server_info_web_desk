@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -8,7 +9,20 @@ namespace server_info_web_desk.Models.functions
 {
     public static class FunctionsProject
     {
+        public static List<T> GetPartialList<T>(ICollection<T> list,int start,int count)
+        {
+            //List<T> res = new List<T>();
+            start = start > 0 ? start - 1 : 0;
+            start = list.Count - start - count;
+            if (start < 0)
+            {
+                count = count + start;
+                start = 0;
+            }
+            //res.AddRange(list.Skip(start).Take(count));
+            return list.Skip(start).Take(count).ToList();
 
+        }
         public static List<byte[]> Get_photo_post(HttpPostedFileBase[] uploadImage)
         {
 

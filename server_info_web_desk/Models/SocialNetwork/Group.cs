@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using static server_info_web_desk.Models.DataBase.DataBase;
+using static server_info_web_desk.Models.functions.FunctionsProject;
 
 
 
@@ -167,10 +168,8 @@ namespace server_info_web_desk.Models.SocialNetwork
             
             List<Record> res = new List<Record>();//System.Collections.Generic.
 
-            start = start > 0 ? start - 1 : 0;
-            start = this.WallRecord.Count - start - count;
+            res.AddRange((List<Record>)GetPartialList<Record>(this.WallRecord, start, count));
 
-            res.AddRange(this.WallRecord.Skip(start).Take(count));
             foreach (var i in res)
             {
                 i.RecordLoadForView();
@@ -304,9 +303,8 @@ namespace server_info_web_desk.Models.SocialNetwork
             }
             else
             {
-                start = start > 0 ? start - 1 : 0;
-                //start = this.Albums.Count - start - count;
-                res.AddRange(this.Albums.Skip(start).Take(count));
+                
+                res.AddRange((List<Album>)GetPartialList<Album>(this.Albums, start, count));
             }
 
 

@@ -252,6 +252,7 @@ function load_more_records() {
 
     var dt = {
         'id': WallRecord_OBJECT.id,
+        'type': WallRecord_OBJECT.type,
         'start': WallRecord_OBJECT.start,
         'count': WallRecord_OBJECT.count
     };

@@ -13,6 +13,7 @@ using static server_info_web_desk.Models.DataBase.DataBase;
 using System.Linq;
 using System.Web.Mvc;
 using System.ComponentModel.DataAnnotations;
+using static server_info_web_desk.Models.functions.FunctionsProject;
 
 namespace server_info_web_desk.Models
 {
@@ -341,16 +342,18 @@ namespace server_info_web_desk.Models
                
            
             List<Record> res = new List<Record>();//System.Collections.Generic.
-            //this.WallRecord.Reverse();
-            start = start > 0 ? start - 1 : 0;
-            start = this.WallRecord.Count - start - count;
-            res.AddRange(this.WallRecord.Skip(start).Take(count));
+                                                  //this.WallRecord.Reverse();
+
+            res.AddRange((List<Record>)GetPartialList<Record>(this.WallRecord, start, count));
+
+            
+            
             foreach (var i in res)
             {
                 i.RecordLoadForView();
                 
             }
-            
+            res.Reverse();
             return res;
         }
 
@@ -368,9 +371,8 @@ namespace server_info_web_desk.Models
            
             List<Record> res = new List<Record>();//System.Collections.Generic.
             //this.News.Reverse();
-            start = start > 0 ? start - 1 : 0;
-            start = this.News.Count - start - count;
-            res.AddRange(this.News.Skip(start).Take(count));
+           
+            res.AddRange((List<Record>)GetPartialList<Record>(this.News, start, count));
             foreach (var i in res)
             {
                 i.RecordLoadForView();
@@ -400,8 +402,9 @@ namespace server_info_web_desk.Models
             }
             else
             {
-                start = start > 0 ? start - 1 : 0;
+                
                 //start = this.Albums.Count - start - count;
+                res.AddRange((List<Album>)GetPartialList<Album>(this.Albums, start, count));
                 res.AddRange(this.Albums.Skip(start).Take(count));
             }
 
@@ -488,9 +491,8 @@ namespace server_info_web_desk.Models
                     db.Entry(dialog).Collection(x1 => x1.Messages).Load();
 
                 //dialog.Messages= dialog.Messages.Reverse().ToList();
-                start = start > 0 ? start - 1 : 0;
-                start = dialog.Messages.Count - start - count;
-                not_res.AddRange(dialog.Messages.Skip(start).Take(count));
+               
+                not_res.AddRange((List<Message>)GetPartialList<Message>(dialog.Messages, start, count));
 
                 foreach (var i in not_res)
                 {
