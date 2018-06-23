@@ -92,7 +92,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                     db.Entry(this).Collection(x1 => x1.Users).Load();
             }
                 
-            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users,null,count));
+            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users, this.Users.Count, count));
             return res;
         }
         public List<ApplicationUserShort> GetAdminShortList( int count)
@@ -105,32 +105,27 @@ namespace server_info_web_desk.Models.SocialNetwork
                     db.Entry(this).Collection(x1 => x1.Admins).Load();
             }
                 
-            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, null, count));
+            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, this.Admins.Count, count));
             return res;
         }
 
         public  void LoadDataForShort()
         {
+            Album alb = null;
             //картинка
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<Group>().Attach(this);
-                if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Albums).Load();
-                if (!db.Entry(this.Albums.First()).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(this.Albums.First()).Collection(x1 => x1.Images).Load();
-                var check = this.Albums.First().Images.LastOrDefault();
-                if (check != null)
-                {
-                    if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
-                        db.Entry(check).Reference(x1 => x1.Image).Load();
-                }
-
-
                 //подписчики
                 if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.Users).Load();
+                if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Albums).Load();
+
+                alb = this.Albums.First();
+
             }
+            alb.LoadDataForShort();
             //GroupShort res = new GroupShort(this);
 
             return;

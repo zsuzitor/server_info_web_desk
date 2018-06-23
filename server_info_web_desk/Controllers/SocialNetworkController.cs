@@ -78,7 +78,8 @@ namespace server_info_web_desk.Controllers
                 if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
                     db.Entry(user).Collection(x1 => x1.Friends).Load();
             }
-            res.Friends.AddRange(user.Friends.Skip(user.Friends.Count-6>0? (user.Friends.Count-6):0).Select(x1=>new Models.ApplicationUserShort(x1)));
+            res.Friends.AddRange(user.Friends.Skip(user.Friends.Count-6>0? (user.Friends.Count-6):0)
+                .Select(x1=>new Models.ApplicationUserShort(x1)));
             Session["NewMessageType"] = "2";
             return View(res);
         }
@@ -122,7 +123,7 @@ namespace server_info_web_desk.Controllers
                 res.CanFollow = group.CanFollow(check_id);
 
 
-            res.Users=group.GetUserShortList(-6);
+            res.Users=group.GetUserShortList(6);
             res.Admins=group.GetAdminShortList( 6);
 
             res.IdMainAlbum = group.GetAlbums(null, 0, 1).First().Id;
@@ -176,7 +177,8 @@ namespace server_info_web_desk.Controllers
         {
             //TODO проверять есть ли доступ
             string check_id = ApplicationUser.GetUserId();
-            ListAlbumsShortView res = new ListAlbumsShortView() {UserId= check_id,PageUserId=id, SelectAlbum=select_id };
+            ListAlbumsShortView res = new ListAlbumsShortView() {
+                UserId = check_id,PageUserId=id, SelectAlbum=select_id };
             //var userPage = db.Users.FirstOrDefault(x1 => x1.Id == id);
             ApplicationUser userPage = ApplicationUser.GetUser(id);
             if (userPage == null)
@@ -190,7 +192,8 @@ namespace server_info_web_desk.Controllers
             
                 
             
-             res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
+             res.AlbumList.AddRange(Models.SocialNetwork.Album
+                 .GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
 
             Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
@@ -200,7 +203,8 @@ namespace server_info_web_desk.Controllers
         public ActionResult AlbumsGroup(int id, int? select_id)
         {
             string check_id = ApplicationUser.GetUserId();
-            ListAlbumsShortView res = new ListAlbumsShortView() { UserId = check_id, PageGroupId = id, SelectAlbum = select_id };
+            ListAlbumsShortView res = new ListAlbumsShortView() {
+                UserId = check_id, PageGroupId = id, SelectAlbum = select_id };
             Group group = Group.GetGroup(id);
             if (group == null)
                 return new HttpStatusCodeResult(404);
@@ -213,7 +217,8 @@ namespace server_info_web_desk.Controllers
                 
 
             
-            res.AlbumList.AddRange(Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)group.Albums, group.Albums.Count));
+            res.AlbumList.AddRange(Models.SocialNetwork.Album
+                .GetAlbumShortListForView((List<Album>)group.Albums, group.Albums.Count));
             Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
         }
@@ -586,7 +591,8 @@ namespace server_info_web_desk.Controllers
             }
 
             //res = !res;
-            return Redirect(Url.Action("FollowUserPartial", "SocialNetwork", new { Iduser = id, CanAddFriend = res }));
+            return Redirect(Url.Action("FollowUserPartial", "SocialNetwork", new {
+                Iduser = id, CanAddFriend = res }));
         }
 
 
@@ -737,8 +743,8 @@ namespace server_info_web_desk.Controllers
             Album album = null;
             using (ApplicationDbContext db = new ApplicationDbContext())
                 album = db.Albums.FirstOrDefault(x1 => x1.Id == id);
-            album.GetAlbumImages(start, count);
-            res.AddRange(album.Images.Select(x1=>x1.Image));//.Select(x1=>new ImageShort() {Id=(int)x1.ImageId,Data=x1.Image.Data }
+            
+            res.AddRange(album.GetAlbumImages(start, count));//.Select(x1=>new ImageShort() {Id=(int)x1.ImageId,Data=x1.Image.Data }
 
             return PartialView(res);
             
@@ -836,7 +842,8 @@ namespace server_info_web_desk.Controllers
             switch (type_message_need)
             {
                 case "1":
-                    return Redirect(Url.Action("ListMessagesUser", "SocialNetwork", new { id = dialog, new_m = true }));//start = 0, int count = 10
+                    return Redirect(Url.Action("ListMessagesUser", "SocialNetwork", new {
+                        id = dialog, new_m = true }));//start = 0, int count = 10
                     break;
                 case "2":
                     //отправить колличество
@@ -848,7 +855,8 @@ namespace server_info_web_desk.Controllers
                             db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
                     }
                         
-                    return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork",new { str=user.MessageNeedRead.Count.ToString() }));
+                    return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork",new {
+                        str =user.MessageNeedRead.Count.ToString() }));
                     break;
 
                 case "3":
@@ -957,10 +965,11 @@ namespace server_info_web_desk.Controllers
                 if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
                     db.Entry(group).Collection(x1 => x1.Users).Load();
             }
-                
-            start = start > 0 ? start - 1 : 0;
-            start = group.Users.Count - start - count;
-            res.AddRange(group.Users.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+
+           
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(group.Users, start, count))
+                .Select(x1 => new Models.ApplicationUserShort(x1)));
+            //res.AddRange(group.Users.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
 
             return PartialView("ListUsers", res);
@@ -983,9 +992,10 @@ namespace server_info_web_desk.Controllers
                     db.Entry(user).Collection(x1 => x1.Friends).Load();
             }
                 
-            start = start > 0 ? start - 1 : 0;
-            start = user.Friends.Count - start - count;
-            res.AddRange(user.Friends.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+            
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(user.Friends, start, count))
+                .Select(x1 => new Models.ApplicationUserShort(x1)));
+            //res.AddRange(user.Friends.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
             
             return PartialView("ListUsers",res);
@@ -1005,10 +1015,11 @@ namespace server_info_web_desk.Controllers
                 if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
                     db.Entry(user).Collection(x1 => x1.Followers).Load();
             }
-                
-            start = start > 0 ? start - 1 : 0;
-            start = user.Followers.Count - start - count;
-            res.AddRange(user.Followers.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(user.Followers, start, count))
+                .Select(x1 => new Models.ApplicationUserShort(x1)));
+
+            //res.AddRange(user.Followers.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
             return PartialView("ListUsers", res);
 
@@ -1029,9 +1040,11 @@ namespace server_info_web_desk.Controllers
                     db.Entry(user).Collection(x1 => x1.FollowUser).Load();
             }
                
-            start = start > 0 ? start - 1 : 0;
-            start = user.FollowUser.Count - start - count;
-            res.AddRange(user.FollowUser.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
+           
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(user.FollowUser, start, count))
+                .Select(x1 => new Models.ApplicationUserShort(x1)));
+
+           // res.AddRange(user.FollowUser.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
             return PartialView("ListUsers", res);
 

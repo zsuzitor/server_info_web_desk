@@ -5,6 +5,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using static server_info_web_desk.Models.DataBase.DataBase;
+using static server_info_web_desk.Models.functions.FunctionsProject;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
@@ -68,44 +69,52 @@ namespace server_info_web_desk.Models.SocialNetwork
             List<AlbumShort> res = new List<AlbumShort>();
             for (var i=0;i<count;++i)
             {
-                res.Add(GetAlbumShortForView(a[i]));
+                res.Add(new AlbumShort(a[i]));
             }
 
             return res;
         }
 
-        public static AlbumShort GetAlbumShortForView(Album a)
-        {
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<Album>().Attach(a);
-                if (!db.Entry(a).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(a).Collection(x1 => x1.Images).Load();
-                var check = a.Images.LastOrDefault();
-                if (check != null)
-                    if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
-                        db.Entry(check).Reference(x1 => x1.Image).Load();
-            }
-            return new AlbumShort(a);
+        //public static AlbumShort GetAlbumShortForView(Album a)
+        //{
+        //    a.LoadDataForShort();
+        //    return new AlbumShort(a);
 
-        }
-
-        public  void GetAlbumImages( int start, int count)
+        //}
+        public bool LoadDataForShort()
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<Album>().Attach(this);
                 if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.Images).Load();
-                foreach (var i in this.Images)
+                var check = this.Images.LastOrDefault();
+                if (check != null)
+                    if (!db.Entry(check).Reference(x1 => x1.Image).IsLoaded)
+                        db.Entry(check).Reference(x1 => x1.Image).Load();
+
+            }
+
+            return true;
+        }
+        public  List<Image> GetAlbumImages( int start, int count)
+        {
+            List<Record> res = new List<Record>();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Album>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Images).Load();
+
+                res.AddRange((List<Record>)GetPartialList<Record>(this.Images, start, count));
+                foreach (var i in res)
                 {
                     if (!db.Entry(i).Reference(x1 => x1.Image).IsLoaded)
                         db.Entry(i).Reference(x1 => x1.Image).Load();
                 }
             }
 
-
-            return;
+            return res.Select(x1 => x1.Image).ToList();
 
         }
     }
@@ -132,6 +141,9 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             Id = a.Id;
             Name = a.Name;
+
+            a.LoadDataForShort();
+
             CountImage = a.Images.Count;
             Image = a.Images.LastOrDefault()?.Image;
         }

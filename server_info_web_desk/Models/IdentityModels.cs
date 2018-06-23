@@ -221,23 +221,16 @@ namespace server_info_web_desk.Models
 
 
         //если указан старт то count должен быть>0
-        public static List<ApplicationUserShort> UserListToShort(List<ApplicationUser> a,int? start, int count)
+        public static List<ApplicationUserShort> UserListToShort(List<ApplicationUser> a,int start, int count)
         {
+            //TODO не нужно, просто для проверки, потом убрать
+            if (count < 0)
+                throw new Exception("посмотреть стек и поправить что бы count не передавалось меньше 0 тк метод поменял");
             List<ApplicationUserShort> res = new List<ApplicationUserShort>();
-            if (start == null)
-            {
 
-           
-            if (count > 0)
-                res.AddRange(a.Take((count <= a.Count ? count : a.Count)).Select(x1 =>
-                       new Models.ApplicationUserShort(x1)));
-            else
-                res.AddRange(a.Skip((a.Count - Math.Abs(count) > 0 ? a.Count - Math.Abs(count) : 0)).Select(x1 =>
-                         new Models.ApplicationUserShort(x1)));
-            }
-            else
-                res.AddRange(a.Skip(((int)start > 1 ? (int)start -1 : (int)start)).Take(count).Select(x1 =>
-                             new Models.ApplicationUserShort(x1)));
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(a, start, count)).Select(x1 =>
+                      new Models.ApplicationUserShort(x1)));
+
             
             return res;
         }
@@ -310,7 +303,7 @@ namespace server_info_web_desk.Models
         }
 
         //вернуть список усеченных гурупп пользователя
-        public  List<GroupShort> UserGroupToShort( int? start, int count)
+        public  List<GroupShort> UserGroupToShort( int start, int count)
         {
             List<GroupShort> res = new List<GroupShort>();
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -319,13 +312,13 @@ namespace server_info_web_desk.Models
                 if (!db.Entry(this).Collection(x1 => x1.Group).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.Group).Load();
             }
-            
-                
 
-            res.AddRange(this.Group.Select(x1 => {
+
+            res.AddRange(((List<Group>)GetPartialList<Group>(this.Group, start, count)).Select(x1 => {
                 x1.LoadDataForShort();
                 return new GroupShort(x1);
-                }));
+            }));
+
             
             return res;
         }
@@ -339,14 +332,9 @@ namespace server_info_web_desk.Models
                     db.Entry(this).Collection(x1 => x1.WallRecord).Load();
             }
             
-               
-           
             List<Record> res = new List<Record>();//System.Collections.Generic.
                                                   //this.WallRecord.Reverse();
-
             res.AddRange((List<Record>)GetPartialList<Record>(this.WallRecord, start, count));
-
-            
             
             foreach (var i in res)
             {
@@ -405,7 +393,7 @@ namespace server_info_web_desk.Models
                 
                 //start = this.Albums.Count - start - count;
                 res.AddRange((List<Album>)GetPartialList<Album>(this.Albums, start, count));
-                res.AddRange(this.Albums.Skip(start).Take(count));
+                //res.AddRange(this.Albums.Skip(start).Take(count));
             }
 
 
@@ -573,6 +561,7 @@ namespace server_info_web_desk.Models
         }
         public bool LoadDataForShort()
         {
+            Album alb = null;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<ApplicationUser>().Attach(this);
@@ -580,17 +569,11 @@ namespace server_info_web_desk.Models
                 {
                     db.Entry(this).Collection(x2 => x2.Albums).Load();
                 }
-                if (!db.Entry(this.Albums.First()).Collection(x2 => x2.Images).IsLoaded)
-                {
-                    db.Entry(this.Albums.First()).Collection(x2 => x2.Images).Load();
-                }
-                var check = this.Albums.First().Images.FirstOrDefault();
-                if(check!=null)
-                if (!db.Entry(check).Reference(x2 => x2.Image).IsLoaded)
-                {
-                    db.Entry(check).Reference(x2 => x2.Image).Load();
-                }
+                alb = this.Albums.First();
             }
+            alb.LoadDataForShort();
+
+
             return true;
         }
     }
