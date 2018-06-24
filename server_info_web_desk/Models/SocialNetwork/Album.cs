@@ -1,4 +1,5 @@
-﻿using System;
+﻿using server_info_web_desk.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -9,7 +10,7 @@ using static server_info_web_desk.Models.functions.FunctionsProject;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Album
+    public class Album:IDomain<int>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
@@ -64,16 +65,16 @@ namespace server_info_web_desk.Models.SocialNetwork
 
                 return res;
         }
-        public static List<AlbumShort> GetAlbumShortListForView(List<Album> a,int count)
-        {
-            List<AlbumShort> res = new List<AlbumShort>();
-            for (var i=0;i<count;++i)
-            {
-                res.Add(new AlbumShort(a[i]));
-            }
+        //public static List<AlbumShort> GetAlbumShortListForView(List<Album> a,int count)
+        //{
+        //    List<AlbumShort> res = new List<AlbumShort>();
+        //    for (var i=0;i<count;++i)
+        //    {
+        //        res.Add(new AlbumShort(a[i]));
+        //    }
 
-            return res;
-        }
+        //    return res;
+        //}
 
         //public static AlbumShort GetAlbumShortForView(Album a)
         //{
@@ -117,7 +118,28 @@ namespace server_info_web_desk.Models.SocialNetwork
             return res.Select(x1 => x1.Image).ToList();
 
         }
-    }
+
+
+        public static Album GetAlbum(int id)
+        {
+            Album album = null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+                album = db.Albums.FirstOrDefault(x1 => x1.Id == id);
+            return album;
+        }
+
+            //----------------------------------------------------------------------------обобщенные
+            //public static List<AlbumShort> GetAlbums<T>(T a, int start, int count)
+            //{
+            //    using (ApplicationDbContext db = new ApplicationDbContext())
+            //    {
+            //        db.Set<T>().Attach(a);
+            //        if (!db.Entry(a).Collection(x1 => x1.Albums).IsLoaded)
+            //            db.Entry(userPage).Collection(x1 => x1.Albums).Load();
+            //    }
+
+            //}
+        }
 
     public class AlbumShort
     {

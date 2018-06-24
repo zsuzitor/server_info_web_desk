@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using server_info_web_desk.Models.Interfaces;
 using static server_info_web_desk.Models.DataBase.DataBase;
 using static server_info_web_desk.Models.functions.FunctionsProject;
 
@@ -12,13 +13,13 @@ using static server_info_web_desk.Models.functions.FunctionsProject;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Group
+    public class Group : IPageR, IHaveAlbum, IDomain<int>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
 
-        
+
         [Required(ErrorMessage = "Имя группы должно быть установлено")]
         public string Name { get; set; }
         public string Status { get; set; }
@@ -32,15 +33,88 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string MainAdminId { get; set; }
         public ApplicationUser MainAdmin { get; set; }
 
-        public ICollection<Record> RecordCreated { get; set; }
+        public List<Record> RecordCreated { get; set; }
 
-        public ICollection<ApplicationUser> Users { get; set; }
-        public ICollection<ApplicationUser> Admins { get; set; }
+        public List<ApplicationUser> Users { get; set; }
+        public List<ApplicationUser> Admins { get; set; }
 
-        public ICollection<Album> Albums { get; set; }
-        public ICollection<Record> WallRecord { get; set; }//тк есть еще записи которые можно репостить
+        public List<Album> Albums { get; set; }
+        public List<Record> WallRecord { get; set; }//тк есть еще записи которые можно репостить
 
 
+        public static Group CreateNewGroup(string name)
+        {
+            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            Group res = new Group() { Name = name, MainAdminId = user.Id };
+            
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Groups.Add(res);
+                db.SaveChanges();
+
+                db.Albums.Add(new Album()
+                {
+                    Name = "Main",
+                    Description = "Сюда добавляются главные фотографии с вашей страницы",
+                    //User = admin
+                    GroupId = res.Id
+                });
+                db.Albums.Add(new Album()
+                {
+                    Name = "NotMain",
+                    Description = "Сюда добавляются фотографии с вашей страницы",
+                    GroupId = res.Id
+                });
+
+                db.Set<ApplicationUser>().Attach(user);
+
+                res.Admins.Add(user);
+                res.Users.Add(user);
+                db.SaveChanges();
+            }
+            return res;
+        }
+
+
+        public int Follow(ApplicationUser user)
+        {
+            int res = 0;
+            if (this == null)
+                return 0;
+            res = this.CanFollow(user.Id);
+            var group = this;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                
+                db.Set<ApplicationUser>().Attach(user);
+                try
+                {
+                    db.Set<Group>().Attach(group);
+                }
+                catch
+                {
+                    //оставить именно так а не методом
+                    //group = db.Groups.First(x1 => x1.Id == group.Id);
+                    group = Group.GetGroup(group.Id, db);
+                }
+                switch (res)
+                {
+                    case 1:
+                        group.Users.Add(user);
+                        res = -1;
+                        break;
+                    case 2:
+                        group.Users.Remove(user);
+                        res = -1;
+                        break;
+                    case 3:
+                        break;
+                }
+              
+                db.SaveChanges();
+            }
+            return res;
+        }
 
         public Group()
         {
@@ -81,8 +155,24 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
 
+        public List<ApplicationUserShort> GetFollowersShortList(int count)
+        {
+            //TODO пока что нет фоловеров
+            List<ApplicationUserShort> res = new List<ApplicationUserShort>();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                //db.Set<Group>().Attach(this);
+                //if (!db.Entry(this).Collection(x1 => x1.).IsLoaded)
+                //    db.Entry(this).Collection(x1 => x1.Users).Load();
+            }
 
-        public List<ApplicationUserShort> GetUserShortList( int count)
+            //res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users, this.Users.Count, count));
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(this.Users, 0, count)).Select(x1 =>
+                      new Models.ApplicationUserShort(x1)));
+
+            return res;
+        }
+        public List<ApplicationUserShort> GetUserShortList(int start, int count)
         {
             List<ApplicationUserShort> res = new List<ApplicationUserShort>();
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -92,7 +182,10 @@ namespace server_info_web_desk.Models.SocialNetwork
                     db.Entry(this).Collection(x1 => x1.Users).Load();
             }
                 
-            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users, this.Users.Count, count));
+            //res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Users, this.Users.Count, count));
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(this.Users, start, count)).Select(x1 =>
+                      new Models.ApplicationUserShort(x1)));
+
             return res;
         }
         public List<ApplicationUserShort> GetAdminShortList( int count)
@@ -105,11 +198,13 @@ namespace server_info_web_desk.Models.SocialNetwork
                     db.Entry(this).Collection(x1 => x1.Admins).Load();
             }
                 
-            res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, this.Admins.Count, count));
+            //res.AddRange(ApplicationUser.UserListToShort((List<ApplicationUser>)this.Admins, this.Admins.Count, count));
+            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(this.Admins, 0, count)).Select(x1 =>
+                      new Models.ApplicationUserShort(x1)));
             return res;
         }
 
-        public  void LoadDataForShort()
+        public  bool LoadDataForShort()
         {
             Album alb = null;
             //картинка
@@ -128,7 +223,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             alb.LoadDataForShort();
             //GroupShort res = new GroupShort(this);
 
-            return;
+            return true;
         }
 
         //добавляет на стену и раскидывает по новостям
@@ -173,6 +268,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
             return res;
         }
+
         public bool CanAddMeme(string user_id)
         {
             bool res = false;
@@ -239,6 +335,42 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
 
+        public bool? AddImage(string text, HttpPostedFileBase[] uploadImage, int? album_id, int? id_group)
+        {
+            ApplicationUser user = null;
+            string check_id = ApplicationUser.GetUserId();
+            bool can_add = this.CanAddMeme(check_id);
+            if (!can_add)
+                return null;
+
+            var album = this.GetAlbums(album_id).FirstOrDefault();
+            //TODO проверка
+            var ch_al = this.GetAlbums(null, 0, 1).First();
+
+            if (can_add && ch_al.Id == album.Id)
+            {
+                can_add = this.HaveAccessAdminGroup(check_id);
+            }
+            if (!can_add)
+                return null;
+
+            if (album == null)
+                return null;
+            var list_img_byte = Get_photo_post(uploadImage);
+            if (user == null)
+                user = ApplicationUser.GetUser(check_id);
+            //user =db.Users.FirstOrDefault(x1 => x1.Id == check_id);
+
+            var record = Record.AddRecordImage(album, user, this, list_img_byte, text);
+
+            this.AddRecordMemeWall(record);
+
+
+            return true;
+        }
+
+
+
         //проверить может ли пользователь редактировать группу(является админом)
         public bool HaveAccessAdminGroup(string userId)
         {
@@ -280,7 +412,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             return true;
         }
 
-        public List<Album> GetAlbums(int? id, int start = 0, int count = 1)
+        public List<Album> GetAlbums(int? id, int start = 0, int? count = null)
         {
             List<Album> res = new List<Album>();
             using (ApplicationDbContext db = new ApplicationDbContext())

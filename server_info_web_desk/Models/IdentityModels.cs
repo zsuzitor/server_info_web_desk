@@ -14,11 +14,12 @@ using System.Linq;
 using System.Web.Mvc;
 using System.ComponentModel.DataAnnotations;
 using static server_info_web_desk.Models.functions.FunctionsProject;
+using System.Web;
 
 namespace server_info_web_desk.Models
 {
     // You can add profile data for the user by adding more properties to your ApplicationUser class, please visit http://go.microsoft.com/fwlink/?LinkID=317594 to learn more.
-    public class ApplicationUser : IdentityUser, Iuser
+    public class ApplicationUser : IdentityUser, Iuser, IPageR, IHaveAlbum, IDomain<string>
     {
         [Required(ErrorMessage="Обязательный параметр")]
         [Display(Name = "Имя")]
@@ -69,7 +70,7 @@ namespace server_info_web_desk.Models
         public List<Record> UsersLikesRecord { get; set; }
         public List<Record> UsersRipostes { get; set; }
         public List<Record> News { get; set; }
-
+        
         public List<Album> Albums { get; set; }
 
         public List<Comment> Comments { get; set; }//которые пользователь оставил где либо
@@ -176,6 +177,19 @@ namespace server_info_web_desk.Models
             return res;
         }
 
+        public List<Chat> GetChats(int start,int count)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Chats).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Chats).Load();
+            }
+            return (List<Chat>)GetPartialList<Chat>(this.Chats, start, count);
+        }
+
+
+        //поиска чата по id чата
         public Chat GetChat(int? id_chat)
         {
             //тут возможно не загружать диалоги юзера а искать диалог по id и загружать его пользователей мб так лучше
@@ -198,6 +212,7 @@ namespace server_info_web_desk.Models
             }
 
         }
+        //поиска чата по id пользователя
         public Chat GetChat(string id_user)
         {
             if (id_user == null)
@@ -221,19 +236,19 @@ namespace server_info_web_desk.Models
 
 
         //если указан старт то count должен быть>0
-        public static List<ApplicationUserShort> UserListToShort(List<ApplicationUser> a,int start, int count)
-        {
-            //TODO не нужно, просто для проверки, потом убрать
-            if (count < 0)
-                throw new Exception("посмотреть стек и поправить что бы count не передавалось меньше 0 тк метод поменял");
-            List<ApplicationUserShort> res = new List<ApplicationUserShort>();
+        //public static List<ApplicationUserShort> UserListToShort(List<ApplicationUser> a,int start, int count)
+        //{
+        //    //TODO не нужно, просто для проверки, потом убрать
+        //    if (count < 0)
+        //        throw new Exception("посмотреть стек и поправить что бы count не передавалось меньше 0 тк метод поменял");
+        //    List<ApplicationUserShort> res = new List<ApplicationUserShort>();
 
-            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(a, start, count)).Select(x1 =>
-                      new Models.ApplicationUserShort(x1)));
+        //    res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(a, start, count)).Select(x1 =>
+        //              new Models.ApplicationUserShort(x1)));
 
             
-            return res;
-        }
+        //    return res;
+        //}
 
         //редактирует и сохраняем данные пользователя
         public bool ChageUserData(ApplicationUser a)
@@ -371,7 +386,7 @@ namespace server_info_web_desk.Models
         }
 
         //получить альбом по номеру или id
-        public List<Album> GetAlbums(int? id,int start=0, int count=1)
+        public List<Album> GetAlbums(int? id,int start=0, int? count=null)
         {
             List<Album> res = new List<Album>();
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -519,6 +534,23 @@ namespace server_info_web_desk.Models
         }
 
 
+        public bool? AddImage(string text, HttpPostedFileBase[] uploadImage, int? album_id)
+        {
+            var album = this.GetAlbums(album_id).FirstOrDefault();
+            if (album == null)
+                return null;
+            var list_img_byte = Get_photo_post(uploadImage);
+
+            var record = Record.AddRecordImage(album, this, null, list_img_byte, text);
+            if (record == null)
+                return null;
+            this.AddRecordWall(record);
+
+
+            return true;
+        }
+
+
         public Message SendNewMessage(int dialog,List<byte[]>images,string text)
         {
             Message res = null;
@@ -559,6 +591,65 @@ namespace server_info_web_desk.Models
             }
             return res;
         }
+        public int GetCountNewMessages()
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.MessageNeedRead).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.MessageNeedRead).Load();
+            }
+            return this.MessageNeedRead.Count;
+        }
+
+        public List<ApplicationUser> GetFollow(int start, int count)
+        {
+            //List<ApplicationUser> res = new List<ApplicationUser>();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.FollowUser).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.FollowUser).Load();
+            }
+
+
+            return (List<ApplicationUser>)GetPartialList<ApplicationUser>(this.FollowUser, start, count);
+
+            //return res;
+        }
+
+        public List<ApplicationUser> GetFriends(int start, int count)
+        {
+            //List<ApplicationUser> res = new List<ApplicationUser>();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Friends).Load();
+            }
+            
+
+            return (List<ApplicationUser>)GetPartialList<ApplicationUser>(this.Friends, start, count);
+
+            //return res;
+        }
+        public List<ApplicationUser> GetFollowers(int start, int count)
+        {
+            //List<ApplicationUser> res = new List<ApplicationUser>();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Followers).Load();
+            }
+
+
+            return (List<ApplicationUser>)GetPartialList<ApplicationUser>(this.Followers, start, count);
+
+           // return res;
+        }
+
+
         public bool LoadDataForShort()
         {
             Album alb = null;
@@ -576,7 +667,77 @@ namespace server_info_web_desk.Models
 
             return true;
         }
-    }
+
+        //добавить в списков фолловеров другей или фоловнутых
+        //1 подписывает act на this, 2удаляет из друзей и подписывает this на act 3 удаляет из пидписчиков this
+        //4 удаляет из списка тех на кого подписан this и добавляет в друзья
+        public int ActionListUsers(int action,ApplicationUser user_act)
+        {
+
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+
+                db.Set<ApplicationUser>().Attach(this);
+                try
+                {
+                    db.Set<ApplicationUser>().Attach(user_act);
+                }
+                catch
+                {
+
+                    user_act = ApplicationUser.GetUser(ApplicationUser.GetUserId(), db);
+                    // user_act = db.Users.First(x1 => x1.Id == id);
+                }
+
+
+                switch (action)
+                {
+                    case 1:
+                        if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.Followers).Load();
+                        this.Followers.Add(user_act);
+                        action = 3;
+                        break;
+                    case 2:
+                        if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.Friends).Load();
+                        if (!db.Entry(this).Collection(x1 => x1.FriendUser).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.FriendUser).Load();
+                        this.Friends.Remove(user_act);
+                        this.FriendUser.Remove(user_act);
+                        this.FollowUser.Add(user_act);
+                        action = 3;
+                        break;
+                    case 3:
+                        if (!db.Entry(this).Collection(x1 => x1.Followers).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.Followers).Load();
+                        this.Followers.Remove(user_act);
+                        action = 1;
+                        break;
+                    case 4:
+                        if (!db.Entry(this).Collection(x1 => x1.FollowUser).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.FollowUser).Load();
+                        if (!db.Entry(this).Collection(x1 => x1.Friends).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.Friends).Load();
+                        if (!db.Entry(this).Collection(x1 => x1.FriendUser).IsLoaded)
+                            db.Entry(this).Collection(x1 => x1.FriendUser).Load();
+                        this.FollowUser.Remove(user_act);
+                        this.Friends.Add(user_act);
+                        this.FriendUser.Add(user_act);
+                        action = 2;
+                        break;
+                }
+
+
+                db.SaveChanges();
+            }
+
+
+            return action;
+        }
+
+
+        }
 
     public class ApplicationUserShort
     {

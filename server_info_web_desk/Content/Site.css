@@ -124,12 +124,18 @@ div.div_content_main_size_1{
     width:230px;
          border:1px solid black;
          transition:1s;
+         box-shadow: 0 0 10px rgba(0,0,0,0.5);
+          border-radius:10px;
+         overflow:hidden;
          /*min-height:10000px;*/
      }
 div.div_content_main_size_2{
     width:510px;
          border:1px solid black;
          transition:1s;
+         box-shadow: 0 0 10px rgba(0,0,0,0.5);
+         border-radius:10px;
+         overflow:hidden;
      }
 
 /*----------------------------------------------------------------------------------
@@ -183,6 +189,7 @@ div.div_for_replace_ajax_2{
         width:100%;
         z-index:5;
         min-width:960px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
     }
 
 
@@ -259,7 +266,9 @@ div.div_for_replace_ajax_2{
         border:2px solid black;
         position:absolute;
         transition:1s;
-        
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        border-radius:10px;
+         overflow:hidden;
     }
 
      li.LeftMenuPersonal_one_line{

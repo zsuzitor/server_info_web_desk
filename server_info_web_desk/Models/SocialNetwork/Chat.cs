@@ -1,15 +1,17 @@
-﻿using System;
+﻿using server_info_web_desk.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using static server_info_web_desk.Models.DataBase.DataBase;
+using server_info_web_desk.Models;
 
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Chat
+    public class Chat: IDomain<int>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
@@ -70,6 +72,34 @@ namespace server_info_web_desk.Models.SocialNetwork
            
             return res;
            
+        }
+
+
+        public static Chat CreateNewChat(ApplicationUser creator, ApplicationUser user)
+        {
+
+           var chat = new Chat() { CreatorId = creator.Id };
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(creator);
+                try
+                {
+                    db.Set<ApplicationUser>().Attach(user);
+                }
+                catch
+                {
+                    //оставить именно так а не методом
+                    user = ApplicationUser.GetUser(user.Id, db);
+                }
+                //db.Set<ApplicationUser>().Attach(user);
+
+                db.Chats.Add(chat);
+                db.SaveChanges();
+                chat.Users.Add(user);
+                chat.Users.Add(creator);
+                db.SaveChanges();
+            }
+            return chat;
         }
         }
 

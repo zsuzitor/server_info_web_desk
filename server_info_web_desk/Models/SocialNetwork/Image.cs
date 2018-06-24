@@ -1,4 +1,5 @@
-﻿using System;
+﻿using server_info_web_desk.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
@@ -9,7 +10,7 @@ using static server_info_web_desk.Models.DataBase.DataBase;
 namespace server_info_web_desk.Models.SocialNetwork
 {
     [Table("ImageSocial")]
-    public class Image : server_info_web_desk.Models.Interfaces.AImage
+    public class Image : server_info_web_desk.Models.Interfaces.AImage, IDomain<int>
     {
         //public bool MainImages { get; set; }
 
@@ -65,6 +66,14 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         //    }
         //}
+
+        public static Image GetImage(int id)
+        {
+            Image img = null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+                img = db.ImagesSocial.FirstOrDefault(x1 => x1.Id == id);
+            return img; 
+        }
 
             //ищет в бд по id  если id нет то создает record только для представления(бд не трогает)
         public void GetRecordForShow()

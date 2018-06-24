@@ -1,4 +1,5 @@
-﻿using System;
+﻿using server_info_web_desk.Models.SocialNetwork;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
@@ -6,6 +7,26 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.Interfaces
 {
+    public interface IDomain<T>
+    {
+        T Id { get; set; }
+    }
+    public interface IPageR
+    {
+        bool LoadDataForShort();
+    }
+    public interface IHaveAlbum
+    {
+        List<Album> Albums { get; set; }
+        List<Album> GetAlbums(int? id, int start = 0, int? count = null);
+
+    }
+    public interface IHaveUsersList
+    {
+
+    }
+
+
     public abstract class AImage
     {
         //int Id { get; set; }

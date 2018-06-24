@@ -1,4 +1,5 @@
-﻿using System;
+﻿using server_info_web_desk.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Comment
+    public class Comment: IDomain<int>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]

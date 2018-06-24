@@ -1,4 +1,5 @@
-﻿using System;
+﻿using server_info_web_desk.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -8,7 +9,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Meme
+    public class Meme: IDomain<int>
     {
         [Key]
         [ForeignKey("Record")]

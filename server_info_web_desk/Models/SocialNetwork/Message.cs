@@ -1,13 +1,15 @@
-﻿using System;
+﻿using server_info_web_desk.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
+using server_info_web_desk.Models;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Message
+    public class Message: IDomain<int>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
@@ -32,6 +34,24 @@ namespace server_info_web_desk.Models.SocialNetwork
         //public ICollection<ApplicationUser> Users { get; set; }
 
         public ICollection<ApplicationUser> UserNeedRead { get; set; }
+
+        //public static int? GetCountNewMessages(ApplicationUser user)
+        //{
+        //    if (user == null)
+        //        return null;
+                
+        //        using (ApplicationDbContext db = new ApplicationDbContext())
+        //        {
+        //            db.Set<ApplicationUser>().Attach(user);
+        //            if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
+        //                db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
+        //        }
+
+        //        return user.MessageNeedRead.Count;
+            
+        //}
+
+
 
         public Message()
         {

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using server_info_web_desk.Models.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -13,7 +14,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 {
 
     //при репосте создается новая запись и новая ссылается на ту которую репостили
-    public class Record
+    public class Record: IDomain<int>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]

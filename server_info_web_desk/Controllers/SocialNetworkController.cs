@@ -58,9 +58,9 @@ namespace server_info_web_desk.Controllers
             res.IdMainAlbum = user.GetAlbums(null,0,1).First().Id;
             res.IdNotMainAlbum = user.GetAlbums(null, 1, 1).First().Id;
 
-            res.Albums=Models.SocialNetwork.Album.GetAlbumShortListForView(user.Albums,2);
+            //res.Albums=Models.SocialNetwork.Album.GetAlbumShortListForView(user.Albums,2);
+            res.Albums.AddRange((user.GetAlbums(null, 0, 2)).Select(x1 => new AlbumShort(x1)));
 
-            
             res.MainImage = Models.SocialNetwork.Album.GetLastImageAlbum(user.Albums.First(),1).FirstOrDefault(); 
 
             res.Image.AddRange(Models.SocialNetwork.Album.GetLastImageAlbum(user.Albums.ElementAt(1), 4));
@@ -72,14 +72,10 @@ namespace server_info_web_desk.Controllers
 
             res.CanAddFriend = user.CanFollow(check_id);
 
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(user);
-                if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.Friends).Load();
-            }
-            res.Friends.AddRange(user.Friends.Skip(user.Friends.Count-6>0? (user.Friends.Count-6):0)
-                .Select(x1=>new Models.ApplicationUserShort(x1)));
+           
+
+            res.Friends.AddRange((user.GetFriends(0,6))
+                .Select(x1 => new Models.ApplicationUserShort(x1)));
             Session["NewMessageType"] = "2";
             return View(res);
         }
@@ -123,13 +119,15 @@ namespace server_info_web_desk.Controllers
                 res.CanFollow = group.CanFollow(check_id);
 
 
-            res.Users=group.GetUserShortList(6);
+            res.Users=group.GetUserShortList(0,6);
             res.Admins=group.GetAdminShortList( 6);
 
             res.IdMainAlbum = group.GetAlbums(null, 0, 1).First().Id;
             res.IdNotMainAlbum = group.GetAlbums(null, 1, 1).First().Id;
 
-            res.Albums = Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)group.Albums, 2);
+            //res.Albums = Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)group.Albums, 2);
+            res.Albums.AddRange((group.GetAlbums(null, 0, 2)).Select(x1 => new AlbumShort(x1)));
+
             res.MainImage= Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.First(), 1).FirstOrDefault();
 
             res.Image = Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.ElementAt(1), 4);
@@ -183,17 +181,22 @@ namespace server_info_web_desk.Controllers
             ApplicationUser userPage = ApplicationUser.GetUser(id);
             if (userPage == null)
                 return new HttpStatusCodeResult(404);
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(userPage);
-                if (!db.Entry(userPage).Collection(x1 => x1.Albums).IsLoaded)
-                    db.Entry(userPage).Collection(x1 => x1.Albums).Load();
-            }
+
+            
+            //using (ApplicationDbContext db = new ApplicationDbContext())
+            //{
+            //    db.Set<ApplicationUser>().Attach(userPage);
+            //    if (!db.Entry(userPage).Collection(x1 => x1.Albums).IsLoaded)
+            //        db.Entry(userPage).Collection(x1 => x1.Albums).Load();
+            //}
             
                 
-            
-             res.AlbumList.AddRange(Models.SocialNetwork.Album
-                 .GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
+            // res.AlbumList.AddRange(Models.SocialNetwork.Album
+            //     .GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
+
+            res.AlbumList.AddRange((userPage.GetAlbums(null,0,null)).Select(x1=>new AlbumShort(x1)));
+
+
 
             Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
@@ -208,17 +211,21 @@ namespace server_info_web_desk.Controllers
             Group group = Group.GetGroup(id);
             if (group == null)
                 return new HttpStatusCodeResult(404);
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<Group>().Attach(group);
-                if (!db.Entry(group).Collection(x1 => x1.Albums).IsLoaded)
-                    db.Entry(group).Collection(x1 => x1.Albums).Load();
-            }
-                
-
             
-            res.AlbumList.AddRange(Models.SocialNetwork.Album
-                .GetAlbumShortListForView((List<Album>)group.Albums, group.Albums.Count));
+
+            //using (ApplicationDbContext db = new ApplicationDbContext())
+            //{
+            //    db.Set<Group>().Attach(group);
+            //    if (!db.Entry(group).Collection(x1 => x1.Albums).IsLoaded)
+            //        db.Entry(group).Collection(x1 => x1.Albums).Load();
+            //}
+               
+            //res.AlbumList.AddRange(Models.SocialNetwork.Album
+            //    .GetAlbumShortListForView((List<Album>)group.Albums, group.Albums.Count));
+
+
+            res.AlbumList.AddRange((group.GetAlbums(null, 0, null)).Select(x1 => new AlbumShort(x1)));
+            
             Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
         }
@@ -263,27 +270,8 @@ namespace server_info_web_desk.Controllers
                     //var user2 = db.Users.FirstOrDefault(x1=>x1.Id== user_id);
                     if (user2 == null)
                         return new HttpStatusCodeResult(404);
-                    chat = new Chat() { CreatorId = user.Id };
-                    using (ApplicationDbContext db = new ApplicationDbContext())
-                    {
-                        db.Set<ApplicationUser>().Attach(user2);
-                        try
-                        {
-                            db.Set<ApplicationUser>().Attach(user);
-                        }
-                        catch
-                        {
-                            //оставить именно так а не методом
-                            user = ApplicationUser.GetUser(user.Id,db);
-                        }
-                        //db.Set<ApplicationUser>().Attach(user);
-                        
-                        db.Chats.Add(chat);
-                        db.SaveChanges();
-                        chat.Users.Add(user);
-                        chat.Users.Add(user2);
-                        db.SaveChanges();
-                    }
+                    
+                    chat = Chat.CreateNewChat(user, user2);
                 }
                 return RedirectToAction("Dialog", "SocialNetwork",new { id= chat.Id });
             }
@@ -331,9 +319,7 @@ namespace server_info_web_desk.Controllers
             ViewBag.id = id;
 
             GroupsListView res = new GroupsListView();
-
             
-
             Session["NewMessageType"] = "2";
             return View(res);
         }
@@ -359,18 +345,8 @@ namespace server_info_web_desk.Controllers
         {
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             ViewBag.id = user?.Id;
-            if (user != null)
-            {
-                using (ApplicationDbContext db = new ApplicationDbContext())
-                {
-                    db.Set<ApplicationUser>().Attach(user);
-                    if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
-                        db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
-                }
-                    
-                ViewBag.CountNewMessage = user.MessageNeedRead.Count;
-            }
-           
+            
+            ViewBag.CountNewMessage = user.GetCountNewMessages() ;
             return PartialView();
         }
 
@@ -398,33 +374,10 @@ namespace server_info_web_desk.Controllers
             string check_id = ApplicationUser.GetUserId();
             if (string.IsNullOrWhiteSpace(a.Name))
                 return new HttpStatusCodeResult(404);
-            Group res = new Group() { Name=a.Name, MainAdminId=check_id };
-            ApplicationUser user = ApplicationUser.GetUser(check_id);
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Groups.Add(res);
-                db.SaveChanges();
+            Group res = Group.CreateNewGroup(a.Name);
+            
+            
 
-                db.Albums.Add(new Album()
-                {
-                    Name = "Main",
-                    Description = "Сюда добавляются главные фотографии с вашей страницы",
-                    //User = admin
-                    GroupId = res.Id
-                });
-                db.Albums.Add(new Album()
-                {
-                    Name = "NotMain",
-                    Description = "Сюда добавляются фотографии с вашей страницы",
-                    GroupId = res.Id
-                });
-                
-                db.Set<ApplicationUser>().Attach(user);
-                
-                res.Admins.Add(user);
-                res.Users.Add(user);
-                db.SaveChanges();
-            }
             return RedirectToAction("GroupRecord", "SocialNetwork",new {id=res.Id });
         }
 
@@ -436,44 +389,9 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
             int res = 0;
-            
+
             Group group = Group.GetGroup(id);
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-               
-                if (group == null)
-                    return new HttpStatusCodeResult(404);
-                res = group.CanFollow(user.Id);
-                db.Set<ApplicationUser>().Attach(user);
-                try
-                {
-                    db.Set<Group>().Attach(group);
-                }
-                catch
-                {
-                    //оставить именно так а не методом
-                    //group = db.Groups.First(x1 => x1.Id == group.Id);
-                    group = Group.GetGroup(group.Id, db);
-                }
-               
-                if (res == 1)
-                {
-                    group.Users.Add(user);
-                    res = -1;
-                }
-                else
-                if (res == 2)
-                {
-                    group.Users.Remove(user);
-                    res = -1;
-                }
-                
-
-
-                db.SaveChanges();
-            }
-               
-
+            res=group.Follow(user);
             
             //res = !res;
             return Redirect(Url.Action("FollowGroupPartial", "SocialNetwork", new { IdGroup = id, CanFollow = res }));
@@ -485,35 +403,15 @@ namespace server_info_web_desk.Controllers
             //удалять прямо из списка
             if(string.IsNullOrWhiteSpace(id))
                 return new HttpStatusCodeResult(404);
-            ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
-            if (user == null)
+            ApplicationUser user_act = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            ApplicationUser user = ApplicationUser.GetUser(id);
+            if (user == null|| user_act==null)
                 return new HttpStatusCodeResult(404);
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(user);
-                if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.Friends).Load();
-                var us = user.Friends.FirstOrDefault(x1 => x1.Id == id);
-                if (us != null)
-                {
-                    user.Friends.Remove(us);
-                    if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
-                        db.Entry(user).Collection(x1 => x1.Followers).Load();
-                    user.Followers.Add(us);
-                }
-                else
-                {
-                    if (!db.Entry(user).Collection(x1 => x1.FollowUser).IsLoaded)
-                        db.Entry(user).Collection(x1 => x1.FollowUser).Load();
-                    us = user.FollowUser.FirstOrDefault(x1 => x1.Id == id);
-                    if (us != null)
-                    {
-                        user.FollowUser.Remove(us);
-                    }
-                }
-                
-                db.SaveChanges();
-            }
+           
+            var res = user.CanFollow(user_act.Id);
+            if (res == 2 || res == 3)
+                res = user.ActionListUsers(res, user_act);
+
             return Redirect(Url.Action("FollowUserPartial", "SocialNetwork", new { Iduser = id, CanAddFriend = true }));
         }
 
@@ -523,72 +421,16 @@ namespace server_info_web_desk.Controllers
         {
             //взаимодействовать на странице пользователя
             ApplicationUser user_act = ApplicationUser.GetUser(ApplicationUser.GetUserId());
-            if (user_act == null)
+            ApplicationUser user = ApplicationUser.GetUser(id);
+            if (user_act == null|| user == null)
                 return new HttpStatusCodeResult(404);
             int res = 0;
-            ApplicationUser user = ApplicationUser.GetUser(id);
-            if (user == null)
-                return new HttpStatusCodeResult(404);
+            
             
             res = user.CanFollow(user_act.Id);
-            
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                
-                db.Set<ApplicationUser>().Attach(user);
-                try
-                {
-                    db.Set<ApplicationUser>().Attach(user_act);
-                }
-                catch
-                {
-                    //оставить именно так а не методом
-                    user_act = ApplicationUser.GetUser(ApplicationUser.GetUserId(), db);
-                   // user_act = db.Users.First(x1 => x1.Id == id);
-                }
+           
+            res = user.ActionListUsers(res, user_act);
 
-
-                switch (res)
-                {
-                    case 1:
-                        if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.Followers).Load();
-                        user.Followers.Add(user_act);
-                        res = 3;
-                        break;
-                    case 2:
-                        if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.Friends).Load();
-                        if (!db.Entry(user).Collection(x1 => x1.FriendUser).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.FriendUser).Load();
-                        user.Friends.Remove(user_act);
-                        user.FriendUser.Remove(user_act);
-                        user.FollowUser.Add(user_act);
-                        res = 3;
-                        break;
-                    case 3:
-                        if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.Followers).Load();
-                        user.Followers.Remove(user_act);
-                        res = 1;
-                        break;
-                    case 4:
-                        if (!db.Entry(user).Collection(x1 => x1.FollowUser).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.FollowUser).Load();
-                        if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.Friends).Load();
-                        if (!db.Entry(user).Collection(x1 => x1.FriendUser).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.FriendUser).Load();
-                        user.FollowUser.Remove(user_act);
-                        user.Friends.Add(user_act);
-                        user.FriendUser.Add(user_act);
-                        res = 2;
-                        break;
-                }
-                
-                
-                db.SaveChanges();
-            }
 
             //res = !res;
             return Redirect(Url.Action("FollowUserPartial", "SocialNetwork", new {
@@ -653,17 +495,9 @@ namespace server_info_web_desk.Controllers
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             if (user == null)
                 return new HttpStatusCodeResult(404);
-
-            var album = user.GetAlbums(album_id).FirstOrDefault();
-            if(album==null)
-                return new HttpStatusCodeResult(404);
-            var list_img_byte = Get_photo_post(uploadImage);
-
-            var record=Record.AddRecordImage(album, user,null, list_img_byte, text);
-            if(record == null)
-                return new HttpStatusCodeResult(404);
-            user.AddRecordWall(record);
-
+            user.AddImage(text, uploadImage, album_id);
+           
+            
             return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = user.Id });
         }
         [Authorize]
@@ -671,50 +505,15 @@ namespace server_info_web_desk.Controllers
         {
             if (uploadImage.Count() < 1 || album_id == null|| id_group==null)
                 return new HttpStatusCodeResult(404);
-
-
-            string check_id = ApplicationUser.GetUserId();
-
+            
             Group group = Group.GetGroup(id_group);
             if (group == null)
                 return new HttpStatusCodeResult(404);
-
-            ApplicationUser user = null;
-
-            bool can_add = group.CanAddMeme(check_id);
-            if (!can_add)
-                return new HttpStatusCodeResult(404);
-
-
-            var album = group.GetAlbums(album_id).FirstOrDefault();
-            //TODO проверка
-            var ch_al = group.GetAlbums(null,0,1).First();
-
-            if (can_add&&ch_al.Id==album.Id)
-            {
-                using (ApplicationDbContext db = new ApplicationDbContext())
-                {
-                    db.Set<Group>().Attach(group);
-                    if (!db.Entry(group).Collection(x1 => x1.Admins).IsLoaded)
-                        db.Entry(group).Collection(x1 => x1.Admins).Load();
-                }
-                    user = group.Admins.FirstOrDefault(x1 => x1.Id == check_id);
-                if (user == null)
-                    can_add = false;
-            }
-            if(!can_add)
-                return new HttpStatusCodeResult(404);
-
-            if (album == null)
-                return new HttpStatusCodeResult(404);
-            var list_img_byte = Get_photo_post(uploadImage);
-            if(user==null)
-                 user = ApplicationUser.GetUser(check_id);
-            //user =db.Users.FirstOrDefault(x1 => x1.Id == check_id);
-
-            var record = Record.AddRecordImage(album, user, group, list_img_byte, text);
             
-            group.AddRecordMemeWall(record);
+            var fl=group.AddImage(text, uploadImage, album_id, id_group);
+            if(fl==null)
+                return new HttpStatusCodeResult(404);
+
             return RedirectToAction("GroupRecord", "SocialNetwork", new { id = id_group });
         }
 
@@ -740,10 +539,8 @@ namespace server_info_web_desk.Controllers
         public ActionResult LoadImagesAlbum(int id, int start, int count)
         {
             List<Image> res = new List<Models.SocialNetwork.Image>();
-            Album album = null;
-            using (ApplicationDbContext db = new ApplicationDbContext())
-                album = db.Albums.FirstOrDefault(x1 => x1.Id == id);
-            
+            Album album = Album.GetAlbum(id);
+
             res.AddRange(album.GetAlbumImages(start, count));//.Select(x1=>new ImageShort() {Id=(int)x1.ImageId,Data=x1.Image.Data }
 
             return PartialView(res);
@@ -770,16 +567,9 @@ namespace server_info_web_desk.Controllers
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             if (user == null)
                 return new HttpStatusCodeResult(404);
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(user);
-                if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.Chats).Load();
-            }
-
             
             List<ChatShort> res = new List<ChatShort>();
-            res.AddRange(user.Chats.Select(x1 => x1.GetChatShort()));
+            res.AddRange((user.GetChats(start, count).Select(x1 => x1.GetChatShort())));
 
 
             return PartialView(res);
@@ -848,15 +638,10 @@ namespace server_info_web_desk.Controllers
                 case "2":
                     //отправить колличество
                     ApplicationUser user = ApplicationUser.GetUser(check_id);
-                    using (ApplicationDbContext db = new ApplicationDbContext())
-                    {
-                        db.Set<ApplicationUser>().Attach(user);
-                        if (!db.Entry(user).Collection(x1 => x1.MessageNeedRead).IsLoaded)
-                            db.Entry(user).Collection(x1 => x1.MessageNeedRead).Load();
-                    }
+                    
                         
                     return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork",new {
-                        str =user.MessageNeedRead.Count.ToString() }));
+                        str =user.GetCountNewMessages().ToString() }));
                     break;
 
                 case "3":
@@ -931,9 +716,8 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
             ViewBag.check_id = check_id;
-            Image img = null;
-            using (ApplicationDbContext db = new ApplicationDbContext())
-                img = db.ImagesSocial.FirstOrDefault(x1 => x1.Id == id);
+            Image img = Image.GetImage((int)id);
+            
             img.GetRecordForShow();
 
            
@@ -959,16 +743,10 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
             List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<Group>().Attach(group);
-                if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
-                    db.Entry(group).Collection(x1 => x1.Users).Load();
-            }
+            
 
            
-            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(group.Users, start, count))
-                .Select(x1 => new Models.ApplicationUserShort(x1)));
+            res.AddRange(group.GetUserShortList(0,6));
             //res.AddRange(group.Users.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
 
@@ -985,16 +763,10 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
             List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(user);
-                if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.Friends).Load();
-            }
+            
                 
             
-            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(user.Friends, start, count))
-                .Select(x1 => new Models.ApplicationUserShort(x1)));
+            res.AddRange((user.GetFriends(start,count)).Select(x1 => new Models.ApplicationUserShort(x1)));
             //res.AddRange(user.Friends.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
             
@@ -1009,15 +781,9 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
             List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(user);
-                if (!db.Entry(user).Collection(x1 => x1.Followers).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.Followers).Load();
-            }
+            
 
-            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(user.Followers, start, count))
-                .Select(x1 => new Models.ApplicationUserShort(x1)));
+            res.AddRange((user.GetFollowers(start,count)).Select(x1 => new Models.ApplicationUserShort(x1)));
 
             //res.AddRange(user.Followers.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
@@ -1032,17 +798,8 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
             List<Models.ApplicationUserShort> res = new List<Models.ApplicationUserShort>();
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                db.Set<ApplicationUser>().Attach(user);
-                
-                if (!db.Entry(user).Collection(x1 => x1.FollowUser).IsLoaded)
-                    db.Entry(user).Collection(x1 => x1.FollowUser).Load();
-            }
-               
-           
-            res.AddRange(((List<ApplicationUser>)GetPartialList<ApplicationUser>(user.FollowUser, start, count))
-                .Select(x1 => new Models.ApplicationUserShort(x1)));
+            
+            res.AddRange((user.GetFollow(start,count).Select(x1 => new Models.ApplicationUserShort(x1))));
 
            // res.AddRange(user.FollowUser.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
