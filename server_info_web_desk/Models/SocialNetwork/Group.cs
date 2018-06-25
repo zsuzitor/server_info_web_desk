@@ -97,15 +97,17 @@ namespace server_info_web_desk.Models.SocialNetwork
                     //group = db.Groups.First(x1 => x1.Id == group.Id);
                     group = Group.GetGroup(group.Id, db);
                 }
+                if (!db.Entry(group).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(group).Collection(x1 => x1.Users).Load();
                 switch (res)
                 {
                     case 1:
                         group.Users.Add(user);
-                        res = -1;
+                        res = 2;
                         break;
                     case 2:
                         group.Users.Remove(user);
-                        res = -1;
+                        res = 1;
                         break;
                     case 3:
                         break;
@@ -412,7 +414,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             return true;
         }
 
-        public List<Album> GetAlbums(int? id, int start = 0, int? count = null)
+        public List<Album> GetAlbums(int? id, int start = 0, int? count = null, bool get_start = false, bool end = true)
         {
             List<Album> res = new List<Album>();
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -431,7 +433,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             else
             {
                 
-                res.AddRange((List<Album>)GetPartialList<Album>(this.Albums, start, count));
+                res.AddRange((List<Album>)GetPartialList<Album>(this.Albums, start, count, get_start, end));
             }
 
 

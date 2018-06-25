@@ -61,7 +61,14 @@
     </div>
 
     <div class="main_div_body_all">
+        
         <div class="main_div_body_layout">
+            @if (controller_name == "socialnetwork")
+            {
+
+                <div class="socialnetwork_up_button_left" id="socialnetwork_up_button_left_id" title="Up" onclick="page_up_function()"></div>
+
+            }
             @if (controller_name == "socialnetwork")
             {
 

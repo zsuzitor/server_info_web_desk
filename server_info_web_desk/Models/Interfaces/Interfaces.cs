@@ -18,7 +18,7 @@ namespace server_info_web_desk.Models.Interfaces
     public interface IHaveAlbum
     {
         List<Album> Albums { get; set; }
-        List<Album> GetAlbums(int? id, int start = 0, int? count = null);
+        List<Album> GetAlbums(int? id, int start, int? count, bool get_start, bool end);
 
     }
     public interface IHaveUsersList

@@ -175,6 +175,9 @@ $(function () {
         //}
         //}
     });
+
+    document.getElementById("socialnetwork_up_button_left_down_id").style.height = document.documentElement.clientHeight+'px';
+    document.getElementById("socialnetwork_up_button_left_id").style.height = document.documentElement.clientHeight + 'px';
 });
 
 

@@ -206,7 +206,7 @@ if (a != null)
 }*@
 
 
-        @helper RecordView(Record a,string  user_id)
+        @helper RecordView(Record a,string  user_id,bool action=true)
         {
         <div class="div_padding_top_10_px">
             <div class="div_padding_side_10_px div_color_white">
@@ -217,14 +217,22 @@ if (a != null)
                     {
                         //запись мем
                         <div>
-                            @Healpers.Author(a?.User, a?.Group, a.Meme.Birthday)
+                            @Healpers.Author(a?.Creator_NM, a?.Group, a.Meme.Birthday)
                             @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
                             @if (a.Description != null)
                             {
                                 <p>@a.Description</p>
                             }
                             <div></div>
-                            @Healpers.Meme(a?.Meme)
+                            @if (a.RecordRiposteId != null)
+                            {
+                                @Healpers.RecordView(a.RecordRiposte, user_id,false)
+                            }
+@if (a.RecordRiposteId == null)
+{
+    @Healpers.Meme(a?.Meme)
+}
+
 
                             @*див для отрисовки комментов по клику*@
                             <div>
@@ -247,9 +255,14 @@ if (a != null)
                             @Healpers.ImageLink(a?.Image)
                         </div>
                     }
+
+                    
                     <hr />
                     @*отрисовка кнопок для записи*@
+@if (action)
+{
                     @Healpers.ActionRecord(a, user_id)
+}
                     <div id="div_for_comments_record_@a.Id"></div>
                 </div>
                 </div>

@@ -127,7 +127,7 @@
             <div class="div_color_white">
                 <div class="div_padding_top_10_px">
                     <div>
-                        @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
+                        @Html.ActionLink("Фотографии", "AlbumsPerson", "SocialNetwork", new {id=Model.IdPage, select_id=Model.IdNotMainAlbum }, new { })
                     </div>
                     @foreach (var i in Model.Image)
             {

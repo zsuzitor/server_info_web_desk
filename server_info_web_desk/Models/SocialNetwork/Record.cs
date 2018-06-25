@@ -35,6 +35,10 @@ namespace server_info_web_desk.Models.SocialNetwork
         public Group Group { get; set; }//группа в которой запись висит первоначально
         public string UserId { get; set; }//чья страница на которой мем
         public ApplicationUser User { get; set; }
+        public string CreatorId { get; set; }//если картинка самостоятельная и должна быть обернута в запись
+        [NotMapped]
+        public ApplicationUser Creator_NM { get; set; }
+
 
         public int? RecordRiposteId { get; set; }
         public Record RecordRiposte { get; set; }//если запись репостят то ссылка на родителя
@@ -63,9 +67,11 @@ namespace server_info_web_desk.Models.SocialNetwork
             Group = null;
             UserId = null;
             User = null;
+            Creator_NM = null;
             RecordRiposteId = null;
             RecordRiposte = null;
             Description = null;
+            CreatorId = null;
             RecordRiposters = new List<Record>();
             UsersLikes = new List<ApplicationUser>();
             UsersRipostes = new List<ApplicationUser>();
@@ -104,7 +110,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             }
         }
 
-        public static Record AddRecordMem(string user_id,int? group_id,List<byte[]>images,string text)
+        public static Record AddRecordMem(string creator_id , string user_id, int? group_id,List<byte[]>images,string text)
         {
             
 
@@ -114,7 +120,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                 record = new Record() { GroupId = group_id };
                 
             else
-                record=new Record() { UserId = user_id };
+                record=new Record() {CreatorId= creator_id, UserId = user_id };
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Record.Add(record);
@@ -122,10 +128,10 @@ namespace server_info_web_desk.Models.SocialNetwork
                 //if (group_id != null && group_id > 0)
                 //    record.GroupWall.Add(Group.GetGroup(group_id));
 
-                Meme mem = new Meme() { Id = record.Id, Description = text, CreatorId = user_id };
+                Meme mem = new Meme() { Id = record.Id, Description = text, CreatorId = creator_id };
                 db.Memes.Add(mem);
                 db.SaveChanges();
-                var list_img = images.Select(x1 => new Image() { MemeId = mem.Id, Data = x1, UserId = user_id });
+                var list_img = images.Select(x1 => new Image() { MemeId = mem.Id, Data = x1, UserId = creator_id });
                 db.ImagesSocial.AddRange(list_img);
                 db.SaveChanges();
             }
@@ -212,13 +218,20 @@ namespace server_info_web_desk.Models.SocialNetwork
                    
                 }
 
-                if (this.UserId != null)
+                //if (this.UserId != null)
+                //{
+                //    if (!db.Entry(this).Reference(x1 => x1.User).IsLoaded)
+                //        db.Entry(this).Reference(x1 => x1.User).Load();
+
+                //}
+                //пока что так мб не загружать если например по GroupId уже будет загрузка
+                if (this.CreatorId != null)
                 {
-                    if (!db.Entry(this).Reference(x1 => x1.User).IsLoaded)
-                        db.Entry(this).Reference(x1 => x1.User).Load();
-                    
+                    this.Creator_NM = ApplicationUser.GetUser(this.CreatorId);
+                    this.Creator_NM.LoadDataForShort();
+
                 }
-                
+
             }
             if (this.GroupId != null)
             {

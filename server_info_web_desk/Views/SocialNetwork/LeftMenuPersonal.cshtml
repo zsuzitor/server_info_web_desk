@@ -3,76 +3,77 @@
 {
 
     <div class="LeftMenuPersonalMain" id="LeftMenuPersonalMain_id">
-        @*<div class="LeftMenuPersonal_one_line">
-            
-        </div>*@
-        <ul class="LeftMenuPersonalMain_main_ul">
-            <li class="LeftMenuPersonal_one_line">
-                <a class="link_standart_for_div" href="@Url.Action("PersonalRecord","SocialNetwork",new {id=ViewBag.id })">
-                    <div class="LeftMenuPersonal_one_line_div">
-                        <div class="div_inline_block LeftMenuPersonal_my_page"></div>
-                        <span>Моя страница</span>
-                         
-                    </div>
-                </a>
-            </li>
-            <li class="LeftMenuPersonal_one_line">
-                <a class="link_standart_for_div" href="@Url.Action("News","SocialNetwork")">
-                    <div class="LeftMenuPersonal_one_line_div">
-                        <div class="div_inline_block LeftMenuPersonal_my_page"></div>
-                        <span>Новости</span>
+        <div class="LeftMenuPersonalMain_menu" >
+            @*<div class="LeftMenuPersonal_one_line">
 
-                    </div>
-                </a>
-            </li>
-            <li class="LeftMenuPersonal_one_line">
-                <a class="link_standart_for_div" href="@Url.Action("Messages","SocialNetwork")">
-                    <div class="LeftMenuPersonal_one_line_div">
-                        <div class="div_inline_block LeftMenuPersonal_messages"></div>
-                        <span>Messages</span>
-                        <div class="div_inline_block LeftMenuPersonal_count" id="num_CountNewMessage_id">@ViewBag.CountNewMessage</div>
-                    </div>
-                </a>
-            </li>
-            <li class="LeftMenuPersonal_one_line">
-                <a class="link_standart_for_div" href="@Url.Action("Friends","SocialNetwork",new {id=ViewBag.id })">
-                    <div class="LeftMenuPersonal_one_line_div">
-                        <div class="div_inline_block LeftMenuPersonal_friends"></div>
-                        <span>Friends</span>
-                        @if (ViewBag.CountNewFriend != null)
-                        {
-                            <div class="div_inline_block LeftMenuPersonal_count" id=""></div>
-                        }
-                       
-                    </div>
+            </div>*@
+            <ul class="LeftMenuPersonalMain_main_ul">
+                <li class="LeftMenuPersonal_one_line">
+                    <a class="link_standart_for_div" href="@Url.Action("PersonalRecord","SocialNetwork",new {id=ViewBag.id })">
+                        <div class="LeftMenuPersonal_one_line_div">
+                            <div class="div_inline_block LeftMenuPersonal_my_page"></div>
+                            <span>Моя страница</span>
 
-                </a>
-            </li>
-            <li class="LeftMenuPersonal_one_line">
-                <a class="link_standart_for_div" href="@Url.Action("Groups","SocialNetwork",new {id=ViewBag.id })">
-                    <div class="LeftMenuPersonal_one_line_div">
-                        <div class="div_inline_block LeftMenuPersonal_groups"></div>
-                        <span>Groups</span>
-                    </div>
+                        </div>
+                    </a>
+                </li>
+                <li class="LeftMenuPersonal_one_line">
+                    <a class="link_standart_for_div" href="@Url.Action("News","SocialNetwork")">
+                        <div class="LeftMenuPersonal_one_line_div">
+                            <div class="div_inline_block LeftMenuPersonal_my_page"></div>
+                            <span>Новости</span>
 
-                </a>
-            </li>
-            <li class="LeftMenuPersonal_one_line">
-                <a class="link_standart_for_div" href="@Url.Action("AlbumsPerson","SocialNetwork",new {id=ViewBag.id })">
-                    <div class="LeftMenuPersonal_one_line_div">
-                        <div class="div_inline_block LeftMenuPersonal_my_page"></div>
-                        <span>Альбомы</span>
+                        </div>
+                    </a>
+                </li>
+                <li class="LeftMenuPersonal_one_line">
+                    <a class="link_standart_for_div" href="@Url.Action("Messages","SocialNetwork")">
+                        <div class="LeftMenuPersonal_one_line_div">
+                            <div class="div_inline_block LeftMenuPersonal_messages"></div>
+                            <span>Messages</span>
+                            <div class="div_inline_block LeftMenuPersonal_count" id="num_CountNewMessage_id">@ViewBag.CountNewMessage</div>
+                        </div>
+                    </a>
+                </li>
+                <li class="LeftMenuPersonal_one_line">
+                    <a class="link_standart_for_div" href="@Url.Action("Friends","SocialNetwork",new {id=ViewBag.id })">
+                        <div class="LeftMenuPersonal_one_line_div">
+                            <div class="div_inline_block LeftMenuPersonal_friends"></div>
+                            <span>Friends</span>
+                            @if (ViewBag.CountNewFriend != null)
+                            {
+                                <div class="div_inline_block LeftMenuPersonal_count" id=""></div>
+                            }
 
-                    </div>
-                </a>
-            </li>
-        </ul>
-        
+                        </div>
+
+                    </a>
+                </li>
+                <li class="LeftMenuPersonal_one_line">
+                    <a class="link_standart_for_div" href="@Url.Action("Groups","SocialNetwork",new {id=ViewBag.id })">
+                        <div class="LeftMenuPersonal_one_line_div">
+                            <div class="div_inline_block LeftMenuPersonal_groups"></div>
+                            <span>Groups</span>
+                        </div>
+
+                    </a>
+                </li>
+                <li class="LeftMenuPersonal_one_line">
+                    <a class="link_standart_for_div" href="@Url.Action("AlbumsPerson","SocialNetwork",new {id=ViewBag.id })">
+                        <div class="LeftMenuPersonal_one_line_div">
+                            <div class="div_inline_block LeftMenuPersonal_my_page"></div>
+                            <span>Альбомы</span>
+
+                        </div>
+                    </a>
+                </li>
+            </ul>
+        </div>
         @*<p>@Html.ActionLink("Моя страница", "PersonalRecord", "SocialNetwork")</p>
         <p>@Html.ActionLink("Messages", "Messages", "SocialNetwork")</p>
         <p>@Html.ActionLink("Friends", "Friends", "SocialNetwork")</p>
         <p>@Html.ActionLink("Groups", "Groups", "SocialNetwork")</p>*@
-        
+        <div class="socialnetwork_up_button_down" id="socialnetwork_up_button_left_down_id" title="Up" onclick="page_up_function()"></div>
        
         
         

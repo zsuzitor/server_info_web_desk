@@ -386,7 +386,7 @@ namespace server_info_web_desk.Models
         }
 
         //получить альбом по номеру или id
-        public List<Album> GetAlbums(int? id,int start=0, int? count=null)
+        public List<Album> GetAlbums(int? id,int start=0, int? count=null,bool get_start=false, bool end=true)
         {
             List<Album> res = new List<Album>();
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -407,7 +407,7 @@ namespace server_info_web_desk.Models
             {
                 
                 //start = this.Albums.Count - start - count;
-                res.AddRange((List<Album>)GetPartialList<Album>(this.Albums, start, count));
+                res.AddRange((List<Album>)GetPartialList<Album>(this.Albums, start, count, get_start, end));
                 //res.AddRange(this.Albums.Skip(start).Take(count));
             }
 

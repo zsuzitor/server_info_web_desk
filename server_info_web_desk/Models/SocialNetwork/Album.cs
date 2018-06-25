@@ -50,6 +50,26 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         }
+        //1 альбом для пользователя 2-для группы
+        public static Album CreateNew(string name,string id,int type)
+        {
+            Album res = new Album() { Name=name };
+            if (type == 1)
+            {
+                res.UserId = id;
+            }
+            if (type == 2)
+            {
+                res.GroupId = Convert.ToInt32(id);
+            }
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Albums.Add(res);
+                db.SaveChanges();
+            }
+
+                return res;
+        }
 
         public static List<Image> GetLastImageAlbum(Album a, int count)
         {

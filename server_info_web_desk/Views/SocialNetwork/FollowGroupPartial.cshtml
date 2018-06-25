@@ -9,15 +9,15 @@
         LoadingElementId = "Main_preloader_id",
         LoadingElementDuration = 200
     };
-    if (ViewBag.CanFollow == true)
+    if (ViewBag.CanFollow == 1)
     {
         @Ajax.ActionLink("Подписаться", "FollowGroup", "SocialNetwork", new { id = ViewBag.IdGroup }, ajax_options_add_frieds)
     }
-    if (ViewBag.CanFollow == false)
+    if (ViewBag.CanFollow == 2)
     {
         @Ajax.ActionLink("Отписаться", "FollowGroup", "SocialNetwork", new { id = ViewBag.IdGroup }, ajax_options_add_frieds)
     }
-    if (ViewBag.CanFollow == null)
+    if (ViewBag.CanFollow == 3)
     {
         @Ajax.ActionLink("Заявка обрабатывается", "FollowGroup", "SocialNetwork", new { id = ViewBag.IdGroup }, ajax_options_add_frieds)
     }

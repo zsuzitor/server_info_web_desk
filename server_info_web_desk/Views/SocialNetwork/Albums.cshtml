@@ -16,24 +16,58 @@
     <div>
         @if (Model.PageUserId != null)
         {
-            using (Html.BeginForm("AddImagePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            if (((int)ViewBag.access) ==0)
             {
+
+            
+            <h1>Добавить альбом</h1>
+            using (Html.BeginForm("AddAlbumPerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                
+
+                @Html.TextArea("name")
+                @*<input type="file" name="uploadImage" multiple="multiple" accept="image/*" />*@
+                <input type="submit" value="Добавить" />
+                }
+            }
+            if (((int)ViewBag.access) <4)
+            {
+            <h1>Загрузить картинку</h1>
+                using (Html.BeginForm("AddImagePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
                 @*@Html.Hidden("id_user", Model.PageUserId)*@
                 @Html.Hidden("album_id", Model.SelectAlbum)
                 @Html.TextArea("text")
                 <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
                 <input type="submit" value="Добавить" />
+                    }
+                }
             }
-        }
         @if (Model.PageUserId == null)
         {
-            using (Html.BeginForm("AddImageGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            if (((int)ViewBag.access) ==0)
             {
+            <h1>Добавить альбом</h1>
+            using (Html.BeginForm("AddAlbumGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+            {
+                @Html.Hidden("id_group", Model.PageGroupId)
+                
+                @Html.TextArea("name")
+                @*<input type="file" name="uploadImage" multiple="multiple" accept="image/*" />*@
+                <input type="submit" value="Добавить" />
+            }
+                }
+            if (((int)ViewBag.access) <4)
+            {
+            <h1>Загрузить картинку</h1>
+                using (Html.BeginForm("AddImageGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                {
                 @Html.Hidden("id_group", Model.PageGroupId)
                 @Html.Hidden("album_id", Model.SelectAlbum)
                 @Html.TextArea("text")
                 <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
                     <input type="submit" value="Добавить" />
+                }
             }
         }
 

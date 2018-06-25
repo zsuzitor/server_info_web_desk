@@ -55,8 +55,8 @@ namespace server_info_web_desk.Controllers
 
             res.CanAddMeme = user.CanAddRecordWall(res.IdUser);
 
-            res.IdMainAlbum = user.GetAlbums(null,0,1).First().Id;
-            res.IdNotMainAlbum = user.GetAlbums(null, 1, 1).First().Id;
+            res.IdMainAlbum = user.GetAlbums(null,0,1,true,false).First().Id;
+            res.IdNotMainAlbum = user.GetAlbums(null, 1, 1, true, false).First().Id;
 
             //res.Albums=Models.SocialNetwork.Album.GetAlbumShortListForView(user.Albums,2);
             res.Albums.AddRange((user.GetAlbums(null, 0, 2)).Select(x1 => new AlbumShort(x1)));
@@ -122,11 +122,12 @@ namespace server_info_web_desk.Controllers
             res.Users=group.GetUserShortList(0,6);
             res.Admins=group.GetAdminShortList( 6);
 
-            res.IdMainAlbum = group.GetAlbums(null, 0, 1).First().Id;
-            res.IdNotMainAlbum = group.GetAlbums(null, 1, 1).First().Id;
+            res.IdMainAlbum = group.GetAlbums(null, 0, 1, true, false).First().Id;
+            res.IdNotMainAlbum = group.GetAlbums(null, 1, 1, true, false).First().Id;
+
 
             //res.Albums = Models.SocialNetwork.Album.GetAlbumShortListForView((List<Album>)group.Albums, 2);
-            res.Albums.AddRange((group.GetAlbums(null, 0, 2)).Select(x1 => new AlbumShort(x1)));
+            res.Albums.AddRange((group.GetAlbums(null, 0, 2, true, false)).Select(x1 => new AlbumShort(x1)));
 
             res.MainImage= Models.SocialNetwork.Album.GetLastImageAlbum(group.Albums.First(), 1).FirstOrDefault();
 
@@ -182,21 +183,17 @@ namespace server_info_web_desk.Controllers
             if (userPage == null)
                 return new HttpStatusCodeResult(404);
 
+           
+            res.AlbumList.AddRange((userPage.GetAlbums(null,0,null, true, false)).Select(x1=>new AlbumShort(x1)));
+
+            //провериить надо ли формы отображать
+            int access = 10;
             
-            //using (ApplicationDbContext db = new ApplicationDbContext())
-            //{
-            //    db.Set<ApplicationUser>().Attach(userPage);
-            //    if (!db.Entry(userPage).Collection(x1 => x1.Albums).IsLoaded)
-            //        db.Entry(userPage).Collection(x1 => x1.Albums).Load();
-            //}
-            
-                
-            // res.AlbumList.AddRange(Models.SocialNetwork.Album
-            //     .GetAlbumShortListForView(userPage.Albums, userPage.Albums.Count));
-
-            res.AlbumList.AddRange((userPage.GetAlbums(null,0,null)).Select(x1=>new AlbumShort(x1)));
-
-
+            if (check_id == id)
+            {
+                access = 0;
+            }
+            ViewBag.access = access;
 
             Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
@@ -211,20 +208,20 @@ namespace server_info_web_desk.Controllers
             Group group = Group.GetGroup(id);
             if (group == null)
                 return new HttpStatusCodeResult(404);
-            
 
-            //using (ApplicationDbContext db = new ApplicationDbContext())
-            //{
-            //    db.Set<Group>().Attach(group);
-            //    if (!db.Entry(group).Collection(x1 => x1.Albums).IsLoaded)
-            //        db.Entry(group).Collection(x1 => x1.Albums).Load();
-            //}
-               
-            //res.AlbumList.AddRange(Models.SocialNetwork.Album
-            //    .GetAlbumShortListForView((List<Album>)group.Albums, group.Albums.Count));
+            //провериить надо ли формы отображать
+            int access = 10;
 
+            access = (group.HaveAccessAdminGroup(check_id)?0:10);
+            if (access == 10)
+            {
+                bool can_add = group.CanAddMeme(check_id);
+                if (can_add)
+                    access = 3;
+            }
 
-            res.AlbumList.AddRange((group.GetAlbums(null, 0, null)).Select(x1 => new AlbumShort(x1)));
+            ViewBag.access = access;
+            res.AlbumList.AddRange((group.GetAlbums(null, 0, null, true, false)).Select(x1 => new AlbumShort(x1)));
             
             Session["NewMessageType"] = "2";
             return View("Albums",  res);//"SocialNetwork",
@@ -345,8 +342,8 @@ namespace server_info_web_desk.Controllers
         {
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
             ViewBag.id = user?.Id;
-            
-            ViewBag.CountNewMessage = user.GetCountNewMessages() ;
+            if (user != null)
+                ViewBag.CountNewMessage = user.GetCountNewMessages();
             return PartialView();
         }
 
@@ -461,7 +458,7 @@ namespace server_info_web_desk.Controllers
 
             var list_img_byte = Get_photo_post(uploadImage);
 
-            Record record = Record.AddRecordMem(check_id, null, list_img_byte, text);
+            Record record = Record.AddRecordMem(check_id, id_user, null, list_img_byte, text);
             user.AddRecordWall(record);
             
             return RedirectToAction("PersonalRecord", "SocialNetwork",new {id= id_user });
@@ -482,7 +479,7 @@ namespace server_info_web_desk.Controllers
             
             var list_img_byte = Get_photo_post(uploadImage);
 
-            var record=Record.AddRecordMem(check_id, id_group, list_img_byte, text);
+            var record=Record.AddRecordMem(check_id,null, id_group, list_img_byte, text);
             group.AddRecordMemeWall(record);
             return RedirectToAction("GroupRecord", "SocialNetwork",new {id= id_group });
         }
@@ -515,6 +512,34 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
 
             return RedirectToAction("GroupRecord", "SocialNetwork", new { id = id_group });
+        }
+        [Authorize]
+        public ActionResult AddAlbumPerson(string name)
+        {
+            string check_id = ApplicationUser.GetUserId();
+
+            if(check_id==null)
+                return new HttpStatusCodeResult(404);
+            var alb = Album.CreateNew(name, check_id,1);
+            
+            return RedirectToAction("AlbumsPerson", "SocialNetwork", new { id = check_id , select_id = alb .Id});
+        }
+        [Authorize]
+        public ActionResult AddAlbumGroup(string name,int group_id)
+        {
+            string check_id = ApplicationUser.GetUserId();
+
+            if (check_id == null)
+                return new HttpStatusCodeResult(404);
+            //TODO проверки
+
+            Group group = Group.GetGroup(group_id);
+            bool admin=group.HaveAccessAdminGroup(check_id);
+            Album alb = null;
+            if (admin)
+                alb = Album.CreateNew(name, check_id, 1);
+
+            return RedirectToAction("AlbumsPerson", "SocialNetwork", new { id = check_id, select_id = alb?.Id });
         }
 
 
@@ -555,7 +580,7 @@ namespace server_info_web_desk.Controllers
                 return new HttpStatusCodeResult(404);
             List<GroupShort> res=user.UserGroupToShort(start, count);
 
-            return View(res);
+            return PartialView(res);
         }
 
 
@@ -671,7 +696,7 @@ namespace server_info_web_desk.Controllers
 
         //[ChildActionOnly]
         [Authorize]
-        public ActionResult FollowGroupPartial(int IdGroup,bool? CanFollow)
+        public ActionResult FollowGroupPartial(int IdGroup,int? CanFollow)
         {
             string check_id = ApplicationUser.GetUserId();
             ViewBag.IdGroup = IdGroup;
