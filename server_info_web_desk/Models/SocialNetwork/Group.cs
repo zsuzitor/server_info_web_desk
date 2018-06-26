@@ -347,7 +347,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
             var album = this.GetAlbums(album_id).FirstOrDefault();
             //TODO проверка
-            var ch_al = this.GetAlbums(null, 0, 1).First();
+            var ch_al = this.GetAlbums(null, 0, 1,true,false).First();
 
             if (can_add && ch_al.Id == album.Id)
             {

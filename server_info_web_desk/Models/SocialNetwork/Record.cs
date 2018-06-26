@@ -35,7 +35,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public Group Group { get; set; }//группа в которой запись висит первоначально
         public string UserId { get; set; }//чья страница на которой мем
         public ApplicationUser User { get; set; }
-        public string CreatorId { get; set; }//если картинка самостоятельная и должна быть обернута в запись
+        public string CreatorId { get; set; }
         [NotMapped]
         public ApplicationUser Creator_NM { get; set; }
 
@@ -247,5 +247,35 @@ namespace server_info_web_desk.Models.SocialNetwork
             //i.Meme_NM.Record_NM=
         }
 
+        //удаление со стены из новостей и тд
+        public  Record DeleteWall(int id)
+        {
+            //Record res = null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                //res = db.Record.FirstOrDefault(x1=>x1.Id==id);
+                db.Set<Record>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.GroupWall).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.GroupWall).Load();
+                this.GroupWall.Clear();
+                //TODO уже удалять у пользователя со стены
+
+                db.SaveChanges();
+            }
+            return this;
+
+            }
+        public Record DeleteInside(int id)
+        {
+
+            //TODO загружать сначала
+            this.Meme.DeleteInside();
+            this.Image.DeleteInside();
+            RecordRiposters
+                UsersLikes
+                UsersNews
+                GroupWall
+                Comments
+        }
     }
-}
+    }

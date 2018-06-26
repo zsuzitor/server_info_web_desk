@@ -537,11 +537,10 @@ namespace server_info_web_desk.Controllers
             bool admin=group.HaveAccessAdminGroup(check_id);
             Album alb = null;
             if (admin)
-                alb = Album.CreateNew(name, check_id, 1);
+                alb = Album.CreateNew(name, group_id.ToString(), 2);
 
-            return RedirectToAction("AlbumsPerson", "SocialNetwork", new { id = check_id, select_id = alb?.Id });
+            return RedirectToAction("AlbumsGroup", "SocialNetwork", new { id = group_id, select_id = alb?.Id });
         }
-
 
         [Authorize]
         //TODO
@@ -813,6 +812,25 @@ namespace server_info_web_desk.Controllers
             //res.AddRange(user.Followers.Skip(start).Take(count).Select(x1 => new Models.ApplicationUserShort(x1)));
 
             return PartialView("ListUsers", res);
+
+        }
+        [Authorize]
+        public ActionResult DeleteRecordWall(int id)
+        {
+            Record rec = Record.GetRecord(id);
+            string check_id = ApplicationUser.GetUserId();
+            if(rec.CreatorId!=check_id)
+                return new HttpStatusCodeResult(404);
+
+
+
+            return View();
+        }
+        //удаляет как саму запись так и то что внитри - картинку мем и тд
+        [Authorize]
+        public ActionResult DeleteRecordInside(int id)
+        {
+
 
         }
         [AllowAnonymous]

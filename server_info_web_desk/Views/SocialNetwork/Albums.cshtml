@@ -50,7 +50,7 @@
             <h1>Добавить альбом</h1>
             using (Html.BeginForm("AddAlbumGroup", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
             {
-                @Html.Hidden("id_group", Model.PageGroupId)
+                @Html.Hidden("group_id", Model.PageGroupId)
                 
                 @Html.TextArea("name")
                 @*<input type="file" name="uploadImage" multiple="multiple" accept="image/*" />*@
