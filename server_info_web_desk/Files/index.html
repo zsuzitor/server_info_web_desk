@@ -1,0 +1,82 @@
+﻿<!DOCTYPE html>
+<html><head>
+	<meta charset="UTF-8">
+	<!-- <meta http-equiv="content-type" content="text/html; charset=utf8" /> -->
+	<link  href="style/style.css" rel="stylesheet" type="text/css" >
+<script src="script/jquery-3.2.1.min.js"></script>
+<script src="script/jquery.unobtrusive-ajax.min.js"></script>
+<script src="script/js.js"></script>
+
+
+
+</head><body>
+	<div style="display: none;">
+		<div id="div_for_ajax_id"></div>
+		<a id="_link_for_ajax_" data-ajax="true"  data-ajax-complete="OnComplete_" data-ajax-mode="replace" data-ajax-update="#div_for_ajax_id" href="/">text</a>
+		<a id="_link_for_ajax_load_data_article" data-ajax="true"  data-ajax-complete="OnComplete_load_data_article"  href="/json_data_article">text</a>
+		<a id="_link_for_ajax_load_data_section" data-ajax="true"  data-ajax-complete="OnComplete_load_data_section"  href="/json_data_section">text</a>
+	</div>
+	<div class="div_for_change_info" id="div_for_change_info_id">
+	</div>
+	<div class="div_for_base_info" id="div_for_base_info_id">
+		<input type="hidden" id="string_base_info_sections" value='<hr class="hr_for_replace_server_1"/>'><input type="hidden" id="string_base_info_articles" value='<hr class="hr_for_replace_server_1"/>'>
+	</div>
+	<div class="main_div">
+		<div class="main_top_div">
+			
+					<div class="div_inline_block div_search" id="div_search_id" onmouseout='hidden_search_block()' onmouseover='show_search_block()'>
+						<div class="div_search_img div_inline_block" id='div_search_img_id' onclick="start_search()">
+							<span class="span_top_menu_lupa"></span></div>
+							<div class="div_inline_block div_search_input_block"> <input id="search_string_client" type="text"></div>
+						</div>
+						<div class="div_inline_block div_settings_block" id="div_settings_block_id">
+							<div>
+								<div class="div_inline_block"><div class="div_settings_left_b" onclick="show_left_menu()"></div></div>
+								<div  class="div_inline_block">
+									<div class="div_settings_centre_b" onmouseup="click_on_centre_settings(false)" onmousedown="click_on_centre_settings(true)">
+									</div></div>
+									<div class="div_inline_block"><div class="div_settings_right_b" onclick="hidden_left_menu()">
+									</div></div>
+								</div>
+								<div id="div_settings_bottom_b_ex"><div class="div_settings_bottom_b" onclick="show_top_menu()">
+
+								</div></div>
+							</div>
+						</div>
+						<div class="div_left_column" id="div_left_column_id">
+<div class="div_for_top_menu" id="div_for_top_menu_id">
+				<div class="top_menu_button top_menu_add_section" title="add section" onclick=''></div> <!--add_section() добавить секцию -->
+				<div class="top_menu_button top_menu_add_article"  title="add article" onclick=''></div> <!--add_article() добавить статью -->
+				<div class="top_menu_button top_menu_dell_select"   title="delete select" onclick=''></div> <!--dell_select() удалить выбранное -->
+				<div class="top_menu_button top_menu_home_button" title="Home" onclick=''> <!--home_button_return_left() восстановить меню -->
+					<span class="span_top_menu_home"></span></div>
+					<div class="top_menu_button top_menu_edit_button" onclick='' title="edit select" > <!--edit_select() редактировать выделенное -->
+						<span class="span_top_menu_edit">&#10000;</span></div>
+						<div class="top_menu_button top_menu_save_button" onclick='' title="save all changes" ><!--save_server_db() Сохранить все изменения -->
+						<span class="span_top_menu_save">&#9883;</span></div>
+						<div class="top_menu_button top_menu_fr_load_button" onclick='load_from_file()' title="загрузить из файла" ><!--close_reload_list() Закрыть все секции -->
+						<span class="span_top_menu_cl_reload">&#9850;</span></div>
+					</div>
+							<div class="scroll_top_button" id="scroll_top_button_id" onclick="up()">
+
+						</div></div>
+
+						<!-- <div class="div_inline_block div_for_block" id="div_for_block_id"><div class="div_inline_block main_block_left" id="main_block_left_id"></div></div> -->
+
+						<div class="div_inline_block div_for_block" id="div_for_block_id"><div class="div_inline_block main_block_left" id="main_block_left_id"></div><div class="div_inline_block main_block_right" id="main_block_right_id">
+							
+						</div></div>
+						
+						</div></body>
+						</html>
+<!-- КОММЕНТАРИИ НИЖЕ НЕ УБИРАТЬ БЕЗ НИХ НЕ РАБОТАЕТ -->
+						<!-- <div class="div_inline_block div_for_block" id="div_for_block_id">
+							<div class="div_inline_block main_block_left" id="main_block_left_id">
+							</div>
+							<div class="div_inline_block main_block_right" id="main_block_right_id">
+							</div></div> --><!-- <div class="div_inline_block div_for_block" id="div_for_block_id">
+							<div class="div_inline_block main_block_left" id="main_block_left_id">
+							</div>
+							<div class="div_inline_block main_block_right" id="main_block_right_id">
+							</div></div> -->
+							

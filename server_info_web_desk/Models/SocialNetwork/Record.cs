@@ -265,17 +265,17 @@ namespace server_info_web_desk.Models.SocialNetwork
             return this;
 
             }
-        public Record DeleteInside(int id)
-        {
+        //public Record DeleteInside(int id)
+        //{
 
-            //TODO загружать сначала
-            this.Meme.DeleteInside();
-            this.Image.DeleteInside();
-            RecordRiposters
-                UsersLikes
-                UsersNews
-                GroupWall
-                Comments
-        }
+        //    //TODO загружать сначала
+        //    this.Meme.DeleteInside();
+        //    this.Image.DeleteInside();
+        //    RecordRiposters
+        //        UsersLikes
+        //        UsersNews
+        //        GroupWall
+        //        Comments
+        //}
     }
     }

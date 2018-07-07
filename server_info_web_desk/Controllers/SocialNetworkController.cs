@@ -827,12 +827,12 @@ namespace server_info_web_desk.Controllers
             return View();
         }
         //удаляет как саму запись так и то что внитри - картинку мем и тд
-        [Authorize]
-        public ActionResult DeleteRecordInside(int id)
-        {
+        //[Authorize]
+        //public ActionResult DeleteRecordInside(int id)
+        //{
 
 
-        }
+        //}
         [AllowAnonymous]
         public ActionResult LoadFollowUser(string id, int start, int count)
         {
