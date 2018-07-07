@@ -148,7 +148,7 @@ var client_heigth=0;
 				
 				var sett_block=document.getElementById("div_settings_block_id");
 				var left_line_div=document.getElementById("div_left_column_id");
-				var cord_mouse=event.clientX;
+				var cord_mouse=e.clientX;
 				var right_div=document.getElementById("main_block_right_id");
 				if(cord_mouse<left_line_div.getBoundingClientRect().right){
 					cord_mouse=left_line_div.getBoundingClientRect().right;
@@ -297,10 +297,11 @@ for(var i=0;i<data.Sections.length;++i){
 mass_section.push(obj);
 
 }
+home_button_return_left();
 		};
 		reader.readAsText(file);
 	}
-home_button_return_left();
+
 }
 
 //<input type="file" onchange="loadFile(this.files)" id="file">
