@@ -27,7 +27,7 @@ document.onmouseup = function (e) {
     click_on_centre_settings(false);
 }
 document.onmousedown = function (e) {
-    if (event.which == 3) {
+    if (e.which == 3) {
 
         click_on_centre_settings(false);
     }
@@ -39,7 +39,7 @@ document.onmousemove = function (e) {
 
         var sett_block = document.getElementById("div_settings_block_id");
         var left_line_div = document.getElementById("div_left_column_id");
-        var cord_mouse = event.clientX;
+        var cord_mouse = e.clientX;
         var right_div = document.getElementById("main_block_right_id");
         if (cord_mouse < left_line_div.getBoundingClientRect().right) {
             cord_mouse = left_line_div.getBoundingClientRect().right;
@@ -620,7 +620,7 @@ function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
             res += '<div><div><label>Заголовок</label></div>';
             res += '<textarea name="Head" class="text_area_add_edit" id="input_for_article_head">' + (block == null ? '' : block.Head) + '</textarea>';
             res += '<div><label>Содержание</label></div>';
-            res += '<textarea name="Body" class="text_area_add_edit" id="input_for_article_body">' + (block == null ? '' : block.Body) + '</textarea>';
+            res += '<textarea name="Body" class="text_area_add_edit" id="input_for_article_body">' + (block == null ? ("\n \n"+GetHashtagForNew()) : block.Body) + '</textarea>';
             if (block == null) {
                 res += "<input name='parrent_sec_id' id='input_for_parrent_sec_id' type='hidden' value=" + click_sect_id() + " />";
                 res += "<button onclick='send_form(3)' >Добавить статью</button>";
@@ -643,6 +643,42 @@ function add_form_for_add_or_edit(id, type) {//1 секция 2 статья
     document.getElementById("main_block_right_id").innerHTML = res;
     //return res;
 }
+
+
+function GetHashtagForNew() {
+    var str = ' ';
+    var p_id = click_sect_id();
+    var mass_id = (p_id + " " + GetParrentSectionId(p_id)).split(' ');
+    var str_hash = '';
+
+    for (var i = 0; i < mass_id.length; ++i) {
+        for (var i2 = 0; i2 < mass_section.length; ++i2) {
+            if (mass_section[i2].Id == mass_id[i]) {
+                str+=mass_section[i2].Head+" ";
+
+            }
+        }
+    }
+    var gg = str.replace(/\s+/gi," #");
+    return gg;
+}
+function GetParrentSectionId(id) {
+    var res = '';
+    for (var i = 0; i < mass_section.length; ++i) {
+        if (mass_section[i].Id == id) {
+            if (mass_section[i].SectionParrentId != null && mass_section[i].SectionParrentId != 0) {
+                res += ' ' + mass_section[i].SectionParrentId;
+                res += GetParrentSectionId(mass_section[i].SectionParrentId);
+            }
+            break;
+        }
+           
+    }
+
+
+    return res;
+}
+
 
 function select_view_line(new_click_id) {
     if (new_click_id != null && new_click_id != undefined) {
@@ -908,34 +944,47 @@ function load_left_block() {
 
 
 
-
-
 function upload_text_all_data() {
     var div=document.getElementById("main_block_right_id");
     var res = "<div>";
-    res += '<textarea name="upload_text" class="text_area_add_edit" id="input_for_text_all_data"></textarea>';
-    res+="<button onclick='before_load_all_data_text()'>Загрузить</button>";
+    //res += '<textarea name="upload_text" class="text_area_add_edit" id="input_for_text_all_data"></textarea>';
+    //res+="<button onclick='before_load_all_data_text()'>Загрузить</button>";
+    res += '<input type="file" onchange="before_load_all_data_text(this.files)" id="file">';
     res += "</div>";
     div.innerHTML = res;
 }
 
-function before_load_all_data_text() {
-    if (!confirm("ВНИМАНИЕ!!! ВСЕ данные на сервере(список секций, статей, картинок из статей) будут перезаписаны на указанные в поле! Продолжить??"))
+function before_load_all_data_text(files) {
+    if (!confirm("ВНИМАНИЕ!!! ВСЕ данные на сервере(список секций, статей, картинок из статей) будут перезаписаны на указанные в поле! Продолжить??")) {
+        var div = document.getElementById("main_block_right_id");
+        div.innerHTML = "";
         return;
-    var string = convert_string(document.getElementById("input_for_text_all_data").value);
-    var dt = { upload_text: string };
-    $.ajax({
-        url: "/Info/Upload_data_file_text",
-        data: dt,
-        success: OnComplete_load_all_data_for_save_server,
-        error: function () {
-            alert("ошибка загрузки");
-            PreloaderAction(false);
-        },
-        beforeSend: function () { PreloaderAction(true); },
-        complete: function () { PreloaderAction(false); },
-        type: 'POST', dataType: 'json'
-    });
+    }
+        
+    var string = '';
+    var file = files[0];
+    if (file) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            string = e.target.result;
+
+            string = convert_string(string);
+            var dt = { upload_text: string };
+            $.ajax({
+                url: "/Info/Upload_data_file_text",
+                data: dt,
+                success: OnComplete_load_all_data_for_save_server,
+                error: function () {
+                    alert("ошибка загрузки");
+                    PreloaderAction(false);
+                },
+                beforeSend: function () { PreloaderAction(true); },
+                complete: function () { PreloaderAction(false); },
+                type: 'POST', dataType: 'json'
+            });
+        }
+    }
+    reader.readAsText(file);
 
 }
 function show_top_menu() {

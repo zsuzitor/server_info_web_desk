@@ -487,7 +487,7 @@ namespace server_info_web_desk.Controllers
             //идти по бд и сравнивать со строкой и удалять менять 
             //идти по файлу и сравнивать с бд менять
             //если в файле есть блок которого нет в бд то добавлять
-
+            Dictionary<int,int> change_sec_id = new Dictionary<int,int>();
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 var lst_sec = db.Sections.Where(x1 => x1.UserId == check_id).ToList();
@@ -513,6 +513,7 @@ namespace server_info_web_desk.Controllers
                         data.Sections.Remove(tmp_sec);
                     }
                 }
+                db.SaveChanges();
                 foreach (var i in data.Sections)
                 {
                     bool owner_sec = true;
@@ -520,12 +521,19 @@ namespace server_info_web_desk.Controllers
                     CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
                     if (i.SectionParrentId == null || owner_sec)
                     {
+                       
+                        int old_id = i.Id;
                         i.Id = 0;
                         i.UserId = check_id;
                         db.Sections.Add(i);
+                        db.SaveChanges();
+                        change_sec_id.Add(old_id,i.Id);
+                       
+                        
                     }
 
                 }
+               
                 var lst_art = db.Articles.Where(x1 => x1.UserId == check_id).ToList();
                 foreach (var i in lst_art)
                 {
@@ -553,20 +561,35 @@ namespace server_info_web_desk.Controllers
                         data.Articles.Remove(tmp_art);
                     }
                 }
+                db.SaveChanges();
                 foreach (var i in data.Articles)
                 {
                     //i.Section_parrentId ==0   НЕ УВЕРЕН ЧТО НУЖНО не знаю как json парсит null для типов INT //i.Section_parrentId ==0||
                     bool owner_sec = true;
                     //тут мб при ошибке проставлять Section_parrentId id главной секции?
+                    
+
+                        var ch_c_i = change_sec_id.FirstOrDefault(x1 => x1.Key == i.SectionParrentId);
+                    if(ch_c_i.Value!=0&& ch_c_i.Key!=0)
+                        i.SectionParrentId = ch_c_i.Value;
+                    
                     CheckAccessSection(check_id, i.SectionParrentId, out owner_sec);
                     if (owner_sec)
                     {
-
+                        //var tmp_a = data.Articles.Where(x1 => x1.SectionParrentId == i.Id).ToList();
+                        //foreach (var i2 in tmp_a)
+                        //{
+                        //    i2.SectionParrentId = i.Id;
+                        //}
+                        
+                        
+                           
                         i.Id = 0;
                         i.UserId = check_id;
                         db.Articles.Add(i);
                     }
                 }
+                db.SaveChanges();
                 var lst_img = db.ImagesInfo.Where(x1 => x1.UserId == check_id).ToList();
                 foreach (var i in lst_img)
                 {
@@ -587,6 +610,7 @@ namespace server_info_web_desk.Controllers
                         data.Images.Remove(tmp_img);
                     }
                 }
+                db.SaveChanges();
                 foreach (var i in data.Images)
                 {
                     if (i.Article_parrentId == null || db.Articles.FirstOrDefault(x1 => x1.Id == i.Article_parrentId && x1.UserId == check_id) != null)
