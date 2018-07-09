@@ -8,6 +8,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using static server_info_web_desk.Models.DataBase.DataBase;
+using static server_info_web_desk.Models.functions.FunctionsProject;
 
 
 namespace server_info_web_desk.Models.SocialNetwork
@@ -83,6 +84,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         //возвращает true если лайк поставлен(красное сердце) и false если снят(серое)
         public bool? LikeAction(string id_user)
         {
+            bool red_heart = false;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 if (id_user == null)
@@ -91,7 +93,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                 if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
                 var like = this.UsersLikes.FirstOrDefault(x1 => x1.Id == id_user);
-                bool red_heart = false;
+                
                 if (like == null)
                 {
                     this.UsersLikes.Add(db.Users.First(x1 => x1.Id == id_user));
@@ -106,8 +108,9 @@ namespace server_info_web_desk.Models.SocialNetwork
                 
                 db.SaveChanges();
 
-                return red_heart;
+               
             }
+            return red_heart;
         }
 
         public static Record AddRecordMem(string creator_id , string user_id, int? group_id,List<byte[]>images,string text)
@@ -168,6 +171,37 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
 
+        public List<Comment> GetComments(int start=0, int? count=null)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Record>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.Comments).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Comments).Load();
+            }
+            var lst = (List<Comment>)GetPartialList<Comment>(this.Comments, start, count, true);
+            foreach(var i in lst)
+            {
+                i.LoadForView();
+            }
+            return lst;
+        }
+
+        public Comment AddComment(string text,int? AnswerCommentId)
+        {
+            var us_id = ApplicationUser.GetUserId();
+            var comm = new Comment() {Text= text, CreatorId= us_id,AnswerCommentId= AnswerCommentId, RecordId=Id };
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Comments.Add(comm);
+                db.SaveChanges();
+
+            }
+
+
+                return comm;
+        }
+
         public static Record GetRecord(int? id)
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -179,6 +213,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                 return record;
             }
         }
+
         public  void RecordLoadForView()
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
@@ -194,6 +229,9 @@ namespace server_info_web_desk.Models.SocialNetwork
                 //можно загружать усеченную версию
                 if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
                     db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
+
+                if (!db.Entry(this).Collection(x1 => x1.Comments).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Comments).Load();
 
                 //колличество нужно +5 записей последних
                 //if (!db.Entry(i).Collection(x1 => x1.Comments).IsLoaded)

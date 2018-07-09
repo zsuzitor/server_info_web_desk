@@ -249,6 +249,11 @@ div.div_for_replace_ajax_2{
          width:50px;
     height:50px;
      }
+     
+     div.small_block_img_short_size_2{
+         width:30px;
+    height:30px;
+     }
 
 
      div.socialnetwork_up_button_left{
@@ -482,6 +487,29 @@ div.Record_ripost_block_img:hover {
     opacity:1;
 }
 
+div.Comment_like_block_img_not_active{
+           width:15px;
+           height:15px;
+            background-image: url(/Content/images/Heart.svg);
+       }
+       div.Comment_like_block_img_active{
+           width:15px;
+           height:15px;
+            background-image: url(/Content/images/HeartRed.svg);
+       }
+       div.Comment_likes_block {
+           float:right;
+       }
+div.Comment_likes_block:hover {
+           cursor:pointer;
+       }
+div.like_div_comment{
+    width:100%;
+}
+
+div.comment_right_block{
+    width:450px;
+}
 div.div_meme_name_date{
     max-width:400px;
 }

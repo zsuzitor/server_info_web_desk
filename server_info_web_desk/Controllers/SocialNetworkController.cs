@@ -353,6 +353,21 @@ namespace server_info_web_desk.Controllers
         //---------------------------------------------------ACTION---------------------------------
         [Authorize]
         [HttpPost]
+        public JsonResult LikeComment(int? id)
+        {
+            string check_id = ApplicationUser.GetUserId();
+
+            var comm = Comment.GetComment(id) ;
+            if (comm == null)
+                return Json(null);
+
+            bool? red_heart = comm.LikeAction(check_id);
+
+            return Json(new { red_heart, id, count = comm.UsersLikes.Count });
+        }
+
+        [Authorize]
+        [HttpPost]
         public JsonResult LikeRecord(int? id)
         {
             string check_id = ApplicationUser.GetUserId();
@@ -646,6 +661,37 @@ namespace server_info_web_desk.Controllers
             return PartialView(res);
         }
 
+
+        //[AllowAnonymous]
+        //public ActionResult LoadCommentsRecord(int record)
+        //{
+        //    ViewBag.start = 0;
+        //    ViewBag.count = null;
+        //    ViewBag.id = record;
+
+        //    return PartialView();
+        //}
+        [AllowAnonymous]
+        public ActionResult LoadCommentsRecord(int id,int? start=0,int?count=null)
+        {
+            List<Comment> res = new List<Comment>();
+            var rec = Record.GetRecord(id);
+            res.AddRange(rec.GetComments());
+            ViewBag.check_id = ApplicationUser.GetUserId();
+            //грузить коммент для вью
+            return PartialView(res);
+        }
+
+
+        [AllowAnonymous]
+        public JsonResult SendComment(int id,string text)
+        {
+            var rec = Record.GetRecord(id);
+            rec.AddComment(text,null);
+
+            return Json(true);
+        }
+        
 
         [Authorize]
         public ActionResult LoadNewMessages(int dialog)

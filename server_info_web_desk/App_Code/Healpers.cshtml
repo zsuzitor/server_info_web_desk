@@ -148,7 +148,7 @@ if (a != null)
 
                 <div id="Record_like_block_count_id_@a.Id" class="div_inline_block">@a.UsersLikes.Count</div>
             </div>
-            <div class="Record_comment_block div_inline_block">
+            <div class="Record_comment_block div_inline_block" onclick="ShowCommentsRecord(@a.Id,true)">
                 <div class="div_inline_block Record_comment_block_img"></div>
                 <div class="div_inline_block">@a.Comments.Count</div>
             </div>
@@ -190,7 +190,13 @@ if (a != null)
 }
                
                 <hr />
-                <div id="div_for_comments_record_@a.Id"></div>
+                @*<div style="display:none;" id="div_for_comments_record_opened_@a.Id"></div>*@
+                <div style="display:none;" id="div_for_comments_record_@a.Id"></div>
+                <div>
+                   <textarea id="text_for_comment_rec_@a.Id"></textarea>
+                    <button onclick="SendComment(@a.Id)">отправить</button>
+
+                </div>
             </div>
         </div>
 
@@ -263,13 +269,82 @@ if (a != null)
 {
                     @Healpers.ActionRecord(a, user_id)
 }
-                    <div id="div_for_comments_record_@a.Id"></div>
+                    <div style="display:none;" id="div_for_comments_record_@a.Id"></div>
+                    <div>
+                        <textarea id="text_for_comment_rec_@a.Id"></textarea>
+                        <button onclick="SendComment(@a.Id)">отправить</button>
+
+                    </div>
                 </div>
                 </div>
         </div>
 
 }
 
+@helper OneComment(Comment a,string user_id) { 
+ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
+    <div class="div_padding_top_10_px">
+        <div class="div_inline_block">
+            <div title="@prs.Name @prs.Surname" class="small_block_img_short_size_2">
+                <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@prs.PageId">
+
+                    <div class="block_circle">
+                        @Healpers.Image(prs.Image, true)
+
+                    </div>
+
+
+                </a>
+            </div>
+            <div></div>
+        </div>
+
+        <div class="div_inline_block comment_right_block">
+            <div>
+                @(prs.Name ) @prs.Surname
+            </div>
+            <div>
+                @*тут коммент отображать номрально с тем что реализовано*@
+                @a.Text
+            </div>
+            <div class="like_div_comment">
+
+                <div class="Comment_likes_block">
+                    @if (user_id != null)
+                    {
+                        <div id="Comment_like_block_img_id_@a.Id" class="div_inline_block Record_like_block_img" onclick="LikeCommentClick(@a.Id)">
+                            @{
+                                var check_user = a.UsersLikes.FirstOrDefault(x1 => x1.Id == user_id);
+                            }
+                            @if (check_user == null)
+                            {
+                                <div class="Comment_like_block_img_not_active"></div>
+                            }
+                            @if (check_user != null)
+                            {
+                                <div class="Comment_like_block_img_active"></div>
+                            }
+
+                        </div>
+                                }
+@if (user_id == null)
+{
+    <div id="Comment_like_block_img_id_@a.Id" class="div_inline_block Record_like_block_img">
+       
+            <div class="Comment_like_block_img_not_active"></div>
+        
+
+    </div>
+            }
+                    <div id="Comment_like_block_count_id_@a.Id" class="div_inline_block">@a.UsersLikes.Count</div>
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    
+    }
 
 
 @helper Author(ApplicationUser user,Group group,DateTime date)

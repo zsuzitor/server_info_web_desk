@@ -55,5 +55,74 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         }
-    }
+        public static Comment GetComment(int? id)
+        {
+           
+            
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                if (id == null)
+                    return null;
+                var comm = db.Comments.FirstOrDefault(x1 => x1.Id == id);
+
+                return comm;
+            }
+        }
+
+        public bool? LikeAction(string id_user)
+        {
+            if (id_user == null)
+                return null;
+            bool red_heart = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Comment>().Attach(this);
+                if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
+                var like = this.UsersLikes.FirstOrDefault(x1 => x1.Id == id_user);
+                
+                if (like == null)
+                {
+                    this.UsersLikes.Add(db.Users.First(x1 => x1.Id == id_user));
+                    red_heart = true;
+                }
+
+                else
+                {
+                    this.UsersLikes.Remove(db.Users.First(x1 => x1.Id == id_user));
+                    red_heart = false;
+                }
+
+                db.SaveChanges();
+                
+            }
+            return red_heart;
+            
+
+            //var pers = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            //using (ApplicationDbContext db = new ApplicationDbContext())
+            //{
+            //    db.Set<Comment>().Attach(this);
+            //    db.Set<ApplicationUser>().Attach(pers);
+            //    this.UsersLikes.Add(pers);
+            //    db.SaveChanges();
+
+            //}
+        }
+
+
+        public void LoadForView()
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Comment>().Attach(this);
+                if (!db.Entry(this).Reference(x1 => x1.Creator).IsLoaded)
+                    db.Entry(this).Reference(x1 => x1.Creator).Load();
+                if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
+
+            }
+            this.Creator.LoadDataForShort();
+        }
+            }
 }

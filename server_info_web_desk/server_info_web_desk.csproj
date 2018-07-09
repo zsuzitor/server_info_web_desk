@@ -338,6 +338,7 @@
     <Content Include="Views\SocialNetwork\ListUsers.cshtml" />
     <Content Include="Views\SocialNetwork\DialogListPartial.cshtml" />
     <Content Include="Views\SocialNetwork\GroupsListPartial.cshtml" />
+    <Content Include="Views\SocialNetwork\LoadCommentsRecord.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

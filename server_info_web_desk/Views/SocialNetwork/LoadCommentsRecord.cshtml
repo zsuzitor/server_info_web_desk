@@ -1,0 +1,14 @@
+﻿@model IEnumerable<server_info_web_desk.Models.SocialNetwork.Comment>
+
+
+
+
+@foreach(var i in Model)
+{
+    <div>
+        @Healpers.OneComment(i,(string)ViewBag.check_id)
+
+
+    </div>
+
+}

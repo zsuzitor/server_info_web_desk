@@ -189,8 +189,44 @@ $(function () {
 
 
 
+function LikeCommentClick(id) {
 
 
+    var dt = {
+        'id': id
+    };
+    $.ajax({
+        url: "/SocialNetwork/LikeComment",
+        data: dt,
+        success: OnComplete_LikeCommentClick,
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+        },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () { PreloaderAction(false); },
+        type: 'POST', dataType: 'json'//html
+    });
+
+}
+function OnComplete_LikeCommentClick(data) {
+    ////Record_like_block_img_id_234
+    if (data == null) {
+        alert("Ошибка OnComplete_LikeRecordClick вернул null");
+        return;
+    }
+    var img = document.getElementById("Comment_like_block_img_id_" + data.id);
+    if (data.red_heart) {
+        img.innerHTML = '<div class="Comment_like_block_img_active"></div>';
+    }
+    else {
+
+        img.innerHTML = '<div class="Comment_like_block_img_not_active"></div>';
+
+    }
+    var num = document.getElementById("Comment_like_block_count_id_" + data.id);
+    num.innerHTML = data.count;
+}
 
 
 
@@ -297,7 +333,83 @@ function OnSuccessLoadWallRecords(data) {
 
 
 
-//-------------------------------------------------NOT NEED NEW FILE
+//-------------------------------------------------NOT NEED NEW FILE--------------------------------------------------------------------------------------------
+
+function SendComment(id) {
+    var text = document.getElementById("text_for_comment_rec_" + id);
+    var div = document.getElementById("div_for_comments_record_" + id);
+
+    var dt = {
+        'id': id,
+        'text':text.value
+    };
+    $.ajax({
+        url: "/SocialNetwork/SendComment",
+        data: dt,
+        success: function (data) {
+            ShowCommentsRecord(id, false)
+            //div.innerHTML = '';
+            //div.innerHTML = data;
+        },
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+
+        },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () {
+            PreloaderAction(false);
+
+        },
+        type: 'POST', dataType: 'json'//html
+    });
+
+}
+
+
+
+
+function ShowCommentsRecord(id,click) {
+    var div = document.getElementById("div_for_comments_record_" + id);
+    if (click) {
+        if (div.style.display == 'block') {
+            div.style.display = 'none';
+        }
+        else {
+            div.style.display = 'block';
+        }
+    }
+    
+    //TODO тут хз сейчас каждый раз будет дозагружать, если убрать строчку то загрузит ТОЛЬКО 1 раз что тоже неправильно
+    div.innerHTML = '';
+    if (div.style.display == 'block')
+    if (div.innerHTML == '') {
+        var dt = {
+            'id': id
+        };
+        $.ajax({
+            url: "/SocialNetwork/LoadCommentsRecord",
+            data: dt,
+            success: function (data) {
+
+                div.innerHTML = data;
+            },
+            error: function () {
+                alert("ошибка загрузки");
+                PreloaderAction(false);
+
+            },
+            beforeSend: function () { PreloaderAction(true); },
+            complete: function () {
+                PreloaderAction(false);
+
+            },
+            type: 'POST', dataType: 'html'//html
+        });
+    }
+   
+}
+
 
 function ShowImageRecordAJAX(a) {
     //var id = a.id.split('_')[1];
