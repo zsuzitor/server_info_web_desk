@@ -19,12 +19,14 @@
                     LoadingElementId = "Main_preloader_id", LoadingElementDuration = 200,OnComplete= "OnComplete_SendMessage" }))
                 {*@
                     @Html.Hidden("dialog", Model.Id)
-                    @Html.TextArea("text")
+                    @Html.TextArea("text",new {@class= "class_for_focus_show" })
+                <div class="class_for_focus_show_s">
                     @*<input type="file" name="uploadImage" multiple="multiple" accept="image/*" />*@
-                <button onclick="SendMessage()">Отправить</button>
+                    <button onclick="SendMessage()">Отправить</button>
                     @*<input type="submit" value="Отправить" />
-                }*@
 
+            }*@
+                </div>
             </div>
         </div>
     </div>

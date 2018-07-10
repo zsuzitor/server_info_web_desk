@@ -1,6 +1,9 @@
 ﻿
 //------------------------------------------------------------------------------------ALL---------------------
 
+jQuery(function () {
+    jQuery('textarea').autoResize();
+});
 
 var time_for_page_up;
 
@@ -379,6 +382,9 @@ function ShowCommentsRecord(id,click) {
             div.style.display = 'block';
         }
     }
+    else {
+        div.style.display = 'block';
+    }
     
     //TODO тут хз сейчас каждый раз будет дозагружать, если убрать строчку то загрузит ТОЛЬКО 1 раз что тоже неправильно
     div.innerHTML = '';
@@ -549,7 +555,7 @@ function Album_one_block_click_al(a) {
     Album_OBJECT.can_load = true;
     document.getElementById("album_id").value = id;
     document.getElementById("Albums_block_for_img").innerHTML="";
-
+    document.getElementById("Albums_block_add_img_all_id").style.display='block';
     load_more_img_album();
 
 }

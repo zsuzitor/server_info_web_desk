@@ -106,6 +106,26 @@ div.div_inline_block {
     vertical-align: top;
 }
 
+.input_no_border{
+    border:none;
+}
+
+
+
+/*div.between_block{
+    /*для связей
+}*/
+.class_for_focus_show_s{
+         display:none;
+     }
+     .class_for_focus_show_s:hover{
+         display:block;
+     }
+     .class_for_focus_show:focus + .class_for_focus_show_s{
+         display:block;
+         /*height:200px;*/
+     }
+
 div.div_paddin_5_px{
     padding:5px;
 }
@@ -137,6 +157,9 @@ div.div_content_main_size_2{
          border-radius:10px;
          overflow:hidden;
      }
+
+
+
 
 /*----------------------------------------------------------------------------------
 
@@ -510,6 +533,12 @@ div.like_div_comment{
 div.comment_right_block{
     width:450px;
 }
+
+
+
+
+
+
 div.div_meme_name_date{
     max-width:400px;
 }
@@ -543,6 +572,18 @@ div.oneDialogShortInside{
     text-align:left;
 }
 
+
+div.one_message_right{
+    max-width: 420px;
+}
+div.one_dialog_line_right{
+    max-width: 420px;
+}
+
+div.OneChatAllblock_div_class{
+    max-height:120px;
+    overflow:hidden;
+}
 
       /*--------PERSON---------NEED--NEW-FILE----------------------------------------------------------*/
      /*div.PersonalRecord_left{
@@ -622,7 +663,51 @@ div.oneDialogShortInside{
          height:160px;
      }
 
+     div.Albums_add_new_block{
+         background-color:rgba(122, 121, 121, .3);
+         position:relative;
+         color:rgba(71, 39, 39, .5);
+     }
+     div.Albums_add_new_block_inside{
+         display:none;
+         z-index:2;
+     }
+     div.Albums_add_new_block:hover .Albums_add_new_block_inside{
+display:block;
+     }
 
+     div.Albums_add_new_block:before{
+         content:"+";
+         position:absolute;
+         left:15px;
+         top:-133px;
+         font-size:220pt;
+         z-index:-1;
+     }
+
+
+
+      div.Albums_add_new_image_block{
+         background-color:rgba(122, 121, 121, .3);
+         position:relative;
+         color:rgba(71, 39, 39, .5);
+     }
+     div.Albums_add_new_image_block_inside{
+         display:none;
+         z-index:2;
+     }
+     div.Albums_add_new_image_block:hover .Albums_add_new_image_block_inside{
+display:block;
+     }
+
+     div.Albums_add_new_image_block:before{
+         content:"+";
+         position:absolute;
+         left:15px;
+         top:-133px;
+         font-size:220pt;
+         z-index:-1;
+     }
 
      /*----------------------------------------------------------------Messages----------------------------------------*/
      div.Messages_div_right{
@@ -631,3 +716,13 @@ div.oneDialogShortInside{
      div.Messages_div_left{
          min-height:300px;
      }
+
+
+
+
+
+
+
+
+     
+

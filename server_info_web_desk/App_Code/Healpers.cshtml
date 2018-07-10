@@ -193,9 +193,11 @@ if (a != null)
                 @*<div style="display:none;" id="div_for_comments_record_opened_@a.Id"></div>*@
                 <div style="display:none;" id="div_for_comments_record_@a.Id"></div>
                 <div>
-                   <textarea id="text_for_comment_rec_@a.Id"></textarea>
-                    <button onclick="SendComment(@a.Id)">отправить</button>
-
+@if (a.Id != 0)
+{
+    @Healpers.AddCommentBlock(a.Id)
+                   
+}
                 </div>
             </div>
         </div>
@@ -210,7 +212,15 @@ if (a != null)
     </div>
 
 }*@
-
+@helper AddCommentBlock(int Id) {
+    <div class="div_padding_top_10_px">
+        <hr />
+        <textarea class="class_for_focus_show input_no_border" id="text_for_comment_rec_@Id" placeholder="Оставьте комментарий"></textarea>
+        <div class="class_for_focus_show_s">
+            <button onclick="SendComment(@Id)">отправить</button>
+        </div>
+    </div>
+}
 
         @helper RecordView(Record a,string  user_id,bool action=true)
         {
@@ -271,9 +281,9 @@ if (a != null)
 }
                     <div style="display:none;" id="div_for_comments_record_@a.Id"></div>
                     <div>
-                        <textarea id="text_for_comment_rec_@a.Id"></textarea>
-                        <button onclick="SendComment(@a.Id)">отправить</button>
-
+                        @*<textarea id="text_for_comment_rec_@a.Id"></textarea>
+                        <button onclick="SendComment(@a.Id)">отправить</button>*@
+                        @Healpers.AddCommentBlock(a.Id)
                     </div>
                 </div>
                 </div>
@@ -305,7 +315,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
             </div>
             <div>
                 @*тут коммент отображать номрально с тем что реализовано*@
-                @a.Text
+                <pre>@a.Text</pre>
             </div>
             <div class="like_div_comment">
 
@@ -442,11 +452,11 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                 </a>
                     @*</div>*@
         </div>
-        <div class="div_inline_block">
+        <div class="div_inline_block one_message_right">
             <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
                 @a.Creator.Name @a.Creator.Surname @a.Birthday
             </a>
-            <div>@a.Text</div>
+            <div><pre>@a.Text</pre></div>
 </div>
         <div>
             @foreach(var i in a.Images) {
@@ -513,7 +523,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 @helper Chat(ChatShort a)
         {
     @*<div id="OneChatAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
-    <div id="OneChatAllblock_div_id_@a.Id">
+    <div id="OneChatAllblock_div_id_@a.Id" class="OneChatAllblock_div_class">
         <a class="link_standart_for_div" href="/SocialNetwork/Dialog/@a.Id">
             <div class="div_padding_left_10_px div_padding_top_10_px oneDialogShortInside">
                 <div class="div_inline_block small_img_circle_size_1 block_circle">
@@ -521,7 +531,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                         @Healpers.Image(a.Image, true)
                     @*</div>*@
                 </div>
-                <div class="div_inline_block">
+                <div class="div_inline_block one_dialog_line_right">
                     <div>@a.Name</div>
                     @if (a.User != null)
                     {
@@ -531,7 +541,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                                 @Healpers.Image(a.User.Image, true)
                             </div>
                             <div class="div_inline_block">
-                                @a.Text
+                                <pre>@a.Text</pre>
                             </div>
                         </div>
                     }

@@ -8,16 +8,18 @@
 <input type="hidden" id="page_type_meme_id" value="3" />
 <div class="div_content_main_size_2 div_inline_block" id="div_content_main_size_2_id">
     @*для добавления поста, просто форма с страницы пользователя*@
-    <div>
+    <div class="div_padding_top_10_px div_color_white">
         @using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
         {
             
-            @Html.TextArea("text")
-            <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
-                            <input type="submit" value="Добавить" />
-        }
+            @Html.TextArea("text", new { @class = "class_for_focus_show input_no_border", placeholder = "Добавить запись" })
+            <div class="class_for_focus_show_s">
+                <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                <input type="submit" value="Добавить" />
+                </div>
+                }
 
-    </div>
+            </div>
     <div id="Wall_meme_block_update_id">
         @*первоначальная загрузка обязательно 10, тк в js подвязано*@
         @Html.Action("MemeRecordListPartial", "SocialNetwork", new {  type = 3, start = 0, count = 10 })
