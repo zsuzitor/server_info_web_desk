@@ -73,10 +73,7 @@ namespace server_info_web_desk.Hubs
             //string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
 
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-
-                
+           
                 
                 var id = Context.ConnectionId;
 
@@ -88,6 +85,9 @@ namespace server_info_web_desk.Hubs
 
                     //подключание к чатам\диалогам
                     if (user != null)
+                    {
+                    user.SetOnline(true);
+                    using (ApplicationDbContext db = new ApplicationDbContext())
                     {
                         db.Set<ApplicationUser>().Attach(user);
                         if (!db.Entry(user).Collection(x1 => x1.Chats).IsLoaded)
@@ -119,9 +119,11 @@ namespace server_info_web_desk.Hubs
             var item = Users.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
             if (item != null)
             {
+                var user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+                user.SetOnline(false);
                 Users.Remove(item);
                 var id = Context.ConnectionId;
-                Clients.All.onUserDisconnected(id);
+                //Clients.All.onUserDisconnected(id);
             }
 
             return base.OnDisconnected(stopCalled);

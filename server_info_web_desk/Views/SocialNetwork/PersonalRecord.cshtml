@@ -103,6 +103,14 @@
             <h2>
                 @Model.Name @Model.Surname
             </h2>
+            @if (Model.Online)
+            {
+                <h3>ONLINE</h3>
+            }
+            @if (!Model.Online)
+            {
+                <h3>OFLINE</h3>
+            }
             <div>
                 @Model.Status
             </div>

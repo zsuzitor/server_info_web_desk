@@ -414,6 +414,19 @@ namespace server_info_web_desk.Models
 
             return res;
         }
+        public  bool SetOnline(bool online)
+        {
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<ApplicationUser>().Attach(this);
+                this.Online = online;
+                db.SaveChanges();
+
+            }
+
+            return true;
+            }
+
 
         //проверка на то можно ли писать на стене
         public bool CanAddRecordWall(string user_id_action)
