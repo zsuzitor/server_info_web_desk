@@ -414,7 +414,7 @@ namespace server_info_web_desk.Models
 
             return res;
         }
-        public  bool SetOnline(bool online)
+        public bool SetOnline(bool online)
         {
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
@@ -425,7 +425,15 @@ namespace server_info_web_desk.Models
             }
 
             return true;
-            }
+        }
+        public static bool SetOnline(string id,bool online)
+        {
+            id = id ??GetUserId();
+            var user = ApplicationUser.GetUser(id);
+                user.SetOnline(false);
+                
+            return true;
+        }
 
 
         //проверка на то можно ли писать на стене

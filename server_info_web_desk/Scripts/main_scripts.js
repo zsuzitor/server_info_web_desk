@@ -619,6 +619,9 @@ function OnComplete_SendMessage(data){
 
 }
 
+
+//type 1-закрыто и вне экрана 2-закрыто в области видимости 3-открыто
+var Message_partial_OBJECT = { type:1,timeout_show:null };
 //<div id="OneMessageAllblock_div_id_
 function OnComplete_Load_new_messages(data) {
     
@@ -628,6 +631,7 @@ function OnComplete_Load_new_messages(data) {
         if (div != undefined || div != null) {
             div.innerHTML += data;
         }
+        //TODO тут надо смотреть и если надо дозагружать в partial диалог справа
     }
     else {
         //<div id="OneChatAllblock_div_id_
@@ -643,6 +647,18 @@ function OnComplete_Load_new_messages(data) {
             div = document.getElementById("num_CountNewMessage_id");
                 if (div != undefined || div != null) {
                     div.innerHTML = data;
+
+                    if (Message_partial_OBJECT.type == 1) {
+                        Message_partial_OBJECT.type = 2;
+                        var div_part_all = document.getElementById("div_for_small_dialog_partial_right_id");
+
+                        var div_part = document.getElementById("div_for_small_dialog_partial_right_head_id");
+                        div_part.innerHTML = "У вас новое сообщение";
+                        div_part_all.style.top = "90%";
+                        Message_partial_OBJECT.timeout_show = setTimeout(function () { div_part_all.style.top = "100%"; Message_partial_OBJECT.type = 1; }, 5000);
+                    }
+                    
+
                 }
         }
     }
@@ -662,6 +678,18 @@ function OnComplete_Load_new_messages(data) {
     
 }
 
+function click_small_partial_dialog() {
+    var div_part_all = document.getElementById("div_for_small_dialog_partial_right_id");
+    if (Message_partial_OBJECT.type == 2) {
+        Message_partial_OBJECT.type = 3;
+        div_part_all.style.height = '300px';
+    }
+    else {
+        div_part_all.style.height = '40px';
+        Message_partial_OBJECT.type = 2;
+    }
+    clearTimeout(Message_partial_OBJECT.timeout_show);
+}
 
 
 var Dialog_OBJECT = { dialog: null, start: 11, count: 10, can_load: true };

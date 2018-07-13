@@ -70,8 +70,7 @@ namespace server_info_web_desk.Hubs
         }
         public void JoinToHub()
         {
-            //string check_id = System.Web.HttpContext.Current.User.Identity.GetUserId();
-
+            
             ApplicationUser user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
            
                 
@@ -119,8 +118,9 @@ namespace server_info_web_desk.Hubs
             var item = Users.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
             if (item != null)
             {
-                var user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
-                user.SetOnline(false);
+                //var gg= System.Web.HttpContext.Current.User.Identity.GetUserId();
+                if (item.UserId != null)
+                    ApplicationUser.SetOnline(item.UserId, false);
                 Users.Remove(item);
                 var id = Context.ConnectionId;
                 //Clients.All.onUserDisconnected(id);

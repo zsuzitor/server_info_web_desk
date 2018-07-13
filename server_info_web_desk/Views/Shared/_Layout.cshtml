@@ -77,6 +77,13 @@
             }
             <div class="main_div_body">
                 @RenderBody()
+@if (controller_name == "socialnetwork")
+{
+    <div  class="div_for_small_dialog_partial_right" id="div_for_small_dialog_partial_right_id">
+        <div onclick="click_small_partial_dialog()" id="div_for_small_dialog_partial_right_head_id"></div>
+        <div id="div_for_small_dialog_partial_right_body_id"></div>
+    </div>
+}
                 @if (controller_name != "info")
             {
                     <hr id="hr_bottom_footer_id"/>

@@ -726,3 +726,26 @@ display:block;
 
      
 
+     div.div_for_small_dialog_partial_right{
+         position:fixed;
+         height:40px;
+         width:300px;
+         background-color:white;
+         top:100%;/*тут 100%*/
+         left:735px;
+         border-radius:10px;
+         border:2px solid black;
+         transition:1s;
+     }
+
+
+
+
+
+
+
+
+
+
+
+
