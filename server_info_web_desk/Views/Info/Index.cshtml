@@ -7,7 +7,14 @@
 
 <div class="index_main_div">
     <div>Продолжить работу</div>
-    <div>@Html.ActionLink("Начать заного", "Info_page", "Info")</div>
+    <div>@Html.ActionLink("Начать работу", "Info_page", "Info")</div>
+
+    <div class="Info_download_link">
+    
+    <a href="@Url.Action("DownloadFilesOfflineVersion","Info",new { })">Скачать Offline версию</a>
+
+    
+    </div>
 
     <div>СООБЩЕНИЕ ПОЛЬЗОВАТЕЛЯ ДЛЯ ПОСЕТЕТЕЛЕЙ</div>
 </div>

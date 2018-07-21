@@ -1,16 +1,139 @@
 ﻿@{
     ViewBag.Title = "Home Page";
 }
+<div class="div_padding_top_10_px home_index_one_block div_inline_block">
+    <div class="home_index_one_block_inside">
+        <a href="@Url.Action("PersonalRecord","SocialNetwork", new { })">
+
+
+            @*@Html.ActionLink("Личная страница", "PersonalRecord", "SocialNetwork", new { }, new { })*@
+            Личная страница
+
+            <div class="home_index_one_block_move">
+                Добро пожаловать в нашу социальную сеть
+
+            </div>
+
+        </a>
+    </div>
+</div>
+
+
+<div class="div_padding_top_10_px home_index_one_block div_inline_block">
+    <div class="home_index_one_block_inside">
+        <a href="@Url.Action("index","info", new { })">
+
+
+            Info data
+
+            <div class="home_index_one_block_move">
+                Добро пожаловать в систематизированное хранилище вашей текстовой информации
+
+            </div>
+
+        </a>
+    </div>
+</div>
+
+<div class="div_padding_top_10_px home_index_one_block div_inline_block">
+    <div class="home_index_one_block_inside">
+        <a href="">@*@Url.Action("index", "info", new { })*@
+
+
+            Текст
+
+            <div class="home_index_one_block_move">
+                Информация
+
+            </div>
+
+        </a>
+    </div>
+</div>
+
+<div class="div_padding_top_10_px home_index_one_block div_inline_block">
+    <div class="home_index_one_block_inside">
+        <a href="">
+            @*@Url.Action("index", "info", new { })*@
+
+
+        Текст
+
+        <div class="home_index_one_block_move">
+            Информация
+
+        </div>
+
+    </a>
+</div>
+</div>
+
+<div class="div_padding_top_10_px home_index_one_block div_inline_block">
+    <div class="home_index_one_block_inside">
+        <a href="">
+            @*@Url.Action("index", "info", new { })*@
+
+
+        Текст
+
+        <div class="home_index_one_block_move">
+            Информация
+
+        </div>
+
+    </a>
+</div>
+</div>
+
+<div class="div_padding_top_10_px home_index_one_block div_inline_block">
+    <div class="home_index_one_block_inside">
+        <a href="">
+            @*@Url.Action("index", "info", new { })*@
+
+
+        Текст
+
+        <div class="home_index_one_block_move">
+            Информация
+
+        </div>
+
+    </a>
+</div>
+</div>
+
+<div class="div_padding_top_10_px home_index_one_block div_inline_block">
+    <div class="home_index_one_block_inside">
+        <a href="">
+            @*@Url.Action("index", "info", new { })*@
+
+
+        Текст
+
+        <div class="home_index_one_block_move">
+            Информация
+
+        </div>
+
+    </a>
+</div>
+</div>
 
 
 
-@Html.ActionLink("Личная страница","PersonalRecord", "SocialNetwork",new { },new { })
-@Html.ActionLink("Info data","index", "info", new { }, new { })
 
 
-@*<h3>Выберите файл для загрузки</h3>
-@using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
-{
-    <input type="file" name="upload" /><br>
-    <input type="submit" value="Загрузить" />
-}*@
+
+
+
+    <div></div>
+
+
+
+
+    @*<h3>Выберите файл для загрузки</h3>
+        @using (Html.BeginForm("Upload", "Home", FormMethod.Post, new { enctype = "multipart/form-data" }))
+        {
+            <input type="file" name="upload" /><br>
+            <input type="submit" value="Загрузить" />
+        }*@

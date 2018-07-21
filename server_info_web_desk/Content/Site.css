@@ -190,6 +190,45 @@ div.div_for_replace_ajax_2{
      /*position:center;*/
 }
 
+div.standart_header_main{
+    width:100%;
+    height:50px;
+    background-color:rgba(0, 0, 0,.3);
+    
+    color:black;
+}
+div.standart_header_main_login_div{
+    
+}
+div.home_index_one_block_inside{
+    height:200px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    border-radius:20px;
+    text-align:center;
+cursor:pointer;
+overflow:hidden;
+position:relative;
+}
+div.home_index_one_block{
+    width:200px;
+    
+}
+div.home_index_one_block_inside:hover div.home_index_one_block_move{
+    top:0;
+}
+div.home_index_one_block_move{
+    /*border:solid 2px black;*/
+position:absolute;
+background-color:rgb(128, 128, 128);
+opacity:1;
+width:200px;
+height:200px;
+top:200px;
+transition:1s;
+color:white;
+
+}
+
     /*-----------------------------------------------------------------------------*/
     div.Main_preloader{
         position:fixed;

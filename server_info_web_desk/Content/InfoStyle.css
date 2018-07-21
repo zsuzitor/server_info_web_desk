@@ -462,7 +462,12 @@ div.div_search{
         margin-top:200px;
     }
 
-
+     div.Info_download_link{
+         margin-top:10px;
+         cursor:pointer;
+         border:2px solid black;
+         width:200px;
+     }
 
 
      

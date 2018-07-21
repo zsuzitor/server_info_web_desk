@@ -664,5 +664,18 @@ namespace server_info_web_desk.Controllers
             }
             return RedirectToAction("Index");
         }
+
+
+
+
+        public FileResult DownloadFilesOfflineVersion()
+        {
+            byte[] fileBytes = System.IO.File.ReadAllBytes(Server.MapPath("~/Files/Files.rar"));
+            string fileName = "InfoOffline.rar";
+            return File(fileBytes, System.Net.Mime.MediaTypeNames.Application.Octet, fileName);
+        }
+
+
+
     }
 }
