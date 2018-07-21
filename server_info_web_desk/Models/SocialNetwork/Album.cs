@@ -81,9 +81,20 @@ namespace server_info_web_desk.Models.SocialNetwork
                     db.Entry(a).Collection(x1 => x1.Images).Load();
             }
                 
-            res.AddRange(a.Images.Skip(a.Images.Count-count>0? a.Images.Count - count:0).Select(x1=> x1.Image));
+            
+            var rec_lst = a.Images.Skip(a.Images.Count - count > 0 ? a.Images.Count - count : 0);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                foreach (var i in rec_lst)
+                {
 
-                return res;
+                    db.Set<Record>().Attach(i);
+                    if (!db.Entry(i).Reference(x1 => x1.Image).IsLoaded)
+                        db.Entry(i).Reference(x1 => x1.Image).Load();
+                }
+            }
+            res.AddRange(rec_lst.Select(x1=>x1.Image));
+            return res;
         }
         //public static List<AlbumShort> GetAlbumShortListForView(List<Album> a,int count)
         //{

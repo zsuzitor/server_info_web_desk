@@ -1,0 +1,29 @@
+﻿  /*div.PersonalRecord_left{
+         
+     }*/
+     div.PersonalRecord_right{
+             /*height: 1500px;*/
+         margin-left:5px;
+     }
+
+     div.PersonalRecord_main_img_div{
+         width:100%;
+         height:300px;
+         border:1px solid black;
+         padding:10px;
+     }
+     div.PersonalRecord_main_img_d{
+         width:100%;
+         height:100%;
+     }
+
+    div.PersonalRecord_button_more_imfo{
+        text-align:center;
+        height:35px;
+        font-size:15pt;
+        cursor:pointer;
+        border-radius:10px;
+    }
+    div.PersonalRecord_button_more_imfo:hover{
+ background: #e1e5eb;
+    }

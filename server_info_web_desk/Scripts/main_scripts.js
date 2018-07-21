@@ -344,7 +344,7 @@ function SendComment(id) {
 
     var dt = {
         'id': id,
-        'text':text.value
+        'text':convert_string(text.value)
     };
     $.ajax({
         url: "/SocialNetwork/SendComment",

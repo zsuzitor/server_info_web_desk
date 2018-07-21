@@ -244,9 +244,13 @@
     <Compile Include="Startup.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Content\Albums.css" />
     <Content Include="Content\bootstrap.css" />
     <Content Include="Content\bootstrap.min.css" />
+    <Content Include="Content\GroupRecord.css" />
     <Content Include="Content\InfoStyle.css" />
+    <Content Include="Content\Messages.css" />
+    <Content Include="Content\PersonalRecord.css" />
     <Content Include="favicon.ico" />
     <Content Include="fonts\glyphicons-halflings-regular.svg" />
     <Content Include="Global.asax" />

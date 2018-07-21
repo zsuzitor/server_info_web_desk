@@ -15,11 +15,12 @@
         <div class="div_color_white">
             <div class="div_padding_top_10_px">
                 <div>
-                    @Html.ActionLink("Фотографии", "", "SocialNetwork", new { }, new { })
+                    @Html.ActionLink("Фотографии", "AlbumsGroup", "SocialNetwork", new { id = Model.IdGroup }, new { })
+                    
                 </div>
                 @foreach (var i in Model.Image)
             {
-                    <div class="div_padding_left_10_px one_image_small_block">
+                    <div class="div_inline_block div_padding_left_10_px one_image_small_block">
                         @Healpers.ImageLink(i)
                     </div>
 
@@ -66,7 +67,7 @@
 
         <div class="div_color_white">
             <div class="GroupRecord_main_img_div">
-                <div class="PersonalRecord_main_img_d">
+                <div class="GroupRecord_main_img_d">
 
                     @Healpers.ImageLink(Model?.MainImage)
                 </div>
@@ -81,9 +82,11 @@
                 {
                     @Html.Hidden("id_group", Model.IdGroup)
                     @Html.Hidden("album_id", Model.IdMainAlbum)
-                    @Html.TextArea("text")
-                    <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
+                    @Html.TextArea("text",new {@class= "class_for_focus_show" })
+                    <div class="class_for_focus_show_s">
+                        <input type="file" name="uploadImage" multiple="multiple" accept="image/*" />
                         <input type="submit" value="Добавить" />
+                    </div>
                 }
             }
 
@@ -154,3 +157,8 @@
 </div>
 
             
+@section scripts{
+    @Styles.Render("~/Content/GroupRecord.css")
+
+
+}

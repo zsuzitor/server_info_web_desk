@@ -43,9 +43,10 @@ namespace server_info_web_desk.Controllers
             //id = id ?? check_id;
             if (id == null&&check_id==null)
             {
-                return RedirectToAction("Index", "SocialNetwork",new { });
+                return RedirectToAction("Login", "Account", new { });
+                //http://localhost:64992/Account/Login
             }
-            if(id==null)
+            if (id==null)
                 return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = check_id });
 
             var user = ApplicationUser.GetUser(id) ;

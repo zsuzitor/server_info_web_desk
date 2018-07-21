@@ -1,0 +1,54 @@
+﻿ /*------------------------------------------------ALBUMS-----------------------------------------------------*/
+     div.Albums_one_album_block_img{
+         cursor:pointer;
+     }
+     div.album_one_image_img{
+         width:218px;
+         height:160px;
+     }
+
+     div.Albums_add_new_block{
+         background-color:rgba(122, 121, 121, .3);
+         position:relative;
+         color:rgba(71, 39, 39, .5);
+     }
+     div.Albums_add_new_block_inside{
+         display:none;
+         z-index:2;
+     }
+     div.Albums_add_new_block:hover .Albums_add_new_block_inside{
+display:block;
+     }
+
+     div.Albums_add_new_block:before{
+         content:"+";
+         position:absolute;
+         left:15px;
+         top:-133px;
+         font-size:220pt;
+         z-index:-1;
+     }
+
+
+
+      div.Albums_add_new_image_block{
+         background-color:rgba(122, 121, 121, .3);
+         position:relative;
+         color:rgba(71, 39, 39, .5);
+     }
+     div.Albums_add_new_image_block_inside{
+         display:none;
+         z-index:2;
+     }
+     div.Albums_add_new_image_block:hover .Albums_add_new_image_block_inside{
+display:block;
+     }
+
+     div.Albums_add_new_image_block:before{
+         content:"+";
+         position:absolute;
+         left:15px;
+         top:-133px;
+         font-size:220pt;
+         z-index:-1;
+     }
