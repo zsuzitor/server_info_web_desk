@@ -804,6 +804,7 @@ namespace server_info_web_desk.Models
         public DbSet<Article> Articles { get; set; }
         public DbSet<Section> Sections { get; set; }
         public DbSet<Info.ImageInfo> ImagesInfo { get; set; }
+
         public DbSet<SocialNetwork.Image> ImagesSocial { get; set; }
         public DbSet<Meme> Memes { get; set; }
         public DbSet<Album> Albums { get; set; }
@@ -864,11 +865,17 @@ namespace server_info_web_desk.Models
                .MapRightKey("ApplicationUserId")
                .ToTable("ApplicationUserRecordNews"));
 
-            modelBuilder.Entity<Record>().HasMany(c => c.GroupWall)
-               .WithMany(s => s.WallRecord)
-               .Map(t => t.MapLeftKey("RecordId")
-               .MapRightKey("GroupId")
-               .ToTable("GroupRecordWall"));
+            //modelBuilder.Entity<Record>().HasMany(c => c.GroupWall)
+            //   .WithMany(s => s.WallRecord)
+            //   .Map(t => t.MapLeftKey("RecordId")
+            //   .MapRightKey("GroupId")
+            //   .ToTable("GroupRecordWall"));
+
+            //modelBuilder.Entity<Record>().HasMany(c => c.UserWall)
+            //   .WithMany(s => s.WallRecord)
+            //   .Map(t => t.MapLeftKey("RecordId")
+            //   .MapRightKey("UserId")
+            //   .ToTable("ApplicationUserRecordWall"));
 
             modelBuilder.Entity<ApplicationUser>().HasMany(c => c.Followers)
                .WithMany(s => s.FollowUser)

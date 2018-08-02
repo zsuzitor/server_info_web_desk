@@ -26,8 +26,27 @@ namespace server_info_web_desk.Controllers
         // GET: SocialNetwork
         public ActionResult Index()
         {
-            // Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
-            Session["NewMessageType"] = "2";
+            //using (ApplicationDbContext db =new ApplicationDbContext())
+            //{
+
+            //    //foreach(var i in db.Groups.ToList())
+            //    //{
+            //    //    db.Entry(i).Collection(x => x.Albums).Load();
+            //    //    db.Groups.Remove(i);
+
+            //    //}
+            //    db.Groups.RemoveRange(db.Groups.Include(x1=>x1.Albums).ToList());
+            //    db.SaveChanges();
+            //    var rg=db.Record.First(x1=>x1.Id==1);
+            //    //rg.GroupId = 2;
+                
+            //    db.Entry(rg).Reference(x=> x.Group).Load();
+            //    var gh = rg.Group;
+            //}
+
+
+                // Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
+                Session["NewMessageType"] = "2";
             return View();
         }
 
@@ -868,6 +887,10 @@ namespace server_info_web_desk.Controllers
             string check_id = ApplicationUser.GetUserId();
             if(rec.CreatorId!=check_id)
                 return new HttpStatusCodeResult(404);
+            //TODO
+            //проверить доступ
+                //удалить
+                rec.DeleteWall();
 
 
 

@@ -50,7 +50,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         public ICollection<ApplicationUser> UsersLikes { get; set; }
         public ICollection<ApplicationUser> UsersRipostes { get; set; }
         public ICollection<ApplicationUser> UsersNews { get; set; }
-        public ICollection<Group> GroupWall { get; set; }
+        //public ICollection<Group> GroupWall { get; set; }
+        //public ICollection<ApplicationUser> UserWall { get; set; }
 
         public ICollection<Comment> Comments { get; set; }
 
@@ -77,7 +78,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             UsersLikes = new List<ApplicationUser>();
             UsersRipostes = new List<ApplicationUser>();
             UsersNews = new List<ApplicationUser>();
-            GroupWall = new List<Group>();
+            //GroupWall = new List<Group>();
             Comments = new List<Comment>();
         }
 
@@ -120,7 +121,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Record record = null;
             if (group_id != null&& group_id > 0)
             
-                record = new Record() { GroupId = group_id };
+                record = new Record() { CreatorId = creator_id, GroupId = group_id };
                 
             else
                 record=new Record() {CreatorId= creator_id, UserId = user_id };
@@ -157,9 +158,9 @@ namespace server_info_web_desk.Models.SocialNetwork
                 db.SaveChanges();
                
                 if (group == null)
-                    record = new Record() { AlbumId = album.Id, UserId = user.Id, Description = text };
+                    record = new Record() { CreatorId = user.Id, AlbumId = album.Id, UserId = user.Id, Description = text };
                 else
-                    record = new Record() { AlbumId = album.Id, GroupId = group.Id, Description = text };
+                    record = new Record() { CreatorId = user.Id, AlbumId = album.Id, GroupId = group.Id, Description = text };
                 db.Record.Add(record);
                 db.SaveChanges();
                 img.RecordId = record.Id;
@@ -286,17 +287,41 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
         //удаление со стены из новостей и тд
-        public  Record DeleteWall(int id)
+        public  Record DeleteWall()
         {
             //Record res = null;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 //res = db.Record.FirstOrDefault(x1=>x1.Id==id);
                 db.Set<Record>().Attach(this);
-                if (!db.Entry(this).Collection(x1 => x1.GroupWall).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.GroupWall).Load();
-                this.GroupWall.Clear();
+                //if (!db.Entry(this).Collection(x1 => x1.GroupWall).IsLoaded)
+                //    db.Entry(this).Collection(x1 => x1.GroupWall).Load();
+                //this.GroupWall.Clear();
                 //TODO уже удалять у пользователя со стены
+                if (!db.Entry(this).Reference(x1 => x1.Meme).IsLoaded)
+                    db.Entry(this).Reference(x1 => x1.Meme).Load();
+                if (this.Meme != null)
+                {
+                    //удаляем картинки в меме
+                    if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
+                        db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+                    db.ImagesSocial.RemoveRange(this.Meme.Images);
+                    
+                }
+                //удаление лайков
+                if (!db.Entry(this).Reference(x1 => x1.UsersLikes).IsLoaded)
+                    db.Entry(this).Reference(x1 => x1.UsersLikes).Load();
+
+                if (!db.Entry(this).Reference(x1 => x1.UsersNews).IsLoaded)
+                    db.Entry(this).Reference(x1 => x1.UsersNews).Load();
+
+                if (!db.Entry(this).Reference(x1 => x1.UsersRipostes).IsLoaded)
+                    db.Entry(this).Reference(x1 => x1.UsersRipostes).Load();
+
+
+
+                //если запись картинка то удалять только со стены
+
 
                 db.SaveChanges();
             }

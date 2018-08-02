@@ -14,6 +14,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         [Key]
         [ForeignKey("Record")]
         [HiddenInput(DisplayValue = false)]
+        [Required]
         public int Id { get; set; }
         [UIHint("MultilineText")]
         [Display(Name = "Описание")]
