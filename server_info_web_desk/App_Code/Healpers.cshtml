@@ -6,7 +6,7 @@
 @using System.Web;
 
 
-
+@*картинка которая может открываться в окне для просмотра картинки*@
 @helper ImageLink(Image a)
 {
     @*<a class="link_standart_for_div" href="/SocialNetwork/Image/@a.Id">*@
@@ -26,7 +26,7 @@ if (a?.Id == null)
 }
 
 
-
+@*просто картинка*@
         @helper Image(Image a, bool show_empty_img)
         {
 if (a?.Data != null)
@@ -47,7 +47,7 @@ if (show_empty_img)
 }
 
 
-
+@*картинка имя ссылки*@
         @helper UserShort(ApplicationUserShort a,int size)
         {
         <div class="small_block_short_size_@size" title="@a.Name @a.Surname">@**@
@@ -64,7 +64,7 @@ if (show_empty_img)
 }
 
 
-
+@*с картинка имя статус ссылкой*@
         @helper GroupShort(GroupShort a, int size)
         {
         <div class="div_inline_block small_block_short_size_@size" title="@a.Name">
@@ -86,7 +86,7 @@ if (show_empty_img)
         </div>
 }
 
-
+@*альбом без ссылок, только картинка и название*@
         @helper Album(AlbumShort a)
         {
     <div class="div_padding_top_10_px">
@@ -106,6 +106,8 @@ if (show_empty_img)
     </div>
 }
 
+
+@*строка с кноками "-лайк коммент репост*@
         @helper ActionRecord(Record a, string user_id)
         {
 if (a == null)
@@ -170,6 +172,9 @@ if (a != null)
                             }
 }
 
+
+@*при нажатии на картинку открывается этот блок*@
+
         @helper ImageRecord(Record a, string user_id)
         {
         <div class="ImageRecord_all_block">
@@ -204,7 +209,7 @@ if (a != null)
 
 }
 
-@*@helper ImageForRecord(Image a, string user_id)
+@* @helper ImageForRecord(Image a, string user_id)
         {
     <div>
         
@@ -212,6 +217,8 @@ if (a != null)
     </div>
 
 }*@
+
+@*поле для отправки комментария*@
 @helper AddCommentBlock(int Id) {
     <div class="div_padding_top_10_px">
         <hr />
@@ -222,75 +229,93 @@ if (a != null)
     </div>
 }
 
+@*на стене и в другим местах(но не открывающемся окне картинки) запись отображается этим хелпером*@
+
         @helper RecordView(Record a,string  user_id,bool action=true)
         {
         <div class="div_padding_top_10_px">
             <div class="div_padding_side_10_px div_color_white">
                 
-                <div class="RecordView_mem div_padding_top_10_px">
-                    
-                    @if (a.Image == null)
-                    {
-                        //запись мем
-                        <div>
-                            @Healpers.Author(a?.Creator_NM, a?.Group, a.Meme.Birthday)
-                            @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
-                            @if (a.Description != null)
-                            {
-                                <p>@a.Description</p>
-                            }
-                            <div></div>
-                            @if (a.RecordRiposteId != null)
-                            {
-                                @Healpers.RecordView(a.RecordRiposte, user_id,false)
-                            }
-@if (a.RecordRiposteId == null)
-{
-    @Healpers.Meme(a?.Meme)
-}
-
-
-                            @*див для отрисовки комментов по клику*@
-                            <div>
-
+                <div class="RecordView_mem div_padding_top_10_px" style="position:relative;">
+                    @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
+                    <div class="RecordView_more_all">
+                        <div class="RecordView_more_but">
+                            <div class="RecordView_more_block">
+                                <p>удалить</p>
+                                <p>пожаловаться</p>
+                                <p>скрыть</p>
+                                <p>...</p>
+                                <p>...</p>
+                                <p>...</p>
                             </div>
+
+                        </div>
                         </div>
 
-                    }
-                    @if (a.Image != null)
-                    {
-                        //запись картинка
-                        @Healpers.Author(a?.User, a?.Group, a.Image.Birthday)
+
+                        @if (a.Image == null)
+                        {
+                            //запись мем
+                            <div>
+                                @Healpers.Author(a?.Creator_NM, a?.Group, a.Meme.Birthday)
+
+                                @if (a.Description != null)
+                                {
+                                    <p>@a.Description</p>
+                                }
+
+                                @if (a.RecordRiposteId != null)
+                                {
+                                    @Healpers.RecordView(a.RecordRiposte, user_id, false)
+                                }
+                                @if (a.RecordRiposteId == null)
+                                {
+                                    @Healpers.Meme(a?.Meme)
+                                }
+
+
+                                @*див для отрисовки комментов по клику*@
+                                <div>
+
+                                </div>
+                            </div>
+
+                        }
+                        @if (a.Image != null)
+                        {
+                            //запись картинка
+                            @Healpers.Author(a?.User, a?.Group, a.Image.Birthday)
+                            <div>
+                                @if (a.Description != null)
+                                {
+                                    <p>@a.Description</p>
+                                }
+                            </div>
+                            <div class="record_image_one_image">
+                                @Healpers.ImageLink(a?.Image)
+                            </div>
+                        }
+
+
+                        <hr />
+                        @*отрисовка кнопок для записи*@
+                        @if (action)
+                        {
+                            @Healpers.ActionRecord(a, user_id)
+                        }
+                        <div style="display:none;" class="div_for_comments_record_class" id="div_for_comments_record_@a.Id"></div>
                         <div>
-                            @if (a.Description != null)
-                            {
-                                <p>@a.Description</p>
-                            }
+                            @*textarea id="text_for_comment_rec_@a.Id">/textarea
+                button onclick="SendComment(@a.Id)"отправить/ button*@
+                            @Healpers.AddCommentBlock(a.Id)
                         </div>
-                        <div class="record_image_one_image">
-                            @Healpers.ImageLink(a?.Image)
-                        </div>
-                    }
-
-                    
-                    <hr />
-                    @*отрисовка кнопок для записи*@
-@if (action)
-{
-                    @Healpers.ActionRecord(a, user_id)
-}
-                    <div style="display:none;" class="div_for_comments_record_class" id="div_for_comments_record_@a.Id"></div>
-                    <div>
-                        @*<textarea id="text_for_comment_rec_@a.Id"></textarea>
-                        <button onclick="SendComment(@a.Id)">отправить</button>*@
-                        @Healpers.AddCommentBlock(a.Id)
                     </div>
-                </div>
                 </div>
         </div>
 
 }
 
+@*отрисовка 1 коммента полностью*@
 @helper OneComment(Comment a,string user_id) { 
 ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
     <div class="div_padding_top_10_px">
@@ -356,7 +381,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
     
     }
 
-
+@*отрисовывает автора мема*@
 @helper Author(ApplicationUser user,Group group,DateTime date)
         {
     <div>
@@ -412,7 +437,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 }*@
 
 
-
+@*отрисовывает часть записи которая считается мемом*@
         @helper Meme(Meme a)
         {
         <div class="">
@@ -440,7 +465,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 
 }
 
-
+@*1 сообщение*@
 @helper Message(Message a)
         {
     @*<div id="OneMessageAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
@@ -481,7 +506,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 
 
 
-
+@*1 строчку списка юзеров с картинкой именем и фамилией+ ссылки*@
 @helper UserListItem(ApplicationUserShort a)
         {
     <div>
@@ -520,9 +545,11 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 }
 
 @*ChatShort*@
+
+@*в списке диалогов отрисовывает 1 диалог*@
 @helper Chat(ChatShort a)
         {
-    @*<div id="OneChatAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
+    @*div id="OneChatAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
     <div id="OneChatAllblock_div_id_@a.Id" class="OneChatAllblock_div_class">
         <a class="link_standart_for_div" href="/SocialNetwork/Dialog/@a.Id">
             <div class="div_padding_left_10_px div_padding_top_10_px oneDialogShortInside">

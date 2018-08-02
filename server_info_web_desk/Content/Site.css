@@ -648,6 +648,51 @@ div.div_for_comments_record_class{
     max-height:320px;
 }
 
+/*--------------------------------------------------not -moz not -o*/
+
+div.RecordView_more_all{
+     width:20px;
+    height:20px;
+    position:absolute;
+     left:470px;
+}
+div.RecordView_more_but{
+    
+    width:15px;
+    height:4px;
+     background-image: url(/Content/images/post_more.png);
+    background-size: 100% 100%;
+   
+}
+div.RecordView_more_all:hover{
+    cursor:pointer;
+}
+div.RecordView_more_all:hover div.RecordView_more_block{
+    display:block;
+    /*visibility:visible;*/
+
+}
+div.RecordView_more_block:hover{
+     display:block;
+      cursor:default;
+
+}
+div.RecordView_more_block{
+    /*width:200px;*/
+    /*height:100px;*/
+    /*display*/
+    border:2px solid black;
+    /*margin-left:-180px;*/
+    float:right;
+    margin-top:-5px;
+    
+    background-color:silver;
+    border-radius:15px;
+    display:none;
+    /*visibility:hidden;*/
+    
+}
+
 
       /*-----------------NEED--NEW-FILE----------------------------------------------------------*/
    

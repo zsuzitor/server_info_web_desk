@@ -38,7 +38,7 @@
     <div class="div_inline_block info_log_partial_div">
     @if (ViewBag.action_name == "index")
     {
-        @Html.ActionLink("Главная страница ресурса","Index","Home")
+        @Html.ActionLink("Главная страница ресурса","Index","Home",new { }, new { })
         @Html.Partial("_LoginPartial")
     }
     </div>
