@@ -8,7 +8,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Comment: IDomain<int>
+    public class Comment: IDomain<int>, IHaveNoCascadeDelContend
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
@@ -18,7 +18,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         [UIHint("MultilineText")]
         [Display(Name = "Текст")]
         public string Text { get; set; }
-
+        public bool DeleteContent { get; set; }//для AnswerComments
 
         public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
@@ -48,6 +48,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             AnswerComment = null;
             Record = null;
             Record = null;
+            DeleteContent = false;
             //ImageId = null;
             //Image = null;
             Images = new List<Image>();

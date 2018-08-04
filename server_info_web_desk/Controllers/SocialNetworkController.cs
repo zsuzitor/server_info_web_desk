@@ -26,6 +26,50 @@ namespace server_info_web_desk.Controllers
         // GET: SocialNetwork
         public ActionResult Index()
         {
+
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                //var rec = db.Record.First(x1 => x1.Id == 1);
+                //db.Entry(rec).Reference(x => x.Meme).Load();
+                //db.Entry(rec).Collection(x => x.RecordRiposters).Load();
+                //db.Entry(rec).Collection(x => x.UsersLikes).Load();
+                //db.Entry(rec).Collection(x => x.UsersNews).Load();
+                //db.Entry(rec).Collection(x => x.UsersRipostes).Load();
+                //db.Entry(rec).Collection(x => x.Comments).Load();
+
+                ////meme
+                //db.Entry(rec.Meme).Collection(x => x.Images).Load();
+                //db.Entry(rec.Meme).Collection(x => x.Messages).Load();
+
+                //db.Record.Remove(rec);
+                //db.SaveChanges();
+                {
+                    var mem = db.Memes.First();
+
+                    //db.Entry(mem).Reference(x => x.ima).Load();
+                    //var img = mem.Image;
+                    //rec.ImageId = null;
+                    //db.SaveChanges();
+                }
+
+                //var rec = db.Record.First();
+                //rec.ImageId = 1;
+                //db.SaveChanges();
+                //db.Entry(rec).Reference(x => x.Image).Load();
+                //var img = rec.Image;
+                //rec.ImageId = null;
+                //db.SaveChanges();
+            }
+
+
+
+
+
+
+
+
+
+
             //using (ApplicationDbContext db =new ApplicationDbContext())
             //{
 
@@ -39,14 +83,14 @@ namespace server_info_web_desk.Controllers
             //    db.SaveChanges();
             //    var rg=db.Record.First(x1=>x1.Id==1);
             //    //rg.GroupId = 2;
-                
+
             //    db.Entry(rg).Reference(x=> x.Group).Load();
             //    var gh = rg.Group;
             //}
 
 
-                // Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
-                Session["NewMessageType"] = "2";
+            // Url.Action("Index", "Book", new { author = "Толстой", id = 10 }, null);
+            Session["NewMessageType"] = "2";
             return View();
         }
 

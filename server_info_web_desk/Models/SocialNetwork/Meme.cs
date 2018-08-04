@@ -9,7 +9,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Meme: IDomain<int>
+    public class Meme: IDomain<int>, IHaveNoCascadeDelContend
     {
         [Key]
         [ForeignKey("Record")]
@@ -20,8 +20,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         [Display(Name = "Описание")]
         public string Description { get; set; }
         public DateTime Birthday { get; set; }
+        public bool DeleteContent { get; set; }//для  Messages
 
-        
         public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
 
@@ -59,6 +59,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             //Group = null;
             //UserId = null;
             //User = null;
+            DeleteContent = false;
             Images = new List<Image>();
             Messages= new List<Message>();
             Birthday = DateTime.Now;
