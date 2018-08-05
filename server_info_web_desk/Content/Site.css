@@ -110,6 +110,9 @@ div.div_inline_block {
 .input_no_border{
     border:none;
 }
+.cursor_pointer{
+    cursor:pointer;
+}
 
 
 
@@ -447,6 +450,7 @@ color:white;
 
 
       /*---------------------------------HEALPERS--------------------------------------------*/
+     
       div.small_img_circle_size_0{
           height:25px;
           width:25px;
@@ -643,21 +647,40 @@ div.OneChatAllblock_div_class{
 }
 
 
+/*--------------------------------------------------not -moz not -o*/
+
+
+
+
+
 div.div_for_comments_record_class{
     overflow-y:auto;
     max-height:320px;
 }
 
-/*--------------------------------------------------not -moz not -o*/
+ div.more_info_record_link{
+
+     /*border-bottom:1px solid white;*/
+     padding-top:5px;
+     height:30px;
+     text-align: center;
+      }
+ div.more_info_record_link:hover{
+      background: #e1e5eb;
+ }
+
+
 
 div.RecordView_more_all{
-     width:20px;
-    height:20px;
+     width:30px;
+    height:30px;
     position:absolute;
      left:470px;
+     margin-left:-10px;
 }
 div.RecordView_more_but{
-    
+    margin-top:10px;
+    margin-left:7px;
     width:15px;
     height:4px;
      background-image: url(/Content/images/post_more.png);
@@ -681,14 +704,17 @@ div.RecordView_more_block{
     /*width:200px;*/
     /*height:100px;*/
     /*display*/
-    border:2px solid black;
+    /*border:2px solid black;*/
     /*margin-left:-180px;*/
     float:right;
     margin-top:5px;
-    
-    background-color:silver;
+    overflow:hidden;
+    background-color:white;
     border-radius:15px;
     display:none;
+    -webkit-box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                 box-shadow: 0 0 10px rgba(0,0,0,0.5);
+                 border: 1px solid #c5d0db;
     /*visibility:hidden;*/
     
 }

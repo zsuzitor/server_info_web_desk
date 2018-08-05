@@ -13,7 +13,7 @@ using static server_info_web_desk.Models.functions.FunctionsProject;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Group : IPageR, IHaveAlbum, IDomain<int>
+    public class Group : IPageR, IHaveAlbum, IDomain<int>, IDeleteDb<Group>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
@@ -33,13 +33,32 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string MainAdminId { get; set; }
         public ApplicationUser MainAdmin { get; set; }
 
-        public List<Record> RecordCreated { get; set; }
+        //public List<Record> RecordCreated { get; set; }
 
         public List<ApplicationUser> Users { get; set; }
         public List<ApplicationUser> Admins { get; set; }
 
         public List<Album> Albums { get; set; }
         public List<Record> WallRecord { get; set; }//тк есть еще записи которые можно репостить
+
+        public Group()
+        {
+            Id = 0;
+            Name = null;
+            Status = null;
+            Birthday = DateTime.Now;
+            OpenGroup = true;
+            AddMemesPrivate = false;
+            MainAdminId = null;
+            MainAdmin = null;
+            Users = new List<ApplicationUser>();
+            Admins = new List<ApplicationUser>();
+            Albums = new List<Album>();
+            WallRecord = new List<Record>();
+            //RecordCreated = new List<Record>();
+
+        }
+
 
 
         public static Group CreateNewGroup(string name)
@@ -73,6 +92,44 @@ namespace server_info_web_desk.Models.SocialNetwork
                 db.SaveChanges();
             }
             return res;
+        }
+
+        public Group DeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.WallRecord).Load();
+                foreach(var i in this.WallRecord)
+                {
+                    bool suc;
+                    i.DeleteFull(out suc);
+                }
+                db.SaveChanges();
+
+                if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Albums).Load();
+                foreach (var i in this.Albums)
+                {
+                    bool suc;
+                    i.DeleteFull(out suc);
+                }
+                db.SaveChanges();
+
+
+                if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Users).Load();
+                if (!db.Entry(this).Collection(x1 => x1.Admins).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Admins).Load();
+
+
+                db.Groups.Remove(this);
+                db.SaveChanges();
+
+            }
+            success = true;
+            return this;
         }
 
 
@@ -118,23 +175,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             return res;
         }
 
-        public Group()
-        {
-            Id = 0;
-            Name = null;
-            Status = null;
-            Birthday = DateTime.Now;
-            OpenGroup = true;
-            AddMemesPrivate = false;
-            MainAdminId = null;
-            MainAdmin = null;
-            Users = new List<ApplicationUser>();
-            Admins = new List<ApplicationUser>();
-            Albums = new List<Album>();
-            WallRecord = new List<Record>();
-            RecordCreated = new List<Record>();
-
-        }
+        
 
         public static Group GetGroup(int? id)
         {

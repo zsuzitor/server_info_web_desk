@@ -237,16 +237,19 @@ if (a != null)
             <div class="div_padding_side_10_px div_color_white">
                 
                 <div class="RecordView_mem div_padding_top_10_px" style="position:relative;">
+                    <div id="record_server_message_@a.Id"></div>
                     @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
                     <div class="RecordView_more_all">
                         <div class="RecordView_more_but">
                             <div class="RecordView_more_block">
-                                <p>удалить</p>
-                                <p>пожаловаться</p>
-                                <p>скрыть</p>
-                                <p>...</p>
-                                <p>...</p>
-                                <p>...</p>
+                                <div class="cursor_pointer more_info_record_link" onclick="delete_record_wall(@a.Id)" >удалить</div>
+                                
+                                <div class="cursor_pointer more_info_record_link" onclick="">пожаловаться</div>
+                                <div class="cursor_pointer more_info_record_link" onclick="">скрыть</div>
+                                <div class="cursor_pointer more_info_record_link" onclick="">...</div>
+                                <div class="cursor_pointer more_info_record_link" onclick="">...</div>
+                                <div class="cursor_pointer more_info_record_link" onclick="">...</div>
+                               
                             </div>
 
                         </div>

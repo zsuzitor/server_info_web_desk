@@ -9,7 +9,7 @@ using server_info_web_desk.Models;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Message: IDomain<int>
+    public class Message: IDomain<int>, IDeleteDb<Message>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
@@ -68,5 +68,32 @@ namespace server_info_web_desk.Models.SocialNetwork
             UserNeedRead = new List<ApplicationUser>();
 
         }
+
+
+        public Message DeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                if (!db.Entry(this).Collection(x1 => x1.UserNeedRead).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.UserNeedRead).Load();
+                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Images).Load();
+                foreach(var i in this.Images)
+                {
+                    bool suc;
+                    i.DeleteFull(out suc);
+                }
+                db.SaveChanges();
+
+                db.Messages.Remove(this);
+                db.SaveChanges();
+
+            }
+            success = true;
+            return this;
+        }
+
+
     }
 }

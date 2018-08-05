@@ -11,14 +11,17 @@ using server_info_web_desk.Models;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Chat: IDomain<int>
+    public class Chat: IDomain<int>, IDeleteDb<Chat>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
         public DateTime Birthday { get; set; }
         public string Name { get; set; }
-        public Image Image { get; set; }
+
+        // public int? ImageId { get; set; }
+        // public Image Image { get; set; }
+        public byte[] Image { get; set; }
 
         public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
@@ -33,6 +36,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Birthday = DateTime.Now;
             CreatorId = null;
             Creator = null;
+            //ImageId = null;
             Image = null;
             Name = null;
             Messages = new List<Message>();
@@ -44,7 +48,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public ChatShort GetChatShort()
         {
            
-                var res = new ChatShort() { Id = this.Id, Image = this.Image, Name = this.Name };
+                var res = new ChatShort() { Id = this.Id, Image = new Image() {Data= this.Image }, Name = this.Name };
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<Chat>().Attach(this);
@@ -73,6 +77,33 @@ namespace server_info_web_desk.Models.SocialNetwork
             return res;
            
         }
+
+
+        public Chat DeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Messages).Load();
+                foreach(var i in this.Messages)
+                {
+                    bool suc;
+                    i.DeleteFull(out suc);
+                }
+                db.SaveChanges();
+                if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Users).Load();
+
+
+                db.Chats.Remove(this);
+                db.SaveChanges();
+
+            }
+            success = true;
+            return this;
+        }
+
 
 
         public static Chat CreateNewChat(ApplicationUser creator, ApplicationUser user)

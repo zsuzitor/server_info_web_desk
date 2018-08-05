@@ -10,7 +10,7 @@ using static server_info_web_desk.Models.functions.FunctionsProject;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Album:IDomain<int>
+    public class Album:IDomain<int>, IDeleteDb<Album>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
@@ -50,6 +50,29 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         }
+
+        public Album DeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Images).Load();
+                foreach(var i in this.Images)
+                {
+                    bool suc;
+                    i.DeleteFull(out suc);
+                }
+                db.SaveChanges();
+
+                db.Albums.Remove(this);
+                db.SaveChanges();
+
+            }
+            success = true;
+            return this;
+        }
+
         //1 альбом для пользователя 2-для группы
         public static Album CreateNew(string name,string id,int type)
         {

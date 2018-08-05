@@ -9,7 +9,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Meme: IDomain<int>, IHaveNoCascadeDelContend
+    public class Meme: IDomain<int>, IHaveNoCascadeDelContend, IDeleteDb<Meme>
     {
         [Key]
         [ForeignKey("Record")]
@@ -64,5 +64,35 @@ namespace server_info_web_desk.Models.SocialNetwork
             Messages= new List<Message>();
             Birthday = DateTime.Now;
         }
+
+
+        public Meme DeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Images).Load();
+                foreach(var i in this.Images)
+                {
+                    bool suc;
+                    i.DeleteFull(out suc);
+                }
+                db.SaveChanges();
+
+                if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
+                    db.Entry(this).Collection(x1 => x1.Messages).Load();
+                
+                
+                    db.Memes.Remove(this);
+                db.SaveChanges();
+
+            }
+            success = true;
+            return this;
+        }
+
+
+
     }
 }

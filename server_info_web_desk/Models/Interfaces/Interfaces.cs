@@ -37,6 +37,12 @@ namespace server_info_web_desk.Models.Interfaces
         bool DeleteContent { get; set; }
     }
 
+    //реализация удаления из бд
+    public interface IDeleteDb<T>
+    {
+
+        T DeleteFull(out bool success);
+    }
 
     public abstract class AImage
     {

@@ -338,6 +338,41 @@ function OnSuccessLoadWallRecords(data) {
 
 //-------------------------------------------------NOT NEED NEW FILE--------------------------------------------------------------------------------------------
 
+function delete_record_wall(id) {
+
+
+
+    var dt = {
+        'id': id
+        
+    };
+    $.ajax({
+        url: "/SocialNetwork/DeleteRecordWall",
+        data: dt,
+        success: function (data) {
+            var div = document.getElementById("record_server_message_" + id);
+            idv.innerHTML = data;
+           
+        },
+        error: function () {
+            alert("ошибка загрузки");
+            PreloaderAction(false);
+
+        },
+        beforeSend: function () { PreloaderAction(true); },
+        complete: function () {
+            PreloaderAction(false);
+
+        },
+        type: 'POST', dataType: 'json'//html
+    });
+
+
+
+}
+
+
+
 function SendComment(id) {
     var text = document.getElementById("text_for_comment_rec_" + id);
     var div = document.getElementById("div_for_comments_record_" + id);

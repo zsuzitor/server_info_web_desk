@@ -10,7 +10,7 @@ using static server_info_web_desk.Models.DataBase.DataBase;
 namespace server_info_web_desk.Models.SocialNetwork
 {
     [Table("ImageSocial")]
-    public class Image : server_info_web_desk.Models.Interfaces.AImage, IDomain<int>
+    public class Image : server_info_web_desk.Models.Interfaces.AImage, IDomain<int>, IDeleteDb<Image>
     {
         //public bool MainImages { get; set; }
 
@@ -32,7 +32,11 @@ namespace server_info_web_desk.Models.SocialNetwork
         public int? MessageId { get; set; }
         public Message Message { get; set; }//если картинка в сообщении
 
-        public int? RecordId { get; set; }//если картинка самостоятельная и должна быть обернута в запись
+
+        //если картинка самостоятельная и должна быть обернута в запись, при удалении это не трогать, тк удаление начинается 
+        //с записи=> это дургой уровень
+        public int? RecordId { get; set; }
+        
         [NotMapped]
         public Record Record_NM { get; set; }
 
@@ -75,7 +79,21 @@ namespace server_info_web_desk.Models.SocialNetwork
             return img; 
         }
 
-            //ищет в бд по id  если id нет то создает record только для представления(бд не трогает)
+        public Image DeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.ImagesSocial.Remove(this);
+                db.SaveChanges();
+
+            }
+            success = true;
+                return this;
+        }
+
+
+        //ищет в бд по id  если id нет то создает record только для представления(бд не трогает)
         public void GetRecordForShow()
         {
             

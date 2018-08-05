@@ -931,14 +931,15 @@ namespace server_info_web_desk.Controllers
             string check_id = ApplicationUser.GetUserId();
             if(rec.CreatorId!=check_id)
                 return new HttpStatusCodeResult(404);
-            //TODO
-            //проверить доступ
-                //удалить
-                rec.DeleteWall();
+            bool success;
+                rec.DeleteWall(out success);
 
 
 
-            return View();
+            return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork", new
+            {
+                str = success ? "Удалено" : "Что то пошло не так"
+            }));
         }
         //удаляет как саму запись так и то что внитри - картинку мем и тд
         //[Authorize]
