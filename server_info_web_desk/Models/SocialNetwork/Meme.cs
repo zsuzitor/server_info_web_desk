@@ -9,7 +9,7 @@ using System.Web.Mvc;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Meme: IDomain<int>, IHaveNoCascadeDelContend, IDeleteDb<Meme>
+    public class Meme: IDomain<int>, IDeleteDb<Meme>
     {
         [Key]
         [ForeignKey("Record")]
@@ -20,7 +20,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         [Display(Name = "Описание")]
         public string Description { get; set; }
         public DateTime Birthday { get; set; }
-        public bool DeleteContent { get; set; }//для  Messages
+        
 
         public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
@@ -43,7 +43,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         //public ICollection<ApplicationUser> UsersLikes { get; set; }
         //public ICollection<ApplicationUser> UsersRipostes { get; set; }
         //public ICollection<ApplicationUser> UsersNews { get; set; }
-        public ICollection<Message> Messages { get; set; }//мем отправляется в сообщении
+        //public ICollection<Message> Messages { get; set; }//мем отправляется в сообщении
         //public ICollection<Comment> Comments { get; set; }
 
 
@@ -59,36 +59,52 @@ namespace server_info_web_desk.Models.SocialNetwork
             //Group = null;
             //UserId = null;
             //User = null;
-            DeleteContent = false;
+            //DeleteContent = false;
             Images = new List<Image>();
-            Messages= new List<Message>();
+            //Messages= new List<Message>();
             Birthday = DateTime.Now;
         }
 
+
+        public bool CanDelete()
+        {
+            bool res = false;
+
+            return res;
+        }
+
+        public Meme DeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            db.Set<Meme>().Attach(this);
+            if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Images).Load();
+            foreach (var i in this.Images)
+            {
+                bool suc;
+                i.DeleteFull(out suc, db);
+            }
+            db.SaveChanges();
+
+            //if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
+            //    db.Entry(this).Collection(x1 => x1.Messages).Load();
+
+
+            db.Memes.Remove(this);
+            db.SaveChanges();
+            success = true;
+            return this;
+        }
 
         public Meme DeleteFull(out bool success)
         {
             success = false;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Images).Load();
-                foreach(var i in this.Images)
-                {
-                    bool suc;
-                    i.DeleteFull(out suc);
-                }
-                db.SaveChanges();
 
-                if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Messages).Load();
-                
-                
-                    db.Memes.Remove(this);
-                db.SaveChanges();
-
+                this.DeleteFull(out success, db);
             }
-            success = true;
+           // success = true;
             return this;
         }
 

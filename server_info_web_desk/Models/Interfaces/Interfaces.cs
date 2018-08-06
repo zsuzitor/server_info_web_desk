@@ -42,6 +42,8 @@ namespace server_info_web_desk.Models.Interfaces
     {
 
         T DeleteFull(out bool success);
+        T DeleteFull(out bool success, ApplicationDbContext context);
+        bool CanDelete();
     }
 
     public abstract class AImage

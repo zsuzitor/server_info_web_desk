@@ -21,7 +21,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
 
-        public bool DeleteContent { get; set; }//для   RecordRiposters
+        public bool DeleteContent { get; set; }//для   RecordRiposters---RecordRiposte
         //public int? MemeId { get; set; }
         //[NotMapped]
         public Meme Meme { get; set; }//мем который в запись
@@ -46,7 +46,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         public ICollection<Record> RecordRiposters { get; set; }
 
 
-
+        public ICollection<Message> Messages { get; set; }//запись отправляется в сообщении
         public ICollection<ApplicationUser> UsersLikes { get; set; }
         public ICollection<ApplicationUser> UsersRipostes { get; set; }
         public ICollection<ApplicationUser> UsersNews { get; set; }
@@ -75,11 +75,13 @@ namespace server_info_web_desk.Models.SocialNetwork
             RecordRiposte = null;
             Description = null;
             CreatorId = null;
+            Messages = new List<Message>();
             RecordRiposters = new List<Record>();
             UsersLikes = new List<ApplicationUser>();
             UsersRipostes = new List<ApplicationUser>();
             UsersNews = new List<ApplicationUser>();
             //GroupWall = new List<Group>();
+
             Comments = new List<Comment>();
         }
 
@@ -291,6 +293,87 @@ namespace server_info_web_desk.Models.SocialNetwork
             //i.Meme_NM.Record_NM=
         }
 
+
+        public bool CanDelete()
+        {
+            bool res = false;
+
+            return res;
+        }
+
+
+        public Record DeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            db.Set<Record>().Attach(this);
+            //удаление только со стены
+            if (this.ImageId != null || this.AlbumId != null)
+            {
+                this.UserId = null;
+                this.GroupId = null;
+                db.SaveChanges();
+                success = true;
+                return this;
+            }
+            //удаление полностью
+
+            if (!db.Entry(this).Collection(x1 => x1.RecordRiposters).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.RecordRiposters).Load();
+            foreach (var i in this.RecordRiposters)
+            {
+                i.DeleteContent = true;
+                i.RecordRiposteId = null;
+            }
+            this.RecordRiposters.Clear();
+            db.SaveChanges();
+
+            if (!db.Entry(this).Reference(x1 => x1.Meme).IsLoaded)
+                db.Entry(this).Reference(x1 => x1.Meme).Load();
+            if (this.Meme != null)
+            {
+                //удаляем картинки в меме
+                if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
+                    db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+                //db.ImagesSocial.RemoveRange(this.Meme.Images);
+
+            }
+            //удаление лайков
+            if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
+
+            if (!db.Entry(this).Collection(x1 => x1.UsersNews).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.UsersNews).Load();
+
+            if (!db.Entry(this).Collection(x1 => x1.UsersRipostes).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.UsersRipostes).Load();
+
+            if (!db.Entry(this).Collection(x1 => x1.Comments).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Comments).Load();
+            foreach (var i in this.Comments)
+            {
+                bool suc;
+                i.DeleteFull(out suc,db);
+            }
+            db.SaveChanges();
+
+            if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Messages).Load();
+            foreach (var i in this.Messages)
+            {
+                i.DeleteContent = true;
+                i.RecordId = null;
+            }
+            db.SaveChanges();
+            //если запись картинка то удалять только со стены
+
+            db.Record.Remove(this);
+            db.SaveChanges();
+
+            success = true;
+            return this;
+        }
+
+
         //удаление со стены(если является фотографией) из новостей и тд и полное удаление если обычная запись(не фото)
         public  Record DeleteWall(out bool success)
         {
@@ -304,63 +387,9 @@ namespace server_info_web_desk.Models.SocialNetwork
             
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                db.Set<Record>().Attach(this);
-                //удаление только со стены
-                if (this.ImageId != null || this.AlbumId != null)
-                {
-                    this.UserId = null;
-                    this.GroupId = null;
-                    db.SaveChanges();
-                    success = true;
-                    return this;
-                }
-                //удаление полностью
-                
-                if (!db.Entry(this).Collection(x1 => x1.RecordRiposters).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.RecordRiposters).Load();
-                foreach (var i in this.RecordRiposters)
-                {
-                    i.DeleteContent = true;
-                    i.RecordRiposteId = null;
-                }
-                this.RecordRiposters.Clear();
-                db.SaveChanges();
-
-                if (!db.Entry(this).Reference(x1 => x1.Meme).IsLoaded)
-                    db.Entry(this).Reference(x1 => x1.Meme).Load();
-                if (this.Meme != null)
-                {
-                    //удаляем картинки в меме
-                    if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
-                        db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
-                    //db.ImagesSocial.RemoveRange(this.Meme.Images);
-                    
-                }
-                //удаление лайков
-                if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
-
-                if (!db.Entry(this).Collection(x1 => x1.UsersNews).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.UsersNews).Load();
-
-                if (!db.Entry(this).Collection(x1 => x1.UsersRipostes).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.UsersRipostes).Load();
-
-                if (!db.Entry(this).Collection(x1 => x1.Comments).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Comments).Load();
-                foreach(var i in this.Comments)
-                {
-                    bool suc;
-                    i.DeleteFull(out suc);
-                }
-                db.SaveChanges();
-
-                //если запись картинка то удалять только со стены
-
-                db.Record.Remove(this);
-                db.SaveChanges();
+                this.DeleteFull(out success, db);
             }
-            success = true;
+            //success = true;
             return this;
 
             }
@@ -380,7 +409,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                     if (!db.Entry(this).Reference(x1 => x1.Image).IsLoaded)
                         db.Entry(this).Reference(x1 => x1.Image).Load();
                     bool sc;
-                    this.Image.DeleteFull(out sc);
+                    this.Image.DeleteFull(out sc, db);
                     //var img = SocialNetwork.Image.GetImage((int)this.ImageId);
                     //var img = db.ImagesSocial.FirstOrDefault(x1 => x1.Id == this.ImageId);
                     //db.ImagesSocial.Remove(img);

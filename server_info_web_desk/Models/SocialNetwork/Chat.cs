@@ -78,29 +78,44 @@ namespace server_info_web_desk.Models.SocialNetwork
            
         }
 
+        public bool CanDelete()
+        {
+            bool res = false;
 
+            return res;
+        }
+
+
+        public Chat DeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            db.Set<Chat>().Attach(this);
+            if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Messages).Load();
+            foreach (var i in this.Messages)
+            {
+                bool suc;
+                i.DeleteFull(out suc, db);
+            }
+            db.SaveChanges();
+            if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Users).Load();
+
+
+            db.Chats.Remove(this);
+            db.SaveChanges();
+            success = true;
+            return this;
+        }
         public Chat DeleteFull(out bool success)
         {
             success = false;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Messages).Load();
-                foreach(var i in this.Messages)
-                {
-                    bool suc;
-                    i.DeleteFull(out suc);
-                }
-                db.SaveChanges();
-                if (!db.Entry(this).Collection(x1 => x1.Users).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Users).Load();
-
-
-                db.Chats.Remove(this);
-                db.SaveChanges();
+                this.DeleteFull(out success, db);
 
             }
-            success = true;
+            //success = true;
             return this;
         }
 

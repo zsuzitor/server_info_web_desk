@@ -50,26 +50,41 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         }
+        public bool CanDelete()
+        {
+            bool res = false;
+            this.UserId;
+            this.GroupId;
+            return res;
+        }
+        public Album DeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            db.Set<Album>().Attach(this);
+            if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Images).Load();
 
+            foreach (var i in this.Images)
+            {
+                bool suc;
+                i.DeleteFull(out suc, db);
+            }
+            db.SaveChanges();
+
+            db.Albums.Remove(this);
+            db.SaveChanges();
+            success = true;
+            return this;
+        }
         public Album DeleteFull(out bool success)
         {
             success = false;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Images).Load();
-                foreach(var i in this.Images)
-                {
-                    bool suc;
-                    i.DeleteFull(out suc);
-                }
-                db.SaveChanges();
-
-                db.Albums.Remove(this);
-                db.SaveChanges();
+                this.DeleteFull(out success,db);
 
             }
-            success = true;
+            //success = true;
             return this;
         }
 

@@ -18,7 +18,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         [UIHint("MultilineText")]
         [Display(Name = "Текст")]
         public string Text { get; set; }
-        public bool DeleteContent { get; set; }//для AnswerComments
+        public bool DeleteContent { get; set; }//для AnswerComments---AnswerCommentId
 
         public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
@@ -70,6 +70,53 @@ namespace server_info_web_desk.Models.SocialNetwork
             }
         }
 
+        public bool CanDelete()
+        {
+            bool res = false;
+
+            return res;
+        }
+
+
+
+        public Comment DeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            db.Set<Comment>().Attach(this);
+            if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Images).Load();
+            foreach (var i in this.Images)
+            {
+                bool suc;
+                i.DeleteFull(out suc, db);
+
+            }
+            db.SaveChanges();
+
+            //мб лишнее
+            this.Images.Clear();
+
+            if (!db.Entry(this).Collection(x1 => x1.AnswerComments).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.AnswerComments).Load();
+            foreach (var i in this.AnswerComments)
+            {
+                i.DeleteContent = true;
+                i.AnswerCommentId = null;
+            }
+            db.SaveChanges();
+            this.AnswerComments.Clear();
+
+            if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
+
+
+            db.Comments.Remove(this);
+            db.SaveChanges();
+            success = true;
+            return this;
+        }
+
+
         public Comment DeleteFull(out bool success)
         {
             success = false;
@@ -77,38 +124,10 @@ namespace server_info_web_desk.Models.SocialNetwork
            
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Images).Load();
-                foreach(var i in this.Images)
-                {
-                    bool suc;
-                    i.DeleteFull(out suc);
-
-                }
-                db.SaveChanges();
-
-                //мб лишнее
-                this.Images.Clear();
-
-                if (!db.Entry(this).Collection(x1 => x1.AnswerComments).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.AnswerComments).Load();
-                foreach(var i in this.AnswerComments)
-                {
-                    i.DeleteContent = true;
-                    i.AnswerCommentId = null;
-                }
-                db.SaveChanges();
-                this.AnswerComments.Clear();
-
-                if (!db.Entry(this).Collection(x1 => x1.UsersLikes).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.UsersLikes).Load();
-
-
-                db.Comments.Remove(this);
-                db.SaveChanges();
+                this.DeleteFull(out success, db);
 
             }
-            success = true;
+            //success = true;
 
             return this;
         }

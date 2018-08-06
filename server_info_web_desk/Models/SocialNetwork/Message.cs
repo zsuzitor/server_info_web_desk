@@ -9,13 +9,13 @@ using server_info_web_desk.Models;
 
 namespace server_info_web_desk.Models.SocialNetwork
 {
-    public class Message: IDomain<int>, IDeleteDb<Message>
+    public class Message: IDomain<int>, IHaveNoCascadeDelContend, IDeleteDb<Message>
     {
         [Key]
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
         public DateTime Birthday { get; set; }
-
+        public bool DeleteContent { get; set; }//для  Meme
         [UIHint("MultilineText")]
         [Display(Name = "Текст")]
         public string Text { get; set; }
@@ -24,8 +24,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
 
-        public int? MemeId { get; set; }
-        public Meme Meme { get; set; }
+        public int? RecordId { get; set; }
+        public Record Record { get; set; }
 
         public int? ChatId { get; set; }
         public Chat Chat { get; set; }
@@ -60,8 +60,8 @@ namespace server_info_web_desk.Models.SocialNetwork
             Text = null;
             CreatorId = null;
             Creator = null;
-            MemeId = null;
-            Meme = null;
+            RecordId = null;
+            Record = null;
             Chat = null;
             ChatId = null;
             Images = new List<Image>();
@@ -70,27 +70,43 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
 
+        public bool CanDelete()
+        {
+            bool res = false;
+
+            return res;
+        }
+
+        public Message DeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            db.Set<Message>().Attach(this);
+            if (!db.Entry(this).Collection(x1 => x1.UserNeedRead).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.UserNeedRead).Load();
+            if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
+                db.Entry(this).Collection(x1 => x1.Images).Load();
+            foreach (var i in this.Images)
+            {
+                bool suc;
+                i.DeleteFull(out suc, db);
+            }
+            db.SaveChanges();
+
+            db.Messages.Remove(this);
+            db.SaveChanges();
+            success = true;
+            return this;
+        }
+
         public Message DeleteFull(out bool success)
         {
             success = false;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                if (!db.Entry(this).Collection(x1 => x1.UserNeedRead).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.UserNeedRead).Load();
-                if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(this).Collection(x1 => x1.Images).Load();
-                foreach(var i in this.Images)
-                {
-                    bool suc;
-                    i.DeleteFull(out suc);
-                }
-                db.SaveChanges();
-
-                db.Messages.Remove(this);
-                db.SaveChanges();
+                this.DeleteFull(out success, db);
 
             }
-            success = true;
+           // success = true;
             return this;
         }
 

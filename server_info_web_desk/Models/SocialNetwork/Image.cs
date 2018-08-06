@@ -79,16 +79,35 @@ namespace server_info_web_desk.Models.SocialNetwork
             return img; 
         }
 
+        public bool CanDelete()
+        {
+            bool res = false;
+
+            return res;
+        }
+
+
+        //картинки можно удалять только через record
+        public Image DeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            db.Set<Image>().Attach(this);
+            db.ImagesSocial.Remove(this);
+            db.SaveChanges();
+            success = true;
+            return this;
+        }
+
+        //картинки можно удалять только через record
         public Image DeleteFull(out bool success)
         {
             success = false;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                db.ImagesSocial.Remove(this);
-                db.SaveChanges();
+                this.DeleteFull(out success, db);
 
             }
-            success = true;
+           // success = true;
                 return this;
         }
 
