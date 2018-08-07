@@ -305,13 +305,14 @@ if (a != null)
                         @if (action)
                         {
                             @Healpers.ActionRecord(a, user_id)
-                        }
+                        
                         <div style="display:none;" class="div_for_comments_record_class" id="div_for_comments_record_@a.Id"></div>
                         <div>
                             @*textarea id="text_for_comment_rec_@a.Id">/textarea
                 button onclick="SendComment(@a.Id)"отправить/ button*@
                             @Healpers.AddCommentBlock(a.Id)
                         </div>
+                        }
                     </div>
                 </div>
         </div>
@@ -471,7 +472,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 @*1 сообщение*@
 @helper Message(Message a)
         {
-    @*<div id="OneMessageAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
+    @*div id="OneMessageAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
     <div id="OneMessageAllblock_div_id_@a.Id">
         <div class="div_inline_block small_img_circle_size_1 block_circle">
             @*<div class="block_circle">*@
@@ -491,13 +492,13 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                 @Healpers.ImageLink(i)
             }
         </div>
-        @if (a?.Meme != null)
+        @if (a?.Record != null)
         {
             <div>
-                @Healpers.Author(a.Meme?.Record?.User, a.Meme?.Record?.Group, a.Meme.Birthday)
+                @Healpers.Author(a.Record?.User, a.Record?.Group, a.Record.Meme.Birthday)
 
-                @Healpers.Meme(a.Meme)
-
+                @*@Healpers.Meme(a.Meme)*@
+                @Healpers.RecordView(a.Record, null,false)
 
             </div>
         }

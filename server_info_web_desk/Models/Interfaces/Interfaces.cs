@@ -41,8 +41,15 @@ namespace server_info_web_desk.Models.Interfaces
     public interface IDeleteDb<T>
     {
 
+
+        //более внутренний уровень, используется когда надо удалить без проверки, например удаляя record и проверяя ее остальное просто удалить
         T DeleteFull(out bool success);
         T DeleteFull(out bool success, ApplicationDbContext context);
+
+        // CanDelete+ DeleteFull
+        //более внешний уровень, используется когда надо удалить элемент и все
+        T TryDeleteFull(out bool success, ApplicationDbContext context);
+        T TryDeleteFull(out bool success);
         bool CanDelete();
     }
 

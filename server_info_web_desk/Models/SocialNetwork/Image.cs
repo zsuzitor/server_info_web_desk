@@ -79,15 +79,41 @@ namespace server_info_web_desk.Models.SocialNetwork
             return img; 
         }
 
+
+
+        //картинка напрямую удаляться не должна, только через record, meme и тд
         public bool CanDelete()
         {
-            bool res = false;
+            var check_id = ApplicationUser.GetUserId();
+            if (this.UserId == check_id)
+                return true;
+            return false;
+        }
 
-            return res;
+        //картинка напрямую удаляться не должна, только через record, meme и тд
+        public Image TryDeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            if (this.CanDelete())
+            {
+                this.DeleteFull(out success);
+            }
+            return this;
+
+        }
+        //картинка напрямую удаляться не должна, только через record, meme и тд
+        public Image TryDeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                this.TryDeleteFull(out success, db);
+            }
+            return this;
         }
 
 
-        //картинки можно удалять только через record
+        //картинка напрямую удаляться не должна, только через record, meme и тд
         public Image DeleteFull(out bool success, ApplicationDbContext db)
         {
             success = false;
@@ -98,7 +124,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             return this;
         }
 
-        //картинки можно удалять только через record
+        //картинка напрямую удаляться не должна, только через record, meme и тд
         public Image DeleteFull(out bool success)
         {
             success = false;

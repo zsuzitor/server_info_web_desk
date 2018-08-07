@@ -80,9 +80,33 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         public bool CanDelete()
         {
-            bool res = false;
+            //bool res = false;
+            var check_id = ApplicationUser.GetUserId();
+            if (this.CreatorId == check_id)
+                return true;
 
-            return res;
+            return false;
+        }
+
+
+        public Chat TryDeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            if (this.CanDelete())
+            {
+                this.DeleteFull(out success);
+            }
+            return this;
+
+        }
+        public Chat TryDeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                this.TryDeleteFull(out success, db);
+            }
+            return this;
         }
 
 

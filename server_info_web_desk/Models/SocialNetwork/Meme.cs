@@ -68,11 +68,14 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         public bool CanDelete()
         {
-            bool res = false;
-
-            return res;
+            var check_id = ApplicationUser.GetUserId();
+            if (this.CreatorId == check_id)
+                return true;
+            return false;
         }
 
+
+        //Meme напрямую удаляться не должн, только через record
         public Meme DeleteFull(out bool success, ApplicationDbContext db)
         {
             success = false;
@@ -96,6 +99,29 @@ namespace server_info_web_desk.Models.SocialNetwork
             return this;
         }
 
+        //Meme напрямую удаляться не должн, только через record
+        public Meme TryDeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            if (this.CanDelete())
+            {
+                this.DeleteFull(out success);
+            }
+            return this;
+
+        }
+        //Meme напрямую удаляться не должн, только через record
+        public Meme TryDeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                this.TryDeleteFull(out success, db);
+            }
+            return this;
+        }
+
+        //Meme напрямую удаляться не должн, только через record
         public Meme DeleteFull(out bool success)
         {
             success = false;

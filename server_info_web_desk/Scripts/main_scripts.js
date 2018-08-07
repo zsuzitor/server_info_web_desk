@@ -341,7 +341,6 @@ function OnSuccessLoadWallRecords(data) {
 function delete_record_wall(id) {
 
 
-
     var dt = {
         'id': id
         

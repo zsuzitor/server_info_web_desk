@@ -296,9 +296,35 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         public bool CanDelete()
         {
-            bool res = false;
+            var check_id = ApplicationUser.GetUserId();
+            if (this.CreatorId == check_id)
+                return true;
+            var gr = Group.GetGroup(this.GroupId);
 
-            return res;
+            if (gr.HaveAccessAdminGroup(check_id))
+                return true;
+            return false;
+        }
+
+
+        public Record TryDeleteFull(out bool success, ApplicationDbContext db)
+        {
+            success = false;
+            if (this.CanDelete())
+            {
+                this.DeleteFull(out success);
+            }
+            return this;
+
+        }
+        public Record TryDeleteFull(out bool success)
+        {
+            success = false;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                this.TryDeleteFull(out success, db);
+            }
+            return this;
         }
 
 
@@ -306,15 +332,24 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             success = false;
             db.Set<Record>().Attach(this);
-            //удаление только со стены
+
+
             if (this.ImageId != null || this.AlbumId != null)
             {
-                this.UserId = null;
-                this.GroupId = null;
-                db.SaveChanges();
-                success = true;
-                return this;
+                    if (!db.Entry(this).Reference(x1 => x1.Image).IsLoaded)
+                        db.Entry(this).Reference(x1 => x1.Image).Load();
+                    bool sc;
+                    this.Image.DeleteFull(out sc, db);
+                    //var img = SocialNetwork.Image.GetImage((int)this.ImageId);
+                    //var img = db.ImagesSocial.FirstOrDefault(x1 => x1.Id == this.ImageId);
+                    //db.ImagesSocial.Remove(img);
+                    this.ImageId = null;
+                    this.AlbumId = null;
+                    db.SaveChanges();
+                
             }
+
+            
             //удаление полностью
 
             if (!db.Entry(this).Collection(x1 => x1.RecordRiposters).IsLoaded)
@@ -380,13 +415,19 @@ namespace server_info_web_desk.Models.SocialNetwork
             //Record res = null;
             var check_id = ApplicationUser.GetUserId();
             success = false;
-            //TODO тут для группы другие условия проверки
-            if (this.CreatorId != check_id && this.UserId != check_id)
-                return null;
-            //мб короче
-            
+
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
+                db.Set<Record>().Attach(this);
+                //удаление только со стены
+                if (this.ImageId != null || this.AlbumId != null)
+                {
+                    this.UserId = null;
+                    this.GroupId = null;
+                    db.SaveChanges();
+                    success = true;
+                    return this;
+                }
                 this.DeleteFull(out success, db);
             }
             //success = true;
@@ -395,35 +436,17 @@ namespace server_info_web_desk.Models.SocialNetwork
             }
         public Record DeleteFull(out bool success)
         {
-            var check_id = ApplicationUser.GetUserId();
+           
             success = false;
-            //TODO тут для группы другие условия
-            if (this.CreatorId != check_id && this.UserId != check_id)
-                return null;
-
-            if (this.ImageId != null || this.AlbumId != null)
+           // Record res = null;
+            
+            using (ApplicationDbContext db = new ApplicationDbContext())
             {
-                using (ApplicationDbContext db = new ApplicationDbContext())
-                {
-                    db.Set<Record>().Attach(this);
-                    if (!db.Entry(this).Reference(x1 => x1.Image).IsLoaded)
-                        db.Entry(this).Reference(x1 => x1.Image).Load();
-                    bool sc;
-                    this.Image.DeleteFull(out sc, db);
-                    //var img = SocialNetwork.Image.GetImage((int)this.ImageId);
-                    //var img = db.ImagesSocial.FirstOrDefault(x1 => x1.Id == this.ImageId);
-                    //db.ImagesSocial.Remove(img);
-                    this.ImageId = null;
-                    this.AlbumId = null;
-                    db.SaveChanges();
+                //res=
+                this.DeleteFull(out success, db);
 
-                }
-                
             }
-            bool suc;
-            var res = this.DeleteWall(out suc);
-            success = suc;
-            return res; 
+            return this; 
         }
             //public Record DeleteInside(int id)
             //{
