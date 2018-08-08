@@ -15,7 +15,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         [HiddenInput(DisplayValue = false)]
         public int Id { get; set; }
         public DateTime Birthday { get; set; }
-        public bool DeleteContent { get; set; }//для  Meme
+        public bool DeleteContent { get; set; }//для  Record
         [UIHint("MultilineText")]
         [Display(Name = "Текст")]
         public string Text { get; set; }
@@ -86,7 +86,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                 db.Entry(this).Collection(x1 => x1.UserNeedRead).Load();
             if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Images).Load();
-            foreach (var i in this.Images)
+            foreach (var i in this.Images.ToList())
             {
                 bool suc;
                 i.DeleteFull(out suc, db);

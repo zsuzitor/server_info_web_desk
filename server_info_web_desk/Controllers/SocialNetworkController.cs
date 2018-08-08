@@ -27,39 +27,39 @@ namespace server_info_web_desk.Controllers
         public ActionResult Index()
         {
 
-            using (ApplicationDbContext db = new ApplicationDbContext())
-            {
-                //var rec = db.Record.First(x1 => x1.Id == 1);
-                //db.Entry(rec).Reference(x => x.Meme).Load();
-                //db.Entry(rec).Collection(x => x.RecordRiposters).Load();
-                //db.Entry(rec).Collection(x => x.UsersLikes).Load();
-                //db.Entry(rec).Collection(x => x.UsersNews).Load();
-                //db.Entry(rec).Collection(x => x.UsersRipostes).Load();
-                //db.Entry(rec).Collection(x => x.Comments).Load();
+            //using (ApplicationDbContext db = new ApplicationDbContext())
+            //{
+            //    //var rec = db.Record.First(x1 => x1.Id == 1);
+            //    //db.Entry(rec).Reference(x => x.Meme).Load();
+            //    //db.Entry(rec).Collection(x => x.RecordRiposters).Load();
+            //    //db.Entry(rec).Collection(x => x.UsersLikes).Load();
+            //    //db.Entry(rec).Collection(x => x.UsersNews).Load();
+            //    //db.Entry(rec).Collection(x => x.UsersRipostes).Load();
+            //    //db.Entry(rec).Collection(x => x.Comments).Load();
 
-                ////meme
-                //db.Entry(rec.Meme).Collection(x => x.Images).Load();
-                //db.Entry(rec.Meme).Collection(x => x.Messages).Load();
+            //    ////meme
+            //    //db.Entry(rec.Meme).Collection(x => x.Images).Load();
+            //    //db.Entry(rec.Meme).Collection(x => x.Messages).Load();
 
-                //db.Record.Remove(rec);
-                //db.SaveChanges();
-                {
-                    var mem = db.Memes.First();
+            //    //db.Record.Remove(rec);
+            //    //db.SaveChanges();
+            //    //{
+            //    //    var mem = db.Memes.First();
 
-                    //db.Entry(mem).Reference(x => x.ima).Load();
-                    //var img = mem.Image;
-                    //rec.ImageId = null;
-                    //db.SaveChanges();
-                }
+            //    //    //db.Entry(mem).Reference(x => x.ima).Load();
+            //    //    //var img = mem.Image;
+            //    //    //rec.ImageId = null;
+            //    //    //db.SaveChanges();
+            //    //}
 
-                //var rec = db.Record.First();
-                //rec.ImageId = 1;
-                //db.SaveChanges();
-                //db.Entry(rec).Reference(x => x.Image).Load();
-                //var img = rec.Image;
-                //rec.ImageId = null;
-                //db.SaveChanges();
-            }
+            //    //var rec = db.Record.First();
+            //    //rec.ImageId = 1;
+            //    //db.SaveChanges();
+            //    //db.Entry(rec).Reference(x => x.Image).Load();
+            //    //var img = rec.Image;
+            //    //rec.ImageId = null;
+            //    //db.SaveChanges();
+            //}
 
 
 
@@ -740,6 +740,8 @@ namespace server_info_web_desk.Controllers
         {
             List<Comment> res = new List<Comment>();
             var rec = Record.GetRecord(id);
+            if(rec==null)
+                return new HttpStatusCodeResult(404);
             res.AddRange(rec.GetComments());
             ViewBag.check_id = ApplicationUser.GetUserId();
             //грузить коммент для вью
@@ -751,6 +753,8 @@ namespace server_info_web_desk.Controllers
         public JsonResult SendComment(int id,string text)
         {
             var rec = Record.GetRecord(id);
+            if (rec == null)
+                return null;
             rec.AddComment(text,null);
 
             return Json(true);
@@ -851,7 +855,8 @@ namespace server_info_web_desk.Controllers
 
             ViewBag.check_id = check_id;
             Image img = Image.GetImage((int)id);
-            
+            if(img==null)
+                return new HttpStatusCodeResult(404);
             img.GetRecordForShow();
 
            
@@ -925,21 +930,21 @@ namespace server_info_web_desk.Controllers
 
         }
         [Authorize]
-        public ActionResult DeleteRecordWall(int id)
+        public JsonResult DeleteRecordWall(int id)
         {
             Record rec = Record.GetRecord(id);
-            string check_id = ApplicationUser.GetUserId();
-            if(rec.CreatorId!=check_id)
-                return new HttpStatusCodeResult(404);
+            if(rec==null)
+                return null;
+            
             bool success;
                 rec.DeleteWall(out success);
 
 
-
-            return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork", new
-            {
-                str = success ? "Удалено" : "Что то пошло не так"
-            }));
+            return Json(success);
+            //return Redirect(Url.Action("ReturnStringPartial", "SocialNetwork", new
+            //{
+            //    str = success ? "Удалено" : "Что то пошло не так"
+            //}));
         }
         //удаляет как саму запись так и то что внитри - картинку мем и тд
         //[Authorize]

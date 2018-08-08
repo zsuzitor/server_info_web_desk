@@ -24,6 +24,8 @@ namespace server_info_web_desk.Models.SocialNetwork
 
         public string CreatorId { get; set; }
         public ApplicationUser Creator { get; set; }//создатель
+        public int? GroupCreatorId { get; set; }
+        public ApplicationUser GroupCreator { get; set; }//создатель
 
         //public int? GroupId { get; set; }
         //public Group Group { get; set; }
@@ -33,7 +35,7 @@ namespace server_info_web_desk.Models.SocialNetwork
         //public string MessageId { get; set; }
         //public Message Message { get; set; }
 
-        
+
         //public int? RecordId { get; set; }
         //[NotMapped]
         public Record Record { get; set; }
@@ -55,6 +57,8 @@ namespace server_info_web_desk.Models.SocialNetwork
                 CreatorId= null;
             Creator = null;
             Record = null;
+            GroupCreatorId = null;
+            GroupCreator = null;
             //GroupId = null;
             //Group = null;
             //UserId = null;
@@ -82,7 +86,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             db.Set<Meme>().Attach(this);
             if (!db.Entry(this).Collection(x1 => x1.Images).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Images).Load();
-            foreach (var i in this.Images)
+            foreach (var i in this.Images.ToList())
             {
                 bool suc;
                 i.DeleteFull(out suc, db);

@@ -720,6 +720,17 @@ div.RecordView_more_block{
 }
 
 
+div.record_server_message_class{
+    position:absolute;
+    display:none;
+    z-index: 10;
+    text-align:center;
+    /*vertical-align:middle;*/
+    /*padding-top:50%;
+    font-size:40pt;*/
+}
+
+
       /*-----------------NEED--NEW-FILE----------------------------------------------------------*/
    
 

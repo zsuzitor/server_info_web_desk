@@ -139,7 +139,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                 //if (group_id != null && group_id > 0)
                 //    record.GroupWall.Add(Group.GetGroup(group_id));
 
-                Meme mem = new Meme() { Id = record.Id, Description = text, CreatorId = creator_id };
+                Meme mem = new Meme() { Id = record.Id, Description = text, CreatorId = creator_id , GroupCreatorId = group_id };
                 db.Memes.Add(mem);
                 db.SaveChanges();
                 var list_img = images.Select(x1 => new Image() { MemeId = mem.Id, Data = x1, UserId = creator_id });
@@ -367,8 +367,11 @@ namespace server_info_web_desk.Models.SocialNetwork
             if (this.Meme != null)
             {
                 //удаляем картинки в меме
-                if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
-                    db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+                //if (!db.Entry(this.Meme).Collection(x1 => x1.Images).IsLoaded)
+                //    db.Entry(this.Meme).Collection(x1 => x1.Images).Load();
+                bool sc = false;
+                this.Meme.DeleteFull(out sc, db);
+
                 //db.ImagesSocial.RemoveRange(this.Meme.Images);
 
             }
@@ -384,7 +387,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
             if (!db.Entry(this).Collection(x1 => x1.Comments).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Comments).Load();
-            foreach (var i in this.Comments)
+            foreach (var i in this.Comments.ToList())//
             {
                 bool suc;
                 i.DeleteFull(out suc,db);
@@ -393,7 +396,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
             if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Messages).Load();
-            foreach (var i in this.Messages)
+            foreach (var i in this.Messages.ToList())
             {
                 i.DeleteContent = true;
                 i.RecordId = null;
@@ -410,12 +413,15 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         //удаление со стены(если является фотографией) из новостей и тд и полное удаление если обычная запись(не фото)
+        //с валидацией
         public  Record DeleteWall(out bool success)
         {
             //Record res = null;
             var check_id = ApplicationUser.GetUserId();
             success = false;
-
+            this.TryDeleteFull(out success);
+            if (!success)
+                return this;
             using (ApplicationDbContext db = new ApplicationDbContext())
             {
                 db.Set<Record>().Attach(this);

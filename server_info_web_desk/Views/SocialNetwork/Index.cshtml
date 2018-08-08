@@ -5,3 +5,67 @@
 
 <h2>Index</h2>
 <h1>HELLO THIS INDEX  SocialNetworkController, MEYBE UR NOT LOGGINED</h1>
+
+<script>
+
+    jQuery(document).ready(function () {
+        $("#commentForm").submit(function () { return false; });
+
+        $("#button").on("click", function () {
+
+            var text = $("#text").val();
+            var id_user = $("#id_user").val();
+
+            
+
+                $(".submit").replaceWith("<div class='form_dscr'><p class='sending'>Отправка...</p></div>");
+
+                var form = document.forms.commentForm;
+
+                var formData = new FormData(form);
+
+                var xhr = new XMLHttpRequest();
+                xhr.open("POST", "/SocialNetwork/AddMemePerson");
+
+                xhr.onreadystatechange = function () {
+                    if (xhr.readyState == 4) {
+                        if (xhr.status == 200) {
+                            data = xhr.responseText;
+                            if (data == "true") {
+                                $(".sending").replaceWith("<p>Принято!<p>");
+                            } else {
+                                $(".sending").replaceWith("<p >Ошибка! Обновите страницу...<p>");
+                            }
+                        }
+                    }
+                };
+
+                xhr.send(formData);
+
+
+            
+        });
+    });
+
+
+
+</script>
+
+
+
+<form id="commentForm" class="form" method="post"  enctype="multipart/form-data">
+    <fieldset>
+        <input type="text" id="text" placeholder="text"  name="text">
+        <input id="id_user" type="text" placeholder="id_user:"  name="id_user">
+        
+        <input id="uploadImage" type="file"  name="uploadImage">
+        
+    </fieldset>
+    <input id="button" class="submit" type="submit" value="Отправить" name="submit">
+</form>
+
+
+
+
+
+

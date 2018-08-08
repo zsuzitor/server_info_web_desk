@@ -38,6 +38,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         public List<ApplicationUser> Users { get; set; }
         public List<ApplicationUser> Admins { get; set; }
 
+        public List<Meme> MemeCreated { get; set; }
+
         public List<Album> Albums { get; set; }
         public List<Record> WallRecord { get; set; }//тк есть еще записи которые можно репостить
 
@@ -55,6 +57,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             Admins = new List<ApplicationUser>();
             Albums = new List<Album>();
             WallRecord = new List<Record>();
+            MemeCreated = new List<Meme>();
             //RecordCreated = new List<Record>();
 
         }
@@ -110,7 +113,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             db.Set<Group>().Attach(this);
             if (!db.Entry(this).Collection(x1 => x1.WallRecord).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.WallRecord).Load();
-            foreach (var i in this.WallRecord)
+            foreach (var i in this.WallRecord.ToList())
             {
                 bool suc;
                 i.DeleteFull(out suc, db);
@@ -119,7 +122,7 @@ namespace server_info_web_desk.Models.SocialNetwork
 
             if (!db.Entry(this).Collection(x1 => x1.Albums).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Albums).Load();
-            foreach (var i in this.Albums)
+            foreach (var i in this.Albums.ToList())
             {
                 bool suc;
                 i.DeleteFull(out suc, db);

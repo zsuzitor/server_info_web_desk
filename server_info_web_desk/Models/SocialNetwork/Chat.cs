@@ -116,7 +116,7 @@ namespace server_info_web_desk.Models.SocialNetwork
             db.Set<Chat>().Attach(this);
             if (!db.Entry(this).Collection(x1 => x1.Messages).IsLoaded)
                 db.Entry(this).Collection(x1 => x1.Messages).Load();
-            foreach (var i in this.Messages)
+            foreach (var i in this.Messages.ToList())
             {
                 bool suc;
                 i.DeleteFull(out suc, db);

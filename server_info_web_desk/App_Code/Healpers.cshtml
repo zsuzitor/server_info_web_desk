@@ -233,11 +233,11 @@ if (a != null)
 
         @helper RecordView(Record a,string  user_id,bool action=true)
         {
-        <div class="div_padding_top_10_px">
+        <div id="one_record_all_block_@a.Id" class="div_padding_top_10_px">
             <div class="div_padding_side_10_px div_color_white">
                 
                 <div class="RecordView_mem div_padding_top_10_px" style="position:relative;">
-                    <div id="record_server_message_@a.Id"></div>
+                    <div class="record_server_message_class" id="record_server_message_@a.Id"></div>
                     @*див скрытой кнопки которая будет появляться типо пожаловаться не показывать и тд*@
                     <div class="RecordView_more_all">
                         <div class="RecordView_more_but">
@@ -266,15 +266,22 @@ if (a != null)
                                 {
                                     <p>@a.Description</p>
                                 }
+                                @if (a.DeleteContent)
+                                {
+                                    <div>Контент удален</div>
+                                }
+                                @if (!a.DeleteContent)
+                                {
+                                    if (a.RecordRiposteId != null)
+                                    {
+                                        @Healpers.RecordView(a.RecordRiposte, user_id, false)
+                                    }
+                                    if (a.RecordRiposteId == null)
+                                    {
+                                        @Healpers.Meme(a?.Meme)
+                                    }
+                                }
 
-                                @if (a.RecordRiposteId != null)
-                                {
-                                    @Healpers.RecordView(a.RecordRiposte, user_id, false)
-                                }
-                                @if (a.RecordRiposteId == null)
-                                {
-                                    @Healpers.Meme(a?.Meme)
-                                }
 
 
                                 @*див для отрисовки комментов по клику*@
@@ -324,6 +331,10 @@ if (a != null)
 ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
     <div class="div_padding_top_10_px">
         <div class="div_inline_block">
+            @if (a.DeleteContent==true)
+            {
+                <div>Коммент на который ссылается удален</div>
+            }
             <div title="@prs.Name @prs.Surname" class="small_block_img_short_size_2">
                 <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@prs.PageId">
 
@@ -492,17 +503,23 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                 @Healpers.ImageLink(i)
             }
         </div>
-        @if (a?.Record != null)
+        @if (a?.DeleteContent == true)
         {
+            <div>Контент удален</div>
+        }
+@if (a?.DeleteContent != true&& a?.Record != null)
+{
+        
             <div>
                 @Healpers.Author(a.Record?.User, a.Record?.Group, a.Record.Meme.Birthday)
 
                 @*@Healpers.Meme(a.Meme)*@
-                @Healpers.RecordView(a.Record, null,false)
+                @Healpers.RecordView(a.Record, null, false)
 
             </div>
-        }
-       
+        
+}
+
     </div>
 
 }

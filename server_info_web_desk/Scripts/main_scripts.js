@@ -350,7 +350,22 @@ function delete_record_wall(id) {
         data: dt,
         success: function (data) {
             var div = document.getElementById("record_server_message_" + id);
-            idv.innerHTML = data;
+            if (data == true) {
+                div.style.display = 'block';
+                div.style.position = 'absolute';
+                div.style.width = '100%';
+                div.style.height = '100%';
+                div.innerHTML = "Удалено";
+                div.style.paddingTop = '50%';
+                div.style.fontSize = '40pt';
+                document.getElementById("one_record_all_block_"+id).style.opacity=".5";
+            }
+            else {
+                div.innerHTML = "Произошла ошибка";
+                div.style.position = 'relative';
+                div.style.display = 'block';
+            }
+            
            
         },
         error: function () {
