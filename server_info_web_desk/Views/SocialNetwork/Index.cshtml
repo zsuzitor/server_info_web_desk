@@ -13,13 +13,9 @@
 
         $("#button").on("click", function () {
 
-            var text = $("#text").val();
-            var id_user = $("#id_user").val();
-
             
-
                 $(".submit").replaceWith("<div class='form_dscr'><p class='sending'>Отправка...</p></div>");
-
+            //получаем форму
                 var form = document.forms.commentForm;
 
                 var formData = new FormData(form);
@@ -30,12 +26,9 @@
                 xhr.onreadystatechange = function () {
                     if (xhr.readyState == 4) {
                         if (xhr.status == 200) {
+                            //при возврате actionresult и тд, вернет -"<html>"
                             data = xhr.responseText;
-                            if (data == "true") {
-                                $(".sending").replaceWith("<p>Принято!<p>");
-                            } else {
-                                $(".sending").replaceWith("<p >Ошибка! Обновите страницу...<p>");
-                            }
+                            
                         }
                     }
                 };

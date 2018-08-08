@@ -157,13 +157,13 @@
                 {
 
                     <div>
-                        @using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new { enctype = "multipart/form-data" }))
+                        @using (Html.BeginForm("AddMemePerson", "SocialNetwork", FormMethod.Post, new {id="from_for_load_record_on_wall", enctype = "multipart/form-data" }))
                         {
                             @Html.Hidden("id_user", Model.IdPage)
                             @Html.TextArea("text",new {@class= "class_for_focus_show input_no_border", placeholder="Добавить запись"})
                             <div class="class_for_focus_show_s">
                                 <input class="between_block" type="file" name="uploadImage" multiple="multiple" accept="image/*" />
-                                <input id="twsddd2i" class="twsddd2" type="submit" value="Добавить" />
+                                <input id="from_for_load_record_on_wall_submit"  type="submit" value="Добавить" />
                             </div>
                         }
                         @*@using (Ajax.BeginForm("AddMemePerson", "SocialNetwork", new { enctype = "multipart/form-data" }, new AjaxOptions {

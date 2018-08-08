@@ -539,8 +539,9 @@ namespace server_info_web_desk.Controllers
 
             Record record = Record.AddRecordMem(check_id, id_user, null, list_img_byte, text);
             user.AddRecordWall(record);
-            
-            return RedirectToAction("PersonalRecord", "SocialNetwork",new {id= id_user });
+            record.RecordLoadForView();
+            return PartialView("RecordMemeView",record);
+            //return RedirectToAction("PersonalRecord", "SocialNetwork",new {id= id_user });
            // return PartialView(record);
         }
         [Authorize]
@@ -560,7 +561,11 @@ namespace server_info_web_desk.Controllers
 
             var record=Record.AddRecordMem(check_id,null, id_group, list_img_byte, text);
             group.AddRecordMemeWall(record);
-            return RedirectToAction("GroupRecord", "SocialNetwork",new {id= id_group });
+
+            record.RecordLoadForView();
+            return PartialView("RecordMemeView", record);
+
+            //return RedirectToAction("GroupRecord", "SocialNetwork",new {id= id_group });
         }
 
         [Authorize]
@@ -677,6 +682,11 @@ namespace server_info_web_desk.Controllers
 
             return PartialView(res);
         }
+
+
+        
+
+          
 
 
         [AllowAnonymous]
