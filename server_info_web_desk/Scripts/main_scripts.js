@@ -522,57 +522,7 @@ function ShowImageRecordClose() {
 }
 
 //-------------------------------------PERSON------------------------------------------------
-function PersonalRecord_show_more_imfo() {
-    var div = document.getElementById("PersonalRecord_div_more_imfo");
-    var button = document.getElementById("PersonalRecord_button_more_imfo");
-    
-    if (div.style.display == 'none') {
-        div.style.display = 'block';
-        button.innerHTML = "Скрыть полную информацию";
-    }
-    else {
-        div.style.display = 'none';
-        button.innerHTML = "  Показать полную информацию";
-      
-    }
 
-
-}
-
-
-
-jQuery(document).ready(function () {
-    $("#from_for_load_record_on_wall").submit(function () { return false; });
-
-    $("#from_for_load_record_on_wall_submit").on("click", function () {
-
-
-        //$(".submit").replaceWith("<div class='form_dscr'><p class='sending'>Отправка...</p></div>");
-        ////получаем форму
-        var form = document.getElementById("from_for_load_record_on_wall");
-
-        var formData = new FormData(form);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/SocialNetwork/AddMemePerson");
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    //при возврате actionresult и тд, вернет -"<html>"
-                    data = xhr.responseText;
-                    var dv = document.getElementById("Wall_meme_block_update_id");
-                    dv.innerHTML = data + dv.innerHTML;
-                }
-            }
-        };
-
-        xhr.send(formData);
-
-
-
-    });
-});
 
 
 
@@ -584,44 +534,7 @@ jQuery(document).ready(function () {
 
 
 //-----------------------------------GROUP------------------------------------------------
-function OnComplete_follow_group(data) {
 
-}
-
-
-
-jQuery(document).ready(function () {
-    $("#from_for_load_record_on_wall").submit(function () { return false; });
-
-    $("#from_for_load_record_on_wall_submit").on("click", function () {
-
-
-        //$(".submit").replaceWith("<div class='form_dscr'><p class='sending'>Отправка...</p></div>");
-        ////получаем форму
-        var form = document.getElementById("from_for_load_record_on_wall");
-
-        var formData = new FormData(form);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/SocialNetwork/AddMemeGroup");
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    //при возврате actionresult и тд, вернет -"<html>"
-                    data = xhr.responseText;
-                    var dv = document.getElementById("Wall_meme_block_update_id");
-                    dv.innerHTML = data + dv.innerHTML;
-                }
-            }
-        };
-
-        xhr.send(formData);
-
-
-
-    });
-});
 
 
 
@@ -749,8 +662,16 @@ function OnComplete_SendMessage(data){
 //type 1-закрыто и вне экрана 2-закрыто в области видимости 3-открыто
 var Message_partial_OBJECT = { type:1,timeout_show:null };
 //<div id="OneMessageAllblock_div_id_
+
+//отрисовка результата получения новых сообщений
 function OnComplete_Load_new_messages(data) {
     
+    //учеличиваем количество загруженных сообщений для коректной дозагрузки
+    if (Dialog_OBJECT) {
+        Dialog_OBJECT.start += 1;
+    }
+
+
     if (data.indexOf('<div id="OneMessageAllblock_div_id_') >= 0) {
         //пришли сообщения для этого диалога и их надо вставить
         var div = document.getElementById("Dialog_div_message_id");
@@ -820,7 +741,7 @@ function click_small_partial_dialog() {
 
 var Dialog_OBJECT = { dialog: null, start: 11, count: 10, can_load: true };
 
-function load_more_dialogs() {
+function load_more_messages() {
     if (Dialog_OBJECT.dialog == null) {
         Dialog_OBJECT.dialog = document.getElementById('dialog_id_input_id').value;
        
@@ -833,7 +754,8 @@ function load_more_dialogs() {
 
     var dt = {
         'start': Dialog_OBJECT.start,
-        'count': Dialog_OBJECT.count
+        'count': Dialog_OBJECT.count,
+        'id': Dialog_OBJECT.dialog
     };
     $.ajax({
         url: "/SocialNetwork/ListMessagesUser",
@@ -918,18 +840,18 @@ function OnSuccessLoadGroups(data) {
 
 //--------------------------------------------------------------------MESSAGES DIALOGs------------------------
 
-var Messages_d_OBJECT = {start: 11, count: 10, can_load: true };
+var Dialogs_list_OBJECT = {start: 11, count: 10, can_load: true };
 
 function load_more_dialogs() {
   
-    if (!Messages_d_OBJECT.can_load) {
+    if (!Dialogs_list_OBJECT.can_load) {
         alert("попробуйте позже");
         return;
     }
 
     var dt = {
-        'start': Messages_d_OBJECT.start,
-        'count': Messages_d_OBJECT.count
+        'start': Dialogs_list_OBJECT.start,
+        'count': Dialogs_list_OBJECT.count
     };
     $.ajax({
         url: "/SocialNetwork/DialogListPartial",
@@ -938,13 +860,13 @@ function load_more_dialogs() {
         error: function () {
             alert("ошибка загрузки");
             PreloaderAction(false);
-            Messages_d_OBJECT.can_load = true;
+            Dialogs_list_OBJECT.can_load = true;
         },
-        beforeSend: function () { PreloaderAction(true); Messages_d_OBJECT.can_load = false; },
+        beforeSend: function () { PreloaderAction(true); Dialogs_list_OBJECT.can_load = false; },
         complete: function () {
             PreloaderAction(false);
-            Messages_d_OBJECT.start += Messages_d_OBJECT.count;
-            Messages_d_OBJECT.can_load = true;
+            Dialogs_list_OBJECT.start += Dialogs_list_OBJECT.count;
+            Dialogs_list_OBJECT.can_load = true;
 
         },
         type: 'POST', dataType: 'html'//html
@@ -971,35 +893,6 @@ function OnSuccessLoadDialogs(data) {
 
 //----------------------------------------------------------------------------------------------------------------NEWS-------------------------------------------
 
-jQuery(document).ready(function () {
-    $("#from_for_load_record_on_wall").submit(function () { return false; });
-
-    $("#from_for_load_record_on_wall_submit").on("click", function () {
-
-
-        //$(".submit").replaceWith("<div class='form_dscr'><p class='sending'>Отправка...</p></div>");
-        ////получаем форму
-        var form = document.getElementById("from_for_load_record_on_wall");
-
-        var formData = new FormData(form);
-
-        var xhr = new XMLHttpRequest();
-        xhr.open("POST", "/SocialNetwork/AddMemePerson");
-
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState == 4) {
-                if (xhr.status == 200) {
-                    //при возврате actionresult и тд, вернет -"<html>"
-                    data = xhr.responseText;
-                    var dv = document.getElementById("Wall_meme_block_update_id");
-                    dv.innerHTML = data + dv.innerHTML;
-                }
-            }
-        };
-
-        xhr.send(formData);
 
 
 
-    });
-});

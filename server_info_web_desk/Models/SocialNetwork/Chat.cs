@@ -45,6 +45,31 @@ namespace server_info_web_desk.Models.SocialNetwork
 
 
         }
+
+
+        //TODO имхо СЛИШКОМ медленно будет , можно ускорить если искать с конца пока это сообщение не прочитано
+        public int GetCountNewMessage(string user_id)
+        {
+            int res = 0;
+            var user = ApplicationUser.GetUser(user_id);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Chat>().Attach(this);
+                if (!db.Entry(this).Collection(x2 => x2.Messages).IsLoaded)
+                    db.Entry(this).Collection(x2 => x2.Messages).Load();
+                //this.Messages.
+                foreach (var i in this.Messages)
+                {
+                    if (!db.Entry(i).Collection(x2 => x2.UserNeedRead).IsLoaded)
+                        db.Entry(i).Collection(x2 => x2.UserNeedRead).Load();
+                    if (i.UserNeedRead.Any(x1=>x1.Id== user.Id))
+                        ++res;
+                }
+            }
+
+            return res;
+        }
+
         public ChatShort GetChatShort()
         {
            
@@ -71,6 +96,7 @@ namespace server_info_web_desk.Models.SocialNetwork
                 }
                 res.User = new Models.ApplicationUserShort(last_message?.Creator);
                 res.Text = last_message.Text;
+                res.CountNewMessage = this.GetCountNewMessage(ApplicationUser.GetUserId());
             }
 
            

@@ -574,10 +574,28 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
     <div id="OneChatAllblock_div_id_@a.Id" class="OneChatAllblock_div_class">
         <a class="link_standart_for_div" href="/SocialNetwork/Dialog/@a.Id">
             <div class="div_padding_left_10_px div_padding_top_10_px oneDialogShortInside">
-                <div class="div_inline_block small_img_circle_size_1 block_circle">
-                    @*<div class="block_circle">*@
+                <div class="div_inline_block">
+                    <div class="small_img_circle_size_1 block_circle">
+                        @*<div class="block_circle">*@
                         @Healpers.Image(a.Image, true)
-                    @*</div>*@
+                        @*</div>*@
+                        
+                    </div>
+                    @if (a.CountNewMessage > 0)
+                    {
+                        <div class="Dialog_count_new_message" title="Новых сообщений:">
+                            @if (Convert.ToDouble(a.CountNewMessage) / 1000 > 1)
+                            {
+                            <div>999+</div>
+                            }
+                            @if (Convert.ToDouble(a.CountNewMessage) / 1000 <= 1)
+                            {
+                            <div>@a.CountNewMessage</div>
+                            }
+                            
+                        </div>
+                    }
+                   
                 </div>
                 <div class="div_inline_block one_dialog_line_right">
                     <div>@a.Name</div>
@@ -588,7 +606,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                             <div class="small_img_circle_size_0 block_circle div_inline_block">
                                 @Healpers.Image(a.User.Image, true)
                             </div>
-                            <div class="div_inline_block">
+                            <div class="one_dialog_text_message div_inline_block">
                                 <pre>@a.Text</pre>
                             </div>
                         </div>
@@ -598,9 +616,32 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                         <div>Сообщений на данный момент нет</div>
                     }
 
+
+                   
                 </div>
+
+                
+                
+                
             </div>
         </a>
+        <div class="RecordView_more_all">
+            <div class="RecordView_more_but">
+                <div class="RecordView_more_block" onclick=''>
+                    <div class="cursor_pointer more_info_record_link" onclick="">удалить ваши сообщения</div>
+
+
+                    @*появляется голосовалка где решается удалить ли все полностью*@
+                    <div class="cursor_pointer more_info_record_link" onclick="">запросить полное удаление</div>
+                    <div class="cursor_pointer more_info_record_link" onclick="">скрыть</div>
+                    <div class="cursor_pointer more_info_record_link" onclick="">...</div>
+                    <div class="cursor_pointer more_info_record_link" onclick="">...</div>
+                    <div class="cursor_pointer more_info_record_link" onclick="">...</div>
+
+                </div>
+
+            </div>
+        </div>
         <hr />
     </div>
 

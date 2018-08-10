@@ -6,6 +6,7 @@
 
 
     // Объявление функции, которая хаб вызывает при получении сообщений
+    //сообщение получено обработано и его нужно загрузить всем, кому оно пришло
     chat.client.NeedDownloadChangesMessages = function (id_dialog) {
         //Dialog_div_message_id
         if (isNaN(id_dialog) || id_dialog == undefined || id_dialog == null) {

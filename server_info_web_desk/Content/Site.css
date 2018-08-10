@@ -639,6 +639,7 @@ div.one_message_right{
 }
 div.one_dialog_line_right{
     max-width: 420px;
+    max-height: 100px;
 }
 
 div.OneChatAllblock_div_class{
@@ -648,9 +649,26 @@ div.OneChatAllblock_div_class{
 
 
 /*--------------------------------------------------not -moz not -o*/
+div.Dialog_count_new_message{
+    /*width:50px;*/
+    padding:3px;
+    padding-top:0px;
+    padding-bottom:5px;
+    height:25px;
+    font-size:14pt;
+    text-align:center;
+   
+    /*position:absolute;*/
+    
+     top:85px;
+     background-color: #d1d9e0;
+     border-radius:2px;
+     margin: auto;
+}
 
-
-
+div.one_dialog_text_message{
+    max-width:300px;
+}
 
 
 div.div_for_comments_record_class{
@@ -664,6 +682,7 @@ div.div_for_comments_record_class{
      padding-top:5px;
      height:30px;
      text-align: center;
+     white-space: nowrap;
       }
  div.more_info_record_link:hover{
       background: #e1e5eb;
@@ -671,12 +690,14 @@ div.div_for_comments_record_class{
 
 
 
+ /*блоки используются не только для record, также в диалогах...*/
 div.RecordView_more_all{
      width:30px;
     height:30px;
     position:absolute;
-     left:470px;
-     margin-left:-10px;
+     left:460px;
+     /*margin-left:-10px;*/
+     top:10px;
 }
 div.RecordView_more_but{
     margin-top:10px;
@@ -708,7 +729,7 @@ div.RecordView_more_block{
     /*margin-left:-180px;*/
     float:right;
     margin-top:5px;
-    overflow:hidden;
+    /*overflow:hidden;*/
     background-color:white;
     border-radius:15px;
     display:none;
@@ -718,6 +739,15 @@ div.RecordView_more_block{
     /*visibility:hidden;*/
     
 }
+
+/*-----*/
+
+
+
+
+
+
+
 
 
 div.record_server_message_class{

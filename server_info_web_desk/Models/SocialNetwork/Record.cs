@@ -418,8 +418,8 @@ namespace server_info_web_desk.Models.SocialNetwork
         {
             //Record res = null;
             var check_id = ApplicationUser.GetUserId();
-            success = false;
-            this.TryDeleteFull(out success);
+            success = this.CanDelete();
+            
             if (!success)
                 return this;
             using (ApplicationDbContext db = new ApplicationDbContext())

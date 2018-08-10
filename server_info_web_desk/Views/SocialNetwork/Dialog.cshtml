@@ -8,7 +8,7 @@
     <input type="hidden" id="dialog_id_input_id" value="@Model.Id" />
     <div class="div_inline_block div_content_main_size_2" id="div_content_main_size_2_id">
         <div class="div_padding_left_10_px div_padding_top_10_px">
-            <button onclick="load_more_records()">загрузить</button>
+            <button onclick="load_more_messages()">загрузить</button>
             <div id="Dialog_div_message_id">
                 
                 @Html.Action("ListMessagesUser", "SocialNetwork",new {id=Model.Id, start=0,count=10 })
