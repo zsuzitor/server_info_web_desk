@@ -5,8 +5,23 @@
 }
 
 <div>
+    @*див нужен для размещения ссылки при выходе и диалога, что бы по ней перейти
+    <div id="div_for_rub"></div>*@
+
+
     <input type="hidden" id="dialog_id_input_id" value="@Model.Id" />
-    <div class="div_inline_block div_content_main_size_2" id="div_content_main_size_2_id">
+    <div class="dialog_fixed_menu">
+        <button onclick="delete_select_messages()">удалить</button>
+        <button onclick="">важные</button>
+        <button onclick="">переслать</button>
+        <button onclick="">запросить удаление дилога</button>
+        <button onclick="leave_dialog()">выйти из диалога</button>
+        @*<span>@Html.ActionLink("выйти из диалога123", "LeaveDialog", "SocialNetwork",new { id=123 },new { })</span>*@
+
+        <button onclick="">удалить(односторенне удаление)</button>
+    </div>
+    <div class="div_inline_block div_content_main_size_2 dialog_left_main_block" id="div_content_main_size_2_id">
+        
         <div class="div_padding_left_10_px div_padding_top_10_px">
             <button onclick="load_more_messages()">загрузить</button>
             <div id="Dialog_div_message_id">
@@ -37,6 +52,6 @@
 
 @section scripts{
     @Styles.Render("~/Content/Messages.css")
-
+@Scripts.Render("~/scripts/Dialog.js")
 
 }

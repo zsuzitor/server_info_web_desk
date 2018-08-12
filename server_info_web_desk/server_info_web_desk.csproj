@@ -265,6 +265,7 @@
     <Content Include="App_Code\Healpers.cshtml" />
     <Content Include="Scripts\autoresize.jquery.js" />
     <None Include="Scripts\jquery-3.3.1.intellisense.js" />
+    <Content Include="Scripts\Dialog.js" />
     <Content Include="Scripts\FormAddRecordOnWallPerson.js" />
     <Content Include="Scripts\GroupRecord.js" />
     <Content Include="Scripts\index_info_scripts.js" />

@@ -548,7 +548,7 @@ namespace server_info_web_desk.Models
             }
             foreach (var i in res.Messages)
                 {
-                i.Creator.LoadDataForShort();
+                i.Creator?.LoadDataForShort();
                 }
            
             return res;

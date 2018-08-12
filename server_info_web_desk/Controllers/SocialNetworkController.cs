@@ -113,7 +113,8 @@ namespace server_info_web_desk.Controllers
                 return RedirectToAction("PersonalRecord", "SocialNetwork", new { id = check_id });
 
             var user = ApplicationUser.GetUser(id) ;
-            
+            if(user==null)
+                return RedirectToAction("Login", "Account", new { });
             PersonalRecordView res = new PersonalRecordView(user);
             res.IdUser = check_id;
 
@@ -956,13 +957,52 @@ namespace server_info_web_desk.Controllers
             //    str = success ? "Удалено" : "Что то пошло не так"
             //}));
         }
+
+
+        //[HttpPost]
+        [Authorize]
+        public ActionResult LeaveDialog(int? id)
+        {
+            
+            var chat=Chat.GetChat(id);
+            if (chat == null)
+                return new HttpStatusCodeResult(404);
+
+            chat.LeaveUser(ApplicationUser.GetUserId());
+            return RedirectToAction("Messages", "SocialNetwork", new { });
+        }
+
+
+        [HttpPost]
+        [Authorize]
+        public JsonResult DeleteMessages(int[]mass_id)
+        {
+            List<int> res = new List<int>();
+            for(int i = 0; i < mass_id.Length; ++i)
+            {
+                var mes = Message.GetMessage(mass_id[i]);
+                bool suc = false;
+                mes?.TryDeleteFull(out suc);
+                if (suc)
+                    res.Add(mass_id[i]);
+            }
+
+
+            return Json(res);
+        }
+
+
+
+
+
+
         //удаляет как саму запись так и то что внитри - картинку мем и тд
         //[Authorize]
         //public ActionResult DeleteRecordInside(int id)
         //{
 
 
-        //}
+            //}
         [AllowAnonymous]
         public ActionResult LoadFollowUser(string id, int start, int count)
         {

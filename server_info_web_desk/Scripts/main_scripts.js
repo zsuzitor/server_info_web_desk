@@ -739,51 +739,7 @@ function click_small_partial_dialog() {
 }
 
 
-var Dialog_OBJECT = { dialog: null, start: 11, count: 10, can_load: true };
 
-function load_more_messages() {
-    if (Dialog_OBJECT.dialog == null) {
-        Dialog_OBJECT.dialog = document.getElementById('dialog_id_input_id').value;
-       
-    }
-
-    if (!Dialog_OBJECT.can_load) {
-        alert("попробуйте позже");
-        return;
-    }
-
-    var dt = {
-        'start': Dialog_OBJECT.start,
-        'count': Dialog_OBJECT.count,
-        'id': Dialog_OBJECT.dialog
-    };
-    $.ajax({
-        url: "/SocialNetwork/ListMessagesUser",
-        data: dt,
-        success: OnSuccessLoadDialogsMessages,
-        error: function () {
-            alert("ошибка загрузки");
-            PreloaderAction(false);
-            Dialog_OBJECT.can_load = true;
-        },
-        beforeSend: function () { PreloaderAction(true); Dialog_OBJECT.can_load = false; },
-        complete: function () {
-            PreloaderAction(false);
-            Dialog_OBJECT.start += Dialog_OBJECT.count;
-            Dialog_OBJECT.can_load = true;
-
-        },
-        type: 'POST', dataType: 'html'//html
-    });
-
-
-}
-
-
-function OnSuccessLoadDialogsMessages(data) {
-    var div = document.getElementById("Dialog_div_message_id");
-    div.innerHTML = data + div.innerHTML;
-}
 
 
 

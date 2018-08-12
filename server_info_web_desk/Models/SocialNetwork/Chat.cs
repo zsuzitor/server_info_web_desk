@@ -70,6 +70,21 @@ namespace server_info_web_desk.Models.SocialNetwork
             return res;
         }
 
+        public static Chat GetChat(int? id)
+        {
+
+            Chat res = null;
+            if (id == null)
+                return null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                res = db.Chats.FirstOrDefault(x1 => x1.Id == id);
+            }
+
+            return res;
+        }
+
+
         public ChatShort GetChatShort()
         {
            
@@ -94,7 +109,9 @@ namespace server_info_web_desk.Models.SocialNetwork
                     if (!db.Entry(last_message).Reference(x2 => x2.Creator).IsLoaded)
                         db.Entry(last_message).Reference(x2 => x2.Creator).Load();
                 }
-                res.User = new Models.ApplicationUserShort(last_message?.Creator);
+                if (last_message?.Creator != null)
+
+                    res.User = new Models.ApplicationUserShort(last_message?.Creator);
                 res.Text = last_message.Text;
                 res.CountNewMessage = this.GetCountNewMessage(ApplicationUser.GetUserId());
             }
@@ -114,6 +131,33 @@ namespace server_info_web_desk.Models.SocialNetwork
             return false;
         }
 
+        public bool LeaveUser(string user_id)
+        {
+            bool res = false;
+            //var user = ApplicationUser.GetUser(ApplicationUser.GetUserId());
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Chat>().Attach(this);
+                if (!db.Entry(this).Collection(x2 => x2.Users).IsLoaded)
+                    db.Entry(this).Collection(x2 => x2.Users).Load();
+                var user = this.Users.FirstOrDefault(x1=>x1.Id== ApplicationUser.GetUserId());
+                if (user == null)
+                    return false;
+                this.Users.Remove(user);
+                db.SaveChanges();
+                var message_leave = new Message() { Text=user.Name+" "+ user.Surname + " покинул беседу"
+                    ,ChatId=this.Id };
+                db.Messages.Add(message_leave);
+                db.SaveChanges();
+                foreach (var i in this.Users)
+                    message_leave.UserNeedRead.Add(i);
+                db.SaveChanges();
+
+            }
+
+
+            return res;
+        }
 
         public Chat TryDeleteFull(out bool success, ApplicationDbContext db)
         {

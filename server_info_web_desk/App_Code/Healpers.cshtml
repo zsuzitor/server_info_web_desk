@@ -484,20 +484,37 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 @helper Message(Message a)
         {
     @*div id="OneMessageAllblock_div_id_ должно быть именно так без доп пробелов и тдтд, этот кусок НЕ МЕНЯТЬ*@
-    <div id="OneMessageAllblock_div_id_@a.Id">
-        <div class="div_inline_block small_img_circle_size_1 block_circle">
-            @*<div class="block_circle">*@
+//эта строка будет проверяться(при отрисовки сообщения) через indexof до @a.id поэтому не трогать
+    <div id="OneMessageAllblock_div_id_@a.Id"  class="OneMessageAllblock_div" onclick="click_on_one_message(this)">
+
+       
+            <div class="div_inline_block small_img_circle_size_1 block_circle">
+@if (a.Creator != null)
+{
+                @*<div class="block_circle">*@
                 <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
                     @Healpers.Image(a.Creator.Albums?.ElementAt(0)?.Images.LastOrDefault()?.Image, true)
                 </a>
-                    @*</div>*@
-        </div>
-        <div class="div_inline_block one_message_right">
-            <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
-                @a.Creator.Name @a.Creator.Surname @a.Birthday
-            </a>
-            <div><pre>@a.Text</pre></div>
-</div>
+                @*</div>*@
+                }
+            </div>
+        
+            <div class="div_inline_block one_message_right">
+@if (a.Creator != null)
+{
+                <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
+                    @a.Creator.Name @a.Creator.Surname @a.Birthday
+                </a>
+}
+@if (a.Creator == null)
+{
+    @a.Birthday
+}
+                <div><pre>@a.Text</pre></div>
+            </div>
+       
+
+        
         <div>
             @foreach(var i in a.Images) {
                 @Healpers.ImageLink(i)
@@ -611,11 +628,16 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
                             </div>
                         </div>
                     }
-                    @if (a.User == null)
+                    @if (a.User == null&& a.Text==null)
                     {
                         <div>Сообщений на данный момент нет</div>
                     }
-
+                    @if (a.User == null && a.Text != null)
+                    {
+                        <div class="one_dialog_text_message div_inline_block">
+                            <pre>@a.Text</pre>
+                        </div>
+                    }
 
                    
                 </div>

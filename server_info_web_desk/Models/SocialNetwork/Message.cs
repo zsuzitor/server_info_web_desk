@@ -70,6 +70,22 @@ namespace server_info_web_desk.Models.SocialNetwork
         }
 
 
+
+        public static Message GetMessage(int? id)
+        {
+            
+            Message res = null;
+            if (id == null)
+                return null;
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                res = db.Messages.FirstOrDefault(x1=>x1.Id==id);
+            }
+
+            return res;
+        }
+
+
         public bool CanDelete()
         {
             var check_id = ApplicationUser.GetUserId();

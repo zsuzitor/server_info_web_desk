@@ -671,6 +671,28 @@ div.one_dialog_text_message{
 }
 
 
+div.dialog_fixed_menu{
+         position:fixed;
+         width:510px;
+         height:50px;
+         border:2px solid black;
+         border-radius:10px;
+         /*margin-top:-50px;*/
+     }
+
+
+     div.dialog_left_main_block{
+         padding-top:50px;
+         background-color:white;
+         /*position:relative;*/
+     }
+
+     div.OneMessageAllblock_div:hover{
+         cursor:pointer;
+     }
+
+
+
 div.div_for_comments_record_class{
     overflow-y:auto;
     max-height:320px;
@@ -790,12 +812,7 @@ div.record_server_message_class{
      
 
 
-
-
-
-
-
-
+     
 
 
 
