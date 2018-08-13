@@ -349,6 +349,7 @@
     <Content Include="Views\SocialNetwork\GroupsListPartial.cshtml" />
     <Content Include="Views\SocialNetwork\LoadCommentsRecord.cshtml" />
     <Content Include="Views\SocialNetwork\RecordMemeView.cshtml" />
+    <Content Include="Views\SocialNetwork\SelectFriendsForAddDialog.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

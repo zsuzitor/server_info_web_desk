@@ -904,6 +904,55 @@ namespace server_info_web_desk.Controllers
 
         }
 
+        [Authorize]
+        public ActionResult SelectFriendsFor(int id_dialog, int start, int count, int type)
+        {
+            return PartialView();
+        }
+
+
+
+        //id диалога что бы не показывать людей которые уже там start+ для дозагруки
+        [Authorize]
+        public ActionResult SelectFriendsForAddDialog(int id_dialog, int start, int count,int type)
+        {
+            List<ApplicationUserShort> res = new List<ApplicationUserShort>();
+            ApplicationUser user = null;
+            var dialog = Chat.GetChat(id_dialog);
+            string check_id = ApplicationUser.GetUserId();
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                if (!db.Entry(dialog).Collection(x1 => x1.Users).IsLoaded)
+                    db.Entry(dialog).Collection(x1 => x1.Users).Load();
+                user = dialog.Users.FirstOrDefault(x1 => x1.Id == check_id);
+                if (user == null)
+                    return new HttpStatusCodeResult(404);
+                if (!db.Entry(user).Collection(x1 => x1.Friends).IsLoaded)
+                    db.Entry(user).Collection(x1 => x1.Friends).Load();
+                //TODO join??? + GetPartialList
+                foreach (var i in user.Friends)
+                {
+                    if (!dialog.Users.Any(x1 => x1.Id == i.Id))
+                    {
+                        res.Add(new ApplicationUserShort(i));
+                    }
+
+                }
+
+            }
+
+            return PartialView(res);
+        }
+
+
+        [Authorize]
+        public ActionResult AddUserToDialog(string[] id_users, int id_dialog)
+        {
+
+
+
+            return PartialView();
+        }
 
         [AllowAnonymous]
         public ActionResult LoadFriends(string id,int start, int count)

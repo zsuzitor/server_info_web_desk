@@ -7,7 +7,8 @@ var Dialog_OBJECT = { get_dialog_id:
         return Dialog_OBJECT.dialog_id;
     }
     , dialog_id:document.getElementById('dialog_id_input_id').value,
-    start: 11, count: 10, can_load: true,selected_messages:[] 
+    start: 11, count: 10, can_load: true, selected_messages: [],
+    selected_friends_for_add: []
 };
 
 function load_more_messages() {
@@ -122,7 +123,10 @@ function leave_dialog() {
     var a = document.createElement('a');
     //href="/SocialNetwork/PersonalRecord/dc9defb2-f9a0-44cc-b7ee-2d08b1f2ada6"
     a.setAttribute('href', "/SocialNetwork/LeaveDialog/" + Dialog_OBJECT.get_dialog_id());
-    a.click();
+    a.setAttribute('id', "leave_dialog_link_id");
+    var div = document.getElementById("div_for_rub");
+    div.appendChild(a);
+    document.getElementById("leave_dialog_link_id").click();
 
     //document.getElementById('body')[0].appendChild(a);
 }
@@ -152,3 +156,36 @@ function leave_dialog() {
 
    
 //}
+
+
+
+
+
+
+//добавление новых пользователей в диалог
+
+
+function select_user_for_add_dialog(id) {
+
+    //Dialog_OBJECT.selected_friends_for_add
+    var mes=;
+    var index = 0;
+    var start_length = Dialog_OBJECT.selected_friends_for_add.length;
+    for (; index < start_length; ++index) {
+        if (Dialog_OBJECT.selected_friends_for_add[index] == id) {
+            mes.style.backgroundColor = '#FFFFFF';
+            Dialog_OBJECT.selected_friends_for_add.splice(index, 1)
+            //break;
+            return;
+        }
+    }
+
+    if (index >= start_length) {
+        mes.style.backgroundColor = '#d1d9e0';
+        Dialog_OBJECT.selected_friends_for_add.push(id);
+    }
+
+
+}
+
+

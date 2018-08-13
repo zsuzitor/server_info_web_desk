@@ -127,8 +127,17 @@ namespace server_info_web_desk.Models.SocialNetwork
             var check_id = ApplicationUser.GetUserId();
             if (this.CreatorId == check_id)
                 return true;
+            //var user = ApplicationUser.GetUser(check_id);
+            using (ApplicationDbContext db = new ApplicationDbContext())
+            {
+                db.Set<Chat>().Attach(this);
+                if (!db.Entry(this).Collection(x2 => x2.Users).IsLoaded)
+                    db.Entry(this).Collection(x2 => x2.Users).Load();
+                if (this.Users.Count <= 1 && this.Users.FirstOrDefault(x1 => x1.Id == check_id) != null)
+                    return true;
+            }
 
-            return false;
+                return false;
         }
 
         public bool LeaveUser(string user_id)
@@ -143,8 +152,15 @@ namespace server_info_web_desk.Models.SocialNetwork
                 var user = this.Users.FirstOrDefault(x1=>x1.Id== ApplicationUser.GetUserId());
                 if (user == null)
                     return false;
+                if (this.Users.Count <= 1)
+                {
+                    bool suc = false;
+                    this.DeleteFull(out suc,db);
+                    return suc;
+                }
                 this.Users.Remove(user);
                 db.SaveChanges();
+
                 var message_leave = new Message() { Text=user.Name+" "+ user.Surname + " покинул беседу"
                     ,ChatId=this.Id };
                 db.Messages.Add(message_leave);

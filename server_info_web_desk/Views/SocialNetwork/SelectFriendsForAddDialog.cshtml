@@ -1,0 +1,22 @@
+﻿@model IEnumerable<server_info_web_desk.Models.ApplicationUserShort>
+
+
+
+
+<div>
+
+    @foreach (var i in Model)
+    {
+        <div>
+            <div>
+                @Healpers.UserListItem(i)
+            </div>
+            <div onclick="select_user_for_add_dialog(@i.PageId)">
+
+
+            </div>
+        </div>
+    }
+
+
+</div>

@@ -643,8 +643,10 @@ div.one_dialog_line_right{
 }
 
 div.OneChatAllblock_div_class{
-    max-height:120px;
+    max-height:130px;
     overflow:hidden;
+    overflow: visible;
+    position:relative;
 }
 
 
@@ -720,6 +722,7 @@ div.RecordView_more_all{
      left:460px;
      /*margin-left:-10px;*/
      top:10px;
+     z-index:2;
 }
 div.RecordView_more_but{
     margin-top:10px;
@@ -732,6 +735,7 @@ div.RecordView_more_but{
 }
 div.RecordView_more_all:hover{
     cursor:pointer;
+    z-index:3;
 }
 div.RecordView_more_all:hover div.RecordView_more_block{
     display:block;

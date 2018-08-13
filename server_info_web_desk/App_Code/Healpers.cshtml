@@ -488,7 +488,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
     <div id="OneMessageAllblock_div_id_@a.Id"  class="OneMessageAllblock_div" onclick="click_on_one_message(this)">
 
        
-            <div class="div_inline_block small_img_circle_size_1 block_circle">
+            <div class="div_inline_block small_img_circle_size_1 block_circle" onclick='event.stopPropagation()'>
 @if (a.Creator != null)
 {
                 @*<div class="block_circle">*@
@@ -502,9 +502,11 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
             <div class="div_inline_block one_message_right">
 @if (a.Creator != null)
 {
-                <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
-                    @a.Creator.Name @a.Creator.Surname @a.Birthday
-                </a>
+    <span onclick='event.stopPropagation()'>
+        <a class="link_standart_for_div" href="/SocialNetwork/PersonalRecord/@a.Creator.Id">
+            @a.Creator.Name @a.Creator.Surname @a.Birthday
+        </a>
+    </span>
 }
 @if (a.Creator == null)
 {
@@ -515,7 +517,7 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
        
 
         
-        <div>
+        <div onclick='event.stopPropagation()'>
             @foreach(var i in a.Images) {
                 @Healpers.ImageLink(i)
             }
@@ -527,8 +529,9 @@ ApplicationUserShort prs = new ApplicationUserShort(a.Creator);
 @if (a?.DeleteContent != true&& a?.Record != null)
 {
         
-            <div>
-                @Healpers.Author(a.Record?.User, a.Record?.Group, a.Record.Meme.Birthday)
+            <div onclick='event.stopPropagation()'>
+                @*вроде не нужно*@
+                @*@Healpers.Author(a.Record?.User, a.Record?.Group, a.Record.Meme.Birthday)*@
 
                 @*@Healpers.Meme(a.Meme)*@
                 @Healpers.RecordView(a.Record, null, false)
